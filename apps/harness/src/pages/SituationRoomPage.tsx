@@ -46,6 +46,12 @@ export function SituationRoomPage() {
     const pending = sources.filter(
       (s) => s.status === "draft" || s.status === "pending_review",
     ).length;
+    const trusted = sources.filter(
+      (s) => s.status === "accepted" || s.status === "adjusted",
+    ).length;
+    const reused = sources.filter(
+      (s) => s.first_seen_mission !== missionId,
+    ).length;
     const rejectedHyp = hypotheses.filter((h) => h.status === "Rejected").length;
     const weak = sources.filter(
       (s) => (s.suggestedConfidence ?? s.suggestedWeight ?? 100) < 50,
@@ -59,6 +65,8 @@ export function SituationRoomPage() {
       .length;
     return {
       pending,
+      trusted,
+      reused,
       rejectedHyp,
       weak,
       missingEvidence,
@@ -66,14 +74,15 @@ export function SituationRoomPage() {
       kvkFail,
       blacklisted,
     };
-  }, [sources, hypotheses, observations, companies]);
+  }, [sources, hypotheses, observations, companies, missionId]);
 
   const bars = [
+    { label: "Trusted lists (CARA)", value: metrics.trusted, max: 5 },
+    { label: "Sources (portfolio)", value: sources.length, max: 12 },
     { label: "Observation", value: observations.length, max: 10 },
     { label: "Hypothesis", value: hypotheses.length, max: 8 },
-    { label: "Sources", value: sources.length, max: 12 },
     { label: "Companies", value: companies.length, max: 20 },
-    { label: "CARA", value: reviews.length, max: 10 },
+    { label: "CARA reviews", value: reviews.length, max: 10 },
     { label: "Journal", value: journal.length, max: 10 },
   ];
 
@@ -97,9 +106,24 @@ export function SituationRoomPage() {
       >
         Situation Room
       </h1>
-      <p className="muted">Operational attention — not vanity dashboards.</p>
+      <p className="muted">
+        Fase 0: build a suitable list portfolio first. Reuse proves the method transfers.
+      </p>
 
       {error ? <div className="error">{error}</div> : null}
+
+      <section className="panel" style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0 }}>Source reuse</h2>
+        <p style={{ marginBottom: 0, fontSize: "1.15rem" }}>
+          <strong className="mono">
+            {metrics.reused} van {sources.length}
+          </strong>{" "}
+          sources in deze missie hergebruikt uit eerdere missies
+        </p>
+        <p className="hint">
+          X = first_seen_mission ≠ deze missie. Dat is het generalisatie-bewijs.
+        </p>
+      </section>
 
       <div className="workspace-layout">
         <section className="panel">
@@ -141,6 +165,11 @@ export function SituationRoomPage() {
             <Issue
               label="Needs human review (sources)"
               count={metrics.pending}
+              to={`/missions/${missionId}/cara`}
+            />
+            <Issue
+              label="Trusted lists (accepted/adjusted)"
+              count={metrics.trusted}
               to={`/missions/${missionId}/cara`}
             />
             <Issue

@@ -5,6 +5,7 @@ import type {
   Hypothesis,
   JournalEntry,
   Mission,
+  MissionSource,
   Observation,
   Source,
 } from "@h3-trust/schema";
@@ -29,6 +30,11 @@ export const api = {
   getMission: (id: string) => request<Mission>(`/missions/${id}`),
   createMission: (mission: Mission) =>
     request<Mission>("/missions", { method: "POST", body: JSON.stringify(mission) }),
+  updateMission: (mission: Mission) =>
+    request<Mission>(`/missions/${mission.id}`, {
+      method: "PUT",
+      body: JSON.stringify(mission),
+    }),
   deleteMission: (id: string) =>
     request<{ ok: boolean }>(`/missions/${id}`, { method: "DELETE" }),
   listJournal: (missionId: string) =>
@@ -41,6 +47,21 @@ export const api = {
     request<Source[]>(`/missions/${missionId}/sources`),
   listCompanies: (missionId: string) =>
     request<Company[]>(`/missions/${missionId}/companies`),
+  listLinkableSources: (excludeMissionId: string, q = "") => {
+    const params = new URLSearchParams({
+      excludeMission: excludeMissionId,
+      ...(q ? { q } : {}),
+    });
+    return request<Source[]>(`/sources/linkable?${params}`);
+  },
+  linkSource: (missionId: string, sourceId: string) =>
+    request<{ source: Source; link: MissionSource }>(
+      `/missions/${missionId}/sources/link`,
+      {
+        method: "POST",
+        body: JSON.stringify({ sourceId, producer: "Human" }),
+      },
+    ),
   createInMission: <T>(
     missionId: string,
     collection: Exclude<CollectionName, "missions" | "patterns">,

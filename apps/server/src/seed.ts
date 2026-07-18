@@ -15,6 +15,7 @@ import type {
   Investigation,
   JournalEntry,
   Mission,
+  MissionSource,
   Observation,
   Pattern,
   Review,
@@ -83,6 +84,11 @@ const ids = {
   inv4: "99999999-9999-4999-8999-999999999904",
   inv5: "99999999-9999-4999-8999-999999999905",
   pattern1: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
+  // missionSources
+  msKvK: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+  msGbp: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
+  msAssoc: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
+  msFair: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
 } as const;
 
 const mission: Mission = {
@@ -93,6 +99,21 @@ const mission: Mission = {
   subsector: "Painters (DEMO)",
   goal: "DEMO walkthrough: every pipeline step filled with mock data so you can click through Journal → CARA → Export.",
   notes: "Safe to delete. Re-run `pnpm seed` to reset this mission.",
+  discoveryBrief: {
+    approach:
+      "Fase 0: inventariseer geschikte lijsten voor Haarlemmermeer × schilders (KvK, lokale OV, keurmerken). CARA op sources vóór company deep-check.",
+    candidateListTypes: [
+      "registry",
+      "local_business_association",
+      "quality_mark",
+      "trade_fair",
+    ],
+    successCriteria:
+      "≥3 CARA-accepted/adjusted lists; then rank companies by weighted list coverage.",
+    notes: "Website/positionering = later (fase 2).",
+    producer: "Human",
+    updatedAt: earlier,
+  },
   phases: [
     { key: "observation", status: "done" },
     { key: "hypothesis", status: "done" },
@@ -257,7 +278,8 @@ const hypotheses: Hypothesis[] = [
 const sources: Source[] = [
   {
     id: ids.srcKvK,
-    missionId: ids.mission,
+    first_seen_mission: ids.mission,
+    reused_in_missions: [],
     producer: "Human",
     name: "KvK Handelsregister",
     type: "registry",
@@ -276,7 +298,8 @@ const sources: Source[] = [
   },
   {
     id: ids.srcGbp,
-    missionId: ids.mission,
+    first_seen_mission: ids.mission,
+    reused_in_missions: [],
     producer: "Human",
     name: "Google Business Profile",
     type: "directory",
@@ -294,7 +317,8 @@ const sources: Source[] = [
   },
   {
     id: ids.srcAssoc,
-    missionId: ids.mission,
+    first_seen_mission: ids.mission,
+    reused_in_missions: [],
     producer: "Human",
     name: "Ondernemersvereniging Haarlemmermeer",
     type: "association",
@@ -305,14 +329,16 @@ const sources: Source[] = [
     suggestedConfidence: 78,
     signalIds: [ids.sigAssoc, ids.sigLongevity],
     evidenceIds: [ids.evAssoc],
-    status: "draft",
+    status: "adjusted",
+    notes: "CARA adjusted — still a trusted list for coverage.",
     createdAt: later,
     updatedAt: later,
     v: 1,
   },
   {
     id: ids.srcFair,
-    missionId: ids.mission,
+    first_seen_mission: ids.mission,
+    reused_in_missions: [],
     producer: "Human",
     name: "BouwBeurs deelnemerslijst 2024",
     type: "other",
@@ -323,8 +349,48 @@ const sources: Source[] = [
     suggestedConfidence: 40,
     signalIds: [],
     evidenceIds: [],
-    status: "draft",
+    status: "accepted",
+    notes: "Accepted as weak-but-valid discovery list (low weight).",
     createdAt: later,
+    updatedAt: later,
+    v: 1,
+  },
+];
+
+const missionSources: MissionSource[] = [
+  {
+    id: ids.msKvK,
+    mission_id: ids.mission,
+    source_id: ids.srcKvK,
+    added_at: earlier,
+    producer: "Human",
+    updatedAt: earlier,
+    v: 1,
+  },
+  {
+    id: ids.msGbp,
+    mission_id: ids.mission,
+    source_id: ids.srcGbp,
+    added_at: earlier,
+    producer: "Human",
+    updatedAt: earlier,
+    v: 1,
+  },
+  {
+    id: ids.msAssoc,
+    mission_id: ids.mission,
+    source_id: ids.srcAssoc,
+    added_at: later,
+    producer: "Human",
+    updatedAt: later,
+    v: 1,
+  },
+  {
+    id: ids.msFair,
+    mission_id: ids.mission,
+    source_id: ids.srcFair,
+    added_at: later,
+    producer: "Human",
     updatedAt: later,
     v: 1,
   },
@@ -491,6 +557,7 @@ const companies: Company[] = [
     sector: "Painters",
     kvk_number: "12345678",
     kvk_gate: "pass",
+    // High-weight lists: KvK (95) + OVH (80) = 175 of 215 trusted weight
     source_ids: [ids.srcKvK, ids.srcAssoc],
     list_membership: ["OVH ledenlijst 2024", "Seed registry check"],
     blacklist_flags: [],
@@ -509,7 +576,8 @@ const companies: Company[] = [
     sector: "Painters",
     kvk_number: "87654321",
     kvk_gate: "pass",
-    source_ids: [ids.srcKvK, ids.srcAssoc, ids.srcFair],
+    // Also on 2 trusted lists, but lower weights: OVH (80) + Fair (40) = 120
+    source_ids: [ids.srcAssoc, ids.srcFair],
     list_membership: ["OVH ledenlijst 2024", "BouwBeurs 2024"],
     blacklist_flags: [],
     status: "target",
@@ -768,6 +836,7 @@ async function seed() {
   for (const obs of observations) await store.upsert("observations", obs);
   for (const hyp of hypotheses) await store.upsert("hypotheses", hyp);
   for (const src of sources) await store.upsert("sources", src);
+  for (const ms of missionSources) await store.upsert("missionSources", ms);
   for (const ev of evidence) await store.upsert("evidence", ev);
   for (const sig of signals) await store.upsert("signals", sig);
   for (const conf of confidenceProposals)
@@ -799,6 +868,7 @@ async function seed() {
     observations: observations.length,
     hypotheses: hypotheses.length,
     sources: sources.length,
+    missionSources: missionSources.length,
     evidence: evidence.length,
     signals: signals.length,
     confidenceProposals: confidenceProposals.length,

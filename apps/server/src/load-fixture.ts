@@ -28,6 +28,8 @@ async function main() {
   for (const obs of bundle.observations) await store.upsert("observations", obs);
   for (const hyp of bundle.hypotheses) await store.upsert("hypotheses", hyp);
   for (const src of bundle.sources) await store.upsert("sources", src);
+  for (const ms of bundle.missionSources ?? [])
+    await store.upsert("missionSources", ms);
   for (const co of bundle.companies) await store.upsert("companies", co);
   for (const ev of bundle.evidence) await store.upsert("evidence", ev);
   for (const sig of bundle.signals) await store.upsert("signals", sig);

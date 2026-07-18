@@ -9,8 +9,10 @@ import type {
   Investigation,
   JournalEntry,
   Mission,
+  MissionSource,
   Observation,
   Pattern,
+  Producer,
   Review,
   Signal,
   Source,
@@ -22,6 +24,7 @@ export type EntityMap = {
   observations: Observation;
   hypotheses: Hypothesis;
   sources: Source;
+  missionSources: MissionSource;
   companies: Company;
   evidence: Evidence;
   signals: Signal;
@@ -32,12 +35,17 @@ export type EntityMap = {
   patterns: Pattern;
 };
 
+export type MissionScopedCollection = Exclude<
+  CollectionName,
+  "missions" | "patterns"
+>;
+
 export interface Store {
   listMissions(): Promise<Mission[]>;
   getMission(id: string): Promise<Mission | null>;
   upsertMission(mission: Mission): Promise<Mission>;
 
-  listByMission<K extends Exclude<CollectionName, "missions" | "patterns">>(
+  listByMission<K extends MissionScopedCollection>(
     collection: K,
     missionId: string,
   ): Promise<EntityMap[K][]>;
@@ -54,9 +62,26 @@ export interface Store {
 
   remove(collection: CollectionName, id: string): Promise<boolean>;
 
-  /** Deletes mission JSON and all mission-scoped records. Patterns linked only to this mission are removed. */
+  /** Deletes mission + scoped records; unlinks shared sources (keeps if still used). */
   deleteMission(missionId: string): Promise<boolean>;
 
   listPatterns(): Promise<Pattern[]>;
   exportBundle(missionId: string): Promise<ExportBundle>;
+
+  createSourceInMission(
+    missionId: string,
+    source: Omit<Source, "first_seen_mission" | "reused_in_missions"> &
+      Partial<Pick<Source, "first_seen_mission" | "reused_in_missions">>,
+  ): Promise<Source>;
+
+  linkSourceToMission(
+    missionId: string,
+    sourceId: string,
+    producer?: Producer,
+  ): Promise<{ source: Source; link: MissionSource }>;
+
+  listLinkableSources(
+    excludeMissionId: string,
+    q?: string,
+  ): Promise<Source[]>;
 }

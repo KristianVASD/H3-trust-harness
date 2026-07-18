@@ -1,5 +1,6 @@
 import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 import {
   CollectionNameSchema,
   CompanySchema,
@@ -11,6 +12,7 @@ import {
   InvestigationSchema,
   JournalEntrySchema,
   MissionSchema,
+  MissionSourceSchema,
   ObservationSchema,
   PatternSchema,
   ReviewSchema,
@@ -19,9 +21,12 @@ import {
   type CollectionName,
   type ExportBundle,
   type Mission,
+  type MissionSource,
   type Pattern,
+  type Producer,
+  type Source,
 } from "@h3-trust/schema";
-import type { EntityMap, Store } from "./types.js";
+import type { EntityMap, MissionScopedCollection, Store } from "./types.js";
 
 const schemas = {
   missions: MissionSchema,
@@ -29,6 +34,7 @@ const schemas = {
   observations: ObservationSchema,
   hypotheses: HypothesisSchema,
   sources: SourceSchema,
+  missionSources: MissionSourceSchema,
   companies: CompanySchema,
   evidence: EvidenceSchema,
   signals: SignalSchema,
@@ -41,6 +47,14 @@ const schemas = {
 
 function nowIso(): string {
   return new Date().toISOString();
+}
+
+function missionKey(item: unknown): string | null {
+  if (!item || typeof item !== "object") return null;
+  const o = item as Record<string, unknown>;
+  if (typeof o.missionId === "string") return o.missionId;
+  if (typeof o.mission_id === "string") return o.mission_id;
+  return null;
 }
 
 export class FileStore implements Store {
@@ -86,14 +100,78 @@ export class FileStore implements Store {
     return this.upsert("missions", mission);
   }
 
-  async listByMission<K extends Exclude<CollectionName, "missions" | "patterns">>(
+  async listByMission<K extends MissionScopedCollection>(
     collection: K,
     missionId: string,
   ): Promise<EntityMap[K][]> {
+    if (collection === "sources") {
+      await this.ensureMissionSourceLinks(missionId);
+      return (await this.listSourcesForMission(missionId)) as EntityMap[K][];
+    }
+
     const all = await this.readAll(collection);
     return all
-      .filter((item) => "missionId" in item && item.missionId === missionId)
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+      .filter((item) => missionKey(item) === missionId)
+      .sort((a, b) => {
+        const au =
+          "updatedAt" in a && typeof a.updatedAt === "string"
+            ? a.updatedAt
+            : "added_at" in a && typeof a.added_at === "string"
+              ? a.added_at
+              : "";
+        const bu =
+          "updatedAt" in b && typeof b.updatedAt === "string"
+            ? b.updatedAt
+            : "added_at" in b && typeof b.added_at === "string"
+              ? b.added_at
+              : "";
+        return bu.localeCompare(au);
+      }) as EntityMap[K][];
+  }
+
+  private async listSourcesForMission(missionId: string): Promise<Source[]> {
+    const links = (await this.readAll("missionSources")).filter(
+      (l) => l.mission_id === missionId,
+    );
+    const sources: Source[] = [];
+    for (const link of links) {
+      const source = await this.get("sources", link.source_id);
+      if (source) sources.push(source);
+    }
+    return sources.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  }
+
+  /** Lazy migrate: old owner-missionId sources get a MissionSource row. */
+  private async ensureMissionSourceLinks(missionId: string): Promise<void> {
+    const existing = await this.readAll("missionSources");
+    const linked = new Set(
+      existing
+        .filter((l) => l.mission_id === missionId)
+        .map((l) => l.source_id),
+    );
+
+    const allSources = await this.readAll("sources");
+    for (const source of allSources) {
+      const belongs =
+        source.first_seen_mission === missionId ||
+        source.reused_in_missions.includes(missionId);
+      if (!belongs || linked.has(source.id)) continue;
+
+      const link: MissionSource = {
+        id: randomUUID(),
+        mission_id: missionId,
+        source_id: source.id,
+        added_at: source.createdAt,
+        producer: "ImportedDataset",
+        updatedAt: nowIso(),
+        v: 1,
+      };
+      await this.upsert("missionSources", link);
+      linked.add(source.id);
+    }
+
+    // Also catch raw files that still only have legacy missionId on disk
+    // (preprocess already mapped first_seen_mission on read above).
   }
 
   async get<K extends CollectionName>(
@@ -117,7 +195,7 @@ export class FileStore implements Store {
     const stamped = {
       ...entity,
       updatedAt: nowIso(),
-      v: ("v" in entity ? Number(entity.v) || 1 : 1),
+      v: "v" in entity ? Number(entity.v) || 1 : 1,
     };
     const parsed = schemas[collection].parse(stamped) as EntityMap[K];
     await writeFile(
@@ -137,23 +215,168 @@ export class FileStore implements Store {
     }
   }
 
+  async createSourceInMission(
+    missionId: string,
+    sourceInput: Omit<Source, "first_seen_mission" | "reused_in_missions"> &
+      Partial<Pick<Source, "first_seen_mission" | "reused_in_missions">>,
+  ): Promise<Source> {
+    const source: Source = SourceSchema.parse({
+      ...sourceInput,
+      first_seen_mission: sourceInput.first_seen_mission ?? missionId,
+      reused_in_missions: sourceInput.reused_in_missions ?? [],
+    });
+    const saved = await this.upsert("sources", source);
+    await this.ensureLink(missionId, saved.id, saved.producer, saved.createdAt);
+    return saved;
+  }
+
+  async linkSourceToMission(
+    missionId: string,
+    sourceId: string,
+    producer: Producer = "Human",
+  ): Promise<{ source: Source; link: MissionSource }> {
+    const source = await this.get("sources", sourceId);
+    if (!source) {
+      throw new Error(`Source not found: ${sourceId}`);
+    }
+
+    const existing = (await this.readAll("missionSources")).find(
+      (l) => l.mission_id === missionId && l.source_id === sourceId,
+    );
+    if (existing) {
+      return { source, link: existing };
+    }
+
+    const link = await this.ensureLink(
+      missionId,
+      sourceId,
+      producer,
+      nowIso(),
+    );
+
+    let next = source;
+    if (source.first_seen_mission !== missionId) {
+      const reused = new Set(source.reused_in_missions);
+      reused.add(missionId);
+      next = await this.upsert("sources", {
+        ...source,
+        reused_in_missions: [...reused],
+      });
+    }
+
+    return { source: next, link };
+  }
+
+  private async ensureLink(
+    missionId: string,
+    sourceId: string,
+    producer: Producer,
+    addedAt: string,
+  ): Promise<MissionSource> {
+    const existing = (await this.readAll("missionSources")).find(
+      (l) => l.mission_id === missionId && l.source_id === sourceId,
+    );
+    if (existing) return existing;
+
+    const link: MissionSource = {
+      id: randomUUID(),
+      mission_id: missionId,
+      source_id: sourceId,
+      added_at: addedAt,
+      producer,
+      updatedAt: nowIso(),
+      v: 1,
+    };
+    return this.upsert("missionSources", link);
+  }
+
+  async listLinkableSources(
+    excludeMissionId: string,
+    q = "",
+  ): Promise<Source[]> {
+    await this.ensureMissionSourceLinks(excludeMissionId);
+    const linkedIds = new Set(
+      (await this.readAll("missionSources"))
+        .filter((l) => l.mission_id === excludeMissionId)
+        .map((l) => l.source_id),
+    );
+    const needle = q.trim().toLowerCase();
+    const all = await this.readAll("sources");
+    return all
+      .filter((s) => !linkedIds.has(s.id))
+      .filter((s) => {
+        if (!needle) return true;
+        return (
+          s.name.toLowerCase().includes(needle) ||
+          s.category.toLowerCase().includes(needle) ||
+          (s.type?.toLowerCase().includes(needle) ?? false)
+        );
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   async deleteMission(missionId: string): Promise<boolean> {
     const mission = await this.getMission(missionId);
     if (!mission) return false;
+
+    // Migrate legacy owner-links before unlinking/deleting.
+    await this.ensureMissionSourceLinks(missionId);
 
     const investigationIds = new Set(
       (await this.listByMission("investigations", missionId)).map((i) => i.id),
     );
 
+    const links = (await this.readAll("missionSources")).filter(
+      (l) => l.mission_id === missionId,
+    );
+    const linkedSourceIds = links.map((l) => l.source_id);
+
     const scoped = CollectionNameSchema.options.filter(
-      (name) => name !== "missions" && name !== "patterns",
-    ) as Exclude<CollectionName, "missions" | "patterns">[];
+      (name) =>
+        name !== "missions" &&
+        name !== "patterns" &&
+        name !== "sources" &&
+        name !== "missionSources",
+    ) as Exclude<
+      CollectionName,
+      "missions" | "patterns" | "sources" | "missionSources"
+    >[];
 
     for (const collection of scoped) {
       const items = await this.listByMission(collection, missionId);
       for (const item of items) {
         await this.remove(collection, item.id);
       }
+    }
+
+    for (const link of links) {
+      await this.remove("missionSources", link.id);
+    }
+
+    const remainingLinks = await this.readAll("missionSources");
+    for (const sourceId of linkedSourceIds) {
+      const still = remainingLinks.filter((l) => l.source_id === sourceId);
+      if (still.length === 0) {
+        await this.remove("sources", sourceId);
+        continue;
+      }
+      const source = await this.get("sources", sourceId);
+      if (!source) continue;
+
+      let first = source.first_seen_mission;
+      let reused = source.reused_in_missions.filter((m) => m !== missionId);
+      if (first === missionId) {
+        const ordered = [...still].sort((a, b) =>
+          a.added_at.localeCompare(b.added_at),
+        );
+        first = ordered[0]!.mission_id;
+        reused = ordered.slice(1).map((l) => l.mission_id);
+      }
+      await this.upsert("sources", {
+        ...source,
+        first_seen_mission: first,
+        reused_in_missions: reused,
+      });
     }
 
     for (const pattern of await this.listPatterns()) {
@@ -189,12 +412,15 @@ export class FileStore implements Store {
       throw new Error(`Mission not found: ${missionId}`);
     }
 
+    await this.ensureMissionSourceLinks(missionId);
+
     const [
       investigations,
       observations,
       evidence,
       hypotheses,
       sources,
+      missionSources,
       companies,
       signals,
       confidenceProposals,
@@ -207,6 +433,7 @@ export class FileStore implements Store {
       this.listByMission("evidence", missionId),
       this.listByMission("hypotheses", missionId),
       this.listByMission("sources", missionId),
+      this.listByMission("missionSources", missionId),
       this.listByMission("companies", missionId),
       this.listByMission("signals", missionId),
       this.listByMission("confidenceProposals", missionId),
@@ -228,6 +455,7 @@ export class FileStore implements Store {
       evidence,
       hypotheses,
       sources,
+      missionSources,
       companies,
       signals,
       confidenceProposals,

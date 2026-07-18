@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import {
   SOURCE_CATEGORIES,
+  computeListCoverage,
   type Company,
   type CompanyStatus,
   type KvkGate,
@@ -37,16 +38,25 @@ export function CompaniesPanel({
   const [blacklistDraft, setBlacklistDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const filtered = useMemo(
-    () =>
+  const filtered = useMemo(() => {
+    const base =
       filter === "all"
         ? companies
-        : companies.filter((c) => c.status === filter),
-    [companies, filter],
-  );
+        : companies.filter((c) => c.status === filter);
+    return [...base].sort((a, b) => {
+      const ca = computeListCoverage(a, sources).score;
+      const cb = computeListCoverage(b, sources).score;
+      return cb - ca;
+    });
+  }, [companies, filter, sources]);
 
   const selected =
     companies.find((c) => c.id === selectedId) ?? filtered[0] ?? null;
+
+  const coverage = useMemo(
+    () => (selected ? computeListCoverage(selected, sources) : null),
+    [selected, sources],
+  );
 
   const linkedSources = useMemo(() => {
     if (!selected) return [];
@@ -132,6 +142,12 @@ export function CompaniesPanel({
                 <StatusChip label={c.status} tone="active" />
               </header>
               <p className="muted">
+                coverage{" "}
+                {(() => {
+                  const cov = computeListCoverage(c, sources);
+                  return `${cov.onCount}/${cov.totalCount} · ${cov.score}%`;
+                })()}
+                {" · "}
                 kvk_gate · {c.kvk_gate}
                 {c.kvk_number ? ` · ${c.kvk_number}` : ""}
               </p>
@@ -165,7 +181,27 @@ export function CompaniesPanel({
               ) : null}
             </div>
 
-            <h4 style={{ marginBottom: "0.35rem" }}>List membership</h4>
+            <h4 style={{ marginBottom: "0.35rem" }}>Weighted list coverage</h4>
+            {coverage ? (
+              <>
+                <p style={{ marginTop: 0 }}>
+                  <strong>
+                    {coverage.onCount} of {coverage.totalCount}
+                  </strong>{" "}
+                  trusted lists · weight{" "}
+                  <strong>
+                    {coverage.coveredWeight}/{coverage.totalWeight}
+                  </strong>{" "}
+                  ({coverage.score}%)
+                </p>
+                <p className="hint">{coverage.explanation}</p>
+                <p className="muted">
+                  Same list-count can rank differently when list weights differ.
+                </p>
+              </>
+            ) : null}
+
+            <h4 style={{ marginBottom: "0.35rem" }}>List membership labels</h4>
             <p>
               {selected.list_membership.length
                 ? selected.list_membership.join(", ")
@@ -348,8 +384,9 @@ function CompanyBulkImport({
         }
         const created = await api.createInMission(missionId, "sources", {
           id: uuid(),
-          missionId,
           producer: "Human" as const,
+          first_seen_mission: missionId,
+          reused_in_missions: [],
           name: newSourceName.trim(),
           type: "association" as const,
           category: newCategory,

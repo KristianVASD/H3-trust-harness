@@ -31,6 +31,17 @@ export const MissionPhaseSchema = z.enum([
 ]);
 export type MissionPhase = z.infer<typeof MissionPhaseSchema>;
 
+/** How we approach this region × sector — Fase 0 thought process. */
+export const DiscoveryBriefSchema = z.object({
+  approach: z.string().default(""),
+  candidateListTypes: z.array(z.string()).default([]),
+  successCriteria: z.string().default(""),
+  notes: z.string().optional(),
+  producer: ProducerSchema.optional(),
+  updatedAt: IsoDateSchema.optional(),
+});
+export type DiscoveryBrief = z.infer<typeof DiscoveryBriefSchema>;
+
 export const MissionSchema = z.object({
   id: z.string().uuid(),
   location: z.string().min(1),
@@ -39,6 +50,11 @@ export const MissionSchema = z.object({
   subsector: z.string().min(1),
   goal: z.string().min(1),
   notes: z.string().optional(),
+  discoveryBrief: DiscoveryBriefSchema.default({
+    approach: "",
+    candidateListTypes: [],
+    successCriteria: "",
+  }),
   phases: z.array(
     z.object({
       key: MissionPhaseSchema,
@@ -126,8 +142,16 @@ export type SourceCategory = z.infer<typeof SourceCategorySchema>;
 
 export const SOURCE_CATEGORIES = SourceCategorySchema.options;
 
-export const SourceSchema = z.object({
-  ...baseMeta,
+const sourceObjectSchema = z.object({
+  id: z.string().uuid(),
+  producer: ProducerSchema,
+  createdAt: IsoDateSchema,
+  updatedAt: IsoDateSchema,
+  v: z.number().int().positive().default(1),
+  /** Mission where this list was first catalogued (not ownership). */
+  first_seen_mission: z.string().uuid(),
+  /** Other missions that linked this source (excludes first_seen_mission). */
+  reused_in_missions: z.array(z.string().uuid()).default([]),
   name: z.string().min(1),
   type: SourceTypeSchema,
   /** Migrates missing values to digital_presence on parse. */
@@ -140,8 +164,38 @@ export const SourceSchema = z.object({
   evidenceIds: z.array(z.string().uuid()).default([]),
   status: SourceStatusSchema.default("draft"),
   notes: z.string().optional(),
+  /** Legacy owner field — stripped after migrate. */
+  missionId: z.string().uuid().optional(),
 });
+
+/** Source is a reusable catalogue entity; missions link via MissionSource. */
+export const SourceSchema = z.preprocess((raw) => {
+  if (!raw || typeof raw !== "object") return raw;
+  const o = { ...(raw as Record<string, unknown>) };
+  if (
+    (o.first_seen_mission == null || o.first_seen_mission === "") &&
+    typeof o.missionId === "string"
+  ) {
+    o.first_seen_mission = o.missionId;
+  }
+  if (!Array.isArray(o.reused_in_missions)) {
+    o.reused_in_missions = [];
+  }
+  return o;
+}, sourceObjectSchema.transform(({ missionId: _legacy, ...rest }) => rest));
 export type Source = z.infer<typeof SourceSchema>;
+
+/** Join: which missions use which catalogue Source. */
+export const MissionSourceSchema = z.object({
+  id: z.string().uuid(),
+  mission_id: z.string().uuid(),
+  source_id: z.string().uuid(),
+  added_at: IsoDateSchema,
+  producer: ProducerSchema,
+  updatedAt: IsoDateSchema.optional(),
+  v: z.number().int().positive().default(1),
+});
+export type MissionSource = z.infer<typeof MissionSourceSchema>;
 
 export const KvkGateSchema = z.enum(["pass", "fail", "unchecked"]);
 export type KvkGate = z.infer<typeof KvkGateSchema>;
@@ -305,6 +359,7 @@ export const ExportBundleSchema = z.object({
   evidence: z.array(EvidenceSchema),
   hypotheses: z.array(HypothesisSchema),
   sources: z.array(SourceSchema),
+  missionSources: z.array(MissionSourceSchema).default([]),
   companies: z.array(CompanySchema),
   signals: z.array(SignalSchema),
   confidenceProposals: z.array(ConfidenceProposalSchema),
@@ -321,6 +376,7 @@ export const CollectionNameSchema = z.enum([
   "observations",
   "hypotheses",
   "sources",
+  "missionSources",
   "companies",
   "evidence",
   "signals",
@@ -333,3 +389,4 @@ export const CollectionNameSchema = z.enum([
 export type CollectionName = z.infer<typeof CollectionNameSchema>;
 
 export * from "./agent-contracts";
+export * from "./list-coverage";

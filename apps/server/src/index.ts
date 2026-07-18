@@ -7,6 +7,8 @@ import {
   CollectionNameSchema,
   type CollectionName,
   type Mission,
+  type Producer,
+  type Source,
 } from "@h3-trust/schema";
 import { FileStore } from "@h3-trust/store";
 
@@ -59,9 +61,60 @@ app.delete("/api/missions/:id", async (c) => {
   return c.json({ ok: true });
 });
 
+/** Create a new catalogue Source and link it to this mission. */
+app.post("/api/missions/:missionId/sources", async (c) => {
+  const missionId = c.req.param("missionId");
+  const body = await c.req.json();
+  try {
+    const saved = await store.createSourceInMission(missionId, body as Source);
+    return c.json(saved, 201);
+  } catch (err) {
+    return c.json(
+      { error: err instanceof Error ? err.message : "Create source failed" },
+      400,
+    );
+  }
+});
+
+/** Link an existing Source into this mission (reuse). */
+app.post("/api/missions/:missionId/sources/link", async (c) => {
+  const missionId = c.req.param("missionId");
+  const body = await c.req.json();
+  const sourceId = body.sourceId as string | undefined;
+  if (!sourceId) {
+    return c.json({ error: "sourceId required" }, 400);
+  }
+  try {
+    const result = await store.linkSourceToMission(
+      missionId,
+      sourceId,
+      (body.producer as Producer | undefined) ?? "Human",
+    );
+    return c.json(result, 201);
+  } catch (err) {
+    return c.json(
+      { error: err instanceof Error ? err.message : "Link failed" },
+      400,
+    );
+  }
+});
+
+app.get("/api/sources/linkable", async (c) => {
+  const excludeMission = c.req.query("excludeMission");
+  if (!excludeMission) {
+    return c.json({ error: "excludeMission required" }, 400);
+  }
+  const q = c.req.query("q") ?? "";
+  const items = await store.listLinkableSources(excludeMission, q);
+  return c.json(items);
+});
+
 const missionCollections = CollectionNameSchema.options.filter(
-  (name) => name !== "missions" && name !== "patterns",
-) as Exclude<CollectionName, "missions" | "patterns">[];
+  (name) =>
+    name !== "missions" &&
+    name !== "patterns" &&
+    name !== "sources",
+) as Exclude<CollectionName, "missions" | "patterns" | "sources">[];
 
 for (const collection of missionCollections) {
   app.get(`/api/missions/:missionId/${collection}`, async (c) => {
@@ -71,7 +124,13 @@ for (const collection of missionCollections) {
 
   app.post(`/api/missions/:missionId/${collection}`, async (c) => {
     const body = await c.req.json();
-    if (body.missionId !== c.req.param("missionId")) {
+    const missionId = c.req.param("missionId");
+    // missionSources use mission_id; others use missionId
+    if (collection === "missionSources") {
+      if (body.mission_id !== missionId) {
+        return c.json({ error: "mission_id mismatch" }, 400);
+      }
+    } else if (body.missionId !== missionId) {
       return c.json({ error: "missionId mismatch" }, 400);
     }
     const saved = await store.upsert(collection, body);
@@ -92,6 +151,26 @@ for (const collection of missionCollections) {
     return c.json({ ok });
   });
 }
+
+// Sources PUT/DELETE (catalogue entity — not mission-prefixed create)
+app.put("/api/sources/:id", async (c) => {
+  const body = await c.req.json();
+  if (body.id !== c.req.param("id")) {
+    return c.json({ error: "ID mismatch" }, 400);
+  }
+  const saved = await store.upsert("sources", body);
+  return c.json(saved);
+});
+
+app.delete("/api/sources/:id", async (c) => {
+  const ok = await store.remove("sources", c.req.param("id"));
+  return c.json({ ok });
+});
+
+app.get("/api/missions/:missionId/sources", async (c) => {
+  const items = await store.listByMission("sources", c.req.param("missionId"));
+  return c.json(items);
+});
 
 app.get("/api/patterns", async (c) => {
   return c.json(await store.listPatterns());

@@ -144,13 +144,15 @@ export function WorkspacePage() {
               />
             ))}
           </div>
+
+          <DiscoveryBriefPanel mission={mission} onSaved={reload} />
         </>
       ) : null}
 
       <div className="workspace">
         <nav className="side-nav panel">
           <p className="hint" style={{ marginBottom: "0.5rem" }}>
-            Investigation Workspace
+            Fase 0: lists first, then companies
           </p>
           {(
             [
@@ -187,7 +189,8 @@ export function WorkspacePage() {
           <div className="panel" style={{ gridColumn: "1 / -1" }}>
             <h2>Companies</h2>
             <p className="hint">
-              Candidates, targets, and staged finds. KvK gate is hard — not a weighted score.
+              Rank by weighted list coverage (trusted lists × their weights). Website deep-check
+              is later — after the portfolio is solid.
             </p>
             <CompaniesPanel
               missionId={missionId}
@@ -210,7 +213,8 @@ export function WorkspacePage() {
               {tab === "journal" && "Notes and tasks. Producer stamped on every entry."}
               {tab === "observations" && "Facts only — no judgement, no score."}
               {tab === "hypotheses" && "Ideas under test. Rejected ones stay — that is knowledge."}
-              {tab === "sources" && "Discovery list. Suggested weight is not a decision."}
+              {tab === "sources" &&
+                "Suitable lists for this region × sector. Weight matters — validate via CARA."}
             </p>
 
             {tab === "journal" && <JournalList items={journal} />}
@@ -218,11 +222,13 @@ export function WorkspacePage() {
             {tab === "hypotheses" && (
               <HypothesisList items={hypotheses} onChanged={reload} />
             )}
-            {tab === "sources" && <SourceList items={sources} />}
+            {tab === "sources" && (
+              <SourceList items={sources} missionId={missionId} />
+            )}
           </section>
 
           <section className="panel">
-            <h2>Add</h2>
+            <h2>{tab === "sources" ? "Add or link" : "Add"}</h2>
             <p className="hint">Writes as Producer · Human (OmegaClaw later).</p>
             {tab === "journal" && (
               <JournalForm missionId={missionId} onSaved={reload} />
@@ -234,7 +240,11 @@ export function WorkspacePage() {
               <HypothesisForm missionId={missionId} onSaved={reload} />
             )}
             {tab === "sources" && (
-              <SourceForm missionId={missionId} onSaved={reload} />
+              <>
+                <SourceForm missionId={missionId} onSaved={reload} />
+                <hr style={{ margin: "1.25rem 0", borderColor: "var(--line)" }} />
+                <LinkSourceForm missionId={missionId} onSaved={reload} />
+              </>
             )}
           </section>
         </div>
@@ -346,33 +356,151 @@ function HypothesisList({
   );
 }
 
-function SourceList({ items }: { items: Source[] }) {
+function DiscoveryBriefPanel({
+  mission,
+  onSaved,
+}: {
+  mission: Mission;
+  onSaved: () => Promise<void>;
+}) {
+  const brief = mission.discoveryBrief ?? {
+    approach: "",
+    candidateListTypes: [] as string[],
+    successCriteria: "",
+  };
+  const [approach, setApproach] = useState(brief.approach);
+  const [listTypes, setListTypes] = useState(
+    brief.candidateListTypes.join(", "),
+  );
+  const [successCriteria, setSuccessCriteria] = useState(
+    brief.successCriteria,
+  );
+  const [notes, setNotes] = useState(brief.notes ?? "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const b = mission.discoveryBrief;
+    setApproach(b?.approach ?? "");
+    setListTypes((b?.candidateListTypes ?? []).join(", "));
+    setSuccessCriteria(b?.successCriteria ?? "");
+    setNotes(b?.notes ?? "");
+  }, [mission]);
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const now = new Date().toISOString();
+      await api.updateMission({
+        ...mission,
+        discoveryBrief: {
+          approach,
+          candidateListTypes: listTypes
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          successCriteria,
+          notes: notes || undefined,
+          producer: "Human",
+          updatedAt: now,
+        },
+        updatedAt: now,
+      });
+      await onSaved();
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="panel" style={{ marginTop: "1rem" }}>
+      <h2 style={{ marginTop: 0 }}>Discovery Brief</h2>
+      <p className="hint">
+        How we attack this region × sector — suitable list types before company deep-check.
+      </p>
+      <form className="form-stack" onSubmit={(e) => void save(e)}>
+        <label>
+          Approach
+          <textarea
+            value={approach}
+            onChange={(e) => setApproach(e.target.value)}
+            placeholder="e.g. Start with KvK + local association; then sector quality marks…"
+            style={{ minHeight: "4rem" }}
+          />
+        </label>
+        <label>
+          Candidate list types (comma-separated)
+          <input
+            value={listTypes}
+            onChange={(e) => setListTypes(e.target.value)}
+            placeholder="registry, local_business_association, quality_mark"
+          />
+        </label>
+        <label>
+          Success criteria
+          <input
+            value={successCriteria}
+            onChange={(e) => setSuccessCriteria(e.target.value)}
+            placeholder="≥5 CARA-accepted lists before company deep-check"
+          />
+        </label>
+        <label>
+          Notes
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            style={{ minHeight: "3rem" }}
+          />
+        </label>
+        <button className="btn secondary small" type="submit" disabled={saving}>
+          {saving ? "Saving…" : "Save discovery brief"}
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function SourceList({
+  items,
+  missionId,
+}: {
+  items: Source[];
+  missionId: string;
+}) {
   if (!items.length) return <div className="empty">No sources yet.</div>;
   return (
     <div className="list">
-      {items.map((item) => (
-        <article key={item.id} className="item">
-          <header>
-            <h4>
-              {item.name}{" "}
-              <span className="muted">({item.type})</span>
-            </h4>
-            <ProducerBadge producer={item.producer} />
-          </header>
-          {item.reason ? <p>{item.reason}</p> : null}
-          <div className="mission-meta">
-            <StatusChip label={item.category} tone="active" />
-            <StatusChip label={item.status} tone="waiting" />
-            {item.suggestedConfidence != null ? (
-              <StatusChip label={`suggested ${item.suggestedConfidence}`} />
-            ) : null}
-            {item.suggestedWeight != null ? (
-              <StatusChip label={`weight ${item.suggestedWeight}`} />
-            ) : null}
-          </div>
-          {item.url ? <p className="mono">{item.url}</p> : null}
-        </article>
-      ))}
+      {items.map((item) => {
+        const reused = item.first_seen_mission !== missionId;
+        return (
+          <article key={item.id} className="item">
+            <header>
+              <h4>
+                {item.name}{" "}
+                <span className="muted">({item.type})</span>
+              </h4>
+              <ProducerBadge producer={item.producer} />
+            </header>
+            {item.reason ? <p>{item.reason}</p> : null}
+            <div className="mission-meta">
+              <StatusChip label={item.category} tone="active" />
+              <StatusChip label={item.status} tone="waiting" />
+              {reused ? (
+                <StatusChip label="hergebruikt" tone="active" />
+              ) : (
+                <StatusChip label="first seen here" />
+              )}
+              {item.suggestedConfidence != null ? (
+                <StatusChip label={`suggested ${item.suggestedConfidence}`} />
+              ) : null}
+              {item.suggestedWeight != null ? (
+                <StatusChip label={`weight ${item.suggestedWeight}`} />
+              ) : null}
+            </div>
+            {item.url ? <p className="mono">{item.url}</p> : null}
+          </article>
+        );
+      })}
     </div>
   );
 }
@@ -563,8 +691,9 @@ function SourceForm({
     const now = new Date().toISOString();
     await api.createInMission(missionId, "sources", {
       id: uuid(),
-      missionId,
       producer: "Human" as const,
+      first_seen_mission: missionId,
+      reused_in_missions: [],
       name,
       type,
       category,
@@ -587,6 +716,7 @@ function SourceForm({
 
   return (
     <form className="form-stack" onSubmit={submit}>
+      <h3 style={{ margin: "0 0 0.5rem", fontSize: "1rem" }}>New source</h3>
       <label>
         Source name
         <input value={name} onChange={(e) => setName(e.target.value)} required />
@@ -644,6 +774,109 @@ function SourceForm({
       </label>
       <button className="btn" type="submit">
         Add source
+      </button>
+    </form>
+  );
+}
+
+function LinkSourceForm({
+  missionId,
+  onSaved,
+}: {
+  missionId: string;
+  onSaved: () => Promise<void>;
+}) {
+  const [q, setQ] = useState("");
+  const [candidates, setCandidates] = useState<Source[]>([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const search = useCallback(async () => {
+    try {
+      setError(null);
+      const items = await api.listLinkableSources(missionId, q);
+      setCandidates(items);
+      if (items.length && !items.some((s) => s.id === selectedId)) {
+        setSelectedId(items[0]!.id);
+      }
+      if (!items.length) setSelectedId("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Search failed");
+    }
+  }, [missionId, q, selectedId]);
+
+  useEffect(() => {
+    void search();
+  }, [missionId]); // initial load only
+
+  async function link(e: FormEvent) {
+    e.preventDefault();
+    if (!selectedId) return;
+    setBusy(true);
+    try {
+      await api.linkSource(missionId, selectedId);
+      setQ("");
+      await onSaved();
+      await search();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Link failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form className="form-stack" onSubmit={(e) => void link(e)}>
+      <h3 style={{ margin: "0 0 0.5rem", fontSize: "1rem" }}>
+        Link existing source
+      </h3>
+      <p className="hint">
+        Reuse a list from another mission (e.g. KvK, regional association).
+      </p>
+      <label>
+        Search name / category
+        <div className="row" style={{ gap: "0.5rem" }}>
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="KvK, association…"
+            style={{ flex: 1 }}
+          />
+          <button
+            className="btn secondary small"
+            type="button"
+            onClick={() => void search()}
+          >
+            Search
+          </button>
+        </div>
+      </label>
+      <label>
+        Source from other missions
+        <select
+          value={selectedId}
+          onChange={(e) => setSelectedId(e.target.value)}
+          disabled={!candidates.length}
+        >
+          {!candidates.length ? (
+            <option value="">No linkable sources</option>
+          ) : (
+            candidates.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} · {s.category} · w{s.suggestedWeight ?? "—"}
+              </option>
+            ))
+          )}
+        </select>
+      </label>
+      {error ? <div className="error">{error}</div> : null}
+      <button
+        className="btn secondary"
+        type="submit"
+        disabled={busy || !selectedId}
+      >
+        {busy ? "Linking…" : "Link to this mission"}
       </button>
     </form>
   );

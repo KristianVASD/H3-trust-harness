@@ -50,6 +50,14 @@ export function MissionControl() {
         id: uuid(),
         ...form,
         notes: form.notes || undefined,
+        discoveryBrief: {
+          approach: "",
+          candidateListTypes: ["registry", "local_business_association"],
+          successCriteria:
+            "≥5 CARA-accepted/adjusted lists before company deep-check",
+          producer: "Human",
+          updatedAt: now,
+        },
         phases: defaultPhases,
         producer: "Human",
         createdAt: now,
