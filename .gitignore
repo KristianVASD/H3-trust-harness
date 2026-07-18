@@ -1,0 +1,101 @@
+# ======================================================
+# H3 Trust — OmegaClaw Harness
+# ======================================================
+# Source code → Git
+# Runtime data (writable/) → NOT in Git
+# Fixtures / demos → IN Git
+# Secrets / local env → NOT in Git
+# ======================================================
+
+##############################
+# Node / package managers
+##############################
+
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+##############################
+# Build / tooling caches
+##############################
+
+dist/
+build/
+coverage/
+.turbo/
+.vite/
+*.tsbuildinfo
+
+##############################
+# Environment & secrets
+##############################
+
+.env
+.env.*
+!.env.example
+
+##############################
+# IDE
+##############################
+
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+##############################
+# OS
+##############################
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+##############################
+# Runtime investigation data
+# (missions, sources, companies, reviews, exports, …)
+##############################
+
+writable/**
+!writable/.gitkeep
+
+##############################
+# Logs & temp
+##############################
+
+logs/
+*.log
+tmp/
+temp/
+
+##############################
+# Local DBs (future)
+##############################
+
+*.sqlite
+*.sqlite3
+*.db
+
+##############################
+# Supabase local
+##############################
+
+.supabase/
+
+##############################
+# Misc exports / archives
+##############################
+
+*.zip
+*.tar.gz
+
+##############################
+# Cursor / agent caches (local)
+##############################
+
+.cursor-cache/

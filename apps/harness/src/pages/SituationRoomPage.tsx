@@ -1,0 +1,190 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import type {
+  Company,
+  Hypothesis,
+  JournalEntry,
+  Observation,
+  Review,
+  Source,
+} from "@h3-trust/schema";
+import { api } from "../api";
+import { listReviews } from "../api-extra";
+import { StatusChip } from "../components/Badges";
+
+export function SituationRoomPage() {
+  const { missionId = "" } = useParams();
+  const [sources, setSources] = useState<Source[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [observations, setObservations] = useState<Observation[]>([]);
+  const [hypotheses, setHypotheses] = useState<Hypothesis[]>([]);
+  const [journal, setJournal] = useState<JournalEntry[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void Promise.all([
+      api.listSources(missionId),
+      api.listCompanies(missionId),
+      api.listObservations(missionId),
+      api.listHypotheses(missionId),
+      api.listJournal(missionId),
+      listReviews(missionId),
+    ])
+      .then(([s, c, o, h, j, r]) => {
+        setSources(s);
+        setCompanies(c);
+        setObservations(o);
+        setHypotheses(h);
+        setJournal(j);
+        setReviews(r);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : "Load failed"));
+  }, [missionId]);
+
+  const metrics = useMemo(() => {
+    const pending = sources.filter(
+      (s) => s.status === "draft" || s.status === "pending_review",
+    ).length;
+    const rejectedHyp = hypotheses.filter((h) => h.status === "Rejected").length;
+    const weak = sources.filter(
+      (s) => (s.suggestedConfidence ?? s.suggestedWeight ?? 100) < 50,
+    ).length;
+    const missingEvidence = observations.filter(
+      (o) => !o.evidenceUrls.length && !o.evidenceIds.length,
+    ).length;
+    const candidates = companies.filter((c) => c.status === "candidate").length;
+    const kvkFail = companies.filter((c) => c.kvk_gate === "fail").length;
+    const blacklisted = companies.filter((c) => c.blacklist_flags.length > 0)
+      .length;
+    return {
+      pending,
+      rejectedHyp,
+      weak,
+      missingEvidence,
+      candidates,
+      kvkFail,
+      blacklisted,
+    };
+  }, [sources, hypotheses, observations, companies]);
+
+  const bars = [
+    { label: "Observation", value: observations.length, max: 10 },
+    { label: "Hypothesis", value: hypotheses.length, max: 8 },
+    { label: "Sources", value: sources.length, max: 12 },
+    { label: "Companies", value: companies.length, max: 20 },
+    { label: "CARA", value: reviews.length, max: 10 },
+    { label: "Journal", value: journal.length, max: 10 },
+  ];
+
+  return (
+    <div>
+      <div className="row" style={{ marginBottom: "1rem" }}>
+        <Link className="btn secondary small" to={`/missions/${missionId}`}>
+          ← Workspace
+        </Link>
+        <Link className="btn secondary small" to={`/missions/${missionId}/cara`}>
+          CARA Review
+        </Link>
+      </div>
+
+      <h1
+        style={{
+          fontFamily: "var(--font-display)",
+          fontSize: "1.8rem",
+          marginTop: 0,
+        }}
+      >
+        Situation Room
+      </h1>
+      <p className="muted">Operational attention — not vanity dashboards.</p>
+
+      {error ? <div className="error">{error}</div> : null}
+
+      <div className="workspace-layout">
+        <section className="panel">
+          <h2>Phase progress</h2>
+          <div className="list">
+            {bars.map((b) => {
+              const pct = Math.min(100, Math.round((b.value / b.max) * 100));
+              return (
+                <div key={b.label}>
+                  <div className="row" style={{ justifyContent: "space-between" }}>
+                    <strong>{b.label}</strong>
+                    <span className="mono">{b.value}</span>
+                  </div>
+                  <div
+                    style={{
+                      height: 10,
+                      background: "var(--paper-2)",
+                      border: "1px solid var(--line)",
+                      marginTop: 4,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${pct}%`,
+                        height: "100%",
+                        background: "var(--teal)",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="panel">
+          <h2>Needs attention</h2>
+          <div className="list">
+            <Issue
+              label="Needs human review (sources)"
+              count={metrics.pending}
+              to={`/missions/${missionId}/cara`}
+            />
+            <Issue
+              label="Company candidates"
+              count={metrics.candidates}
+              to={`/missions/${missionId}`}
+            />
+            <Issue label="KvK gate fail" count={metrics.kvkFail} />
+            <Issue label="Blacklist flags set" count={metrics.blacklisted} />
+            <Issue label="Rejected hypotheses" count={metrics.rejectedHyp} />
+            <Issue label="Missing evidence on observations" count={metrics.missingEvidence} />
+            <Issue label="Weak suggested confidence" count={metrics.weak} />
+          </div>
+          <div className="mission-meta" style={{ marginTop: "1rem" }}>
+            <StatusChip label={`${sources.length} sources`} tone="active" />
+            <StatusChip label={`${companies.length} companies`} tone="active" />
+            <StatusChip label={`${observations.length} observations`} />
+            <StatusChip label={`${hypotheses.length} hypotheses`} />
+            <StatusChip label={`${reviews.length} reviews`} />
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function Issue({
+  label,
+  count,
+  to,
+}: {
+  label: string;
+  count: number;
+  to?: string;
+}) {
+  const body = (
+    <article className="item">
+      <header>
+        <h4>{label}</h4>
+        <span className="mono" style={{ fontSize: "1.1rem" }}>
+          {count}
+        </span>
+      </header>
+    </article>
+  );
+  return to ? <Link to={to}>{body}</Link> : body;
+}

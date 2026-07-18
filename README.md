@@ -1,0 +1,248 @@
+# H3 Trust — OmegaClaw Harness
+
+> **The Harness never decides.**  
+> It structures investigations, preserves evidence, captures human reasoning, and accumulates validated knowledge.
+
+This is a **Trust Investigation Platform** — not an AI agent, not a trust engine.
+
+| Role | Meaning |
+|------|---------|
+| **Harness** | Investigation environment |
+| **Human** | Investigator (today) |
+| **OmegaClaw** | Investigator (tomorrow) |
+| **CARA** | Human alignment — final validation only |
+
+Every saved record has a **Producer** badge: `Human`, `OmegaClaw`, `ExternalAI`, or `ImportedDataset`. That way you always know *who* wrote which fact, hypothesis, or score suggestion.
+
+---
+
+## Quick start
+
+```powershell
+pnpm install
+pnpm seed
+pnpm dev
+```
+
+- Harness UI: http://localhost:5173  
+- API: http://localhost:8787  
+- API health: http://localhost:8787/api/health  
+
+`pnpm seed` loads the **DEMO** mission into `writable/` (local only — never committed).  
+Maintainers can refresh the committed snapshot with `pnpm fixtures:write`.  
+Reload a fixture with `pnpm fixtures:load`.
+
+Sample bulk-import files: [`fixtures/samples/`](fixtures/samples/).
+
+---
+
+## Design thesis
+
+Human investigators work today. OmegaClaw becomes another investigator tomorrow. Every object carries a **Producer**. OmegaClaw never performs final CARA validation.
+
+You investigate which **sources** and **signals** should count when judging trustworthiness of home-service companies — starting with residential maintenance (painters), later more sectors and geographies.
+
+---
+
+## Repository layout
+
+```
+apps/harness     — Vite + React investigation UI
+apps/server      — Local API (port 8787) + FileStore
+packages/schema  — Shared Zod models + agent contracts
+packages/store   — Store interface + FileStore (JSON on disk)
+fixtures/        — Committed demos + sample imports (IN Git)
+writable/        — Runtime mission data (NOT in Git)
+```
+
+| What | Location | Git? |
+|------|----------|------|
+| Source code | `apps/`, `packages/` | yes |
+| Demo / sample data | `fixtures/` | yes |
+| Live investigations | `writable/` | **no** |
+| Secrets | `.env` | **no** (use `.env.example`) |
+
+Flow:
+
+```text
+Browser (5173)  →  API (8787)  →  writable/*.json on disk
+fixtures/demos  →  pnpm seed / fixtures:load  →  writable/
+```
+
+---
+
+## Investigation pipeline
+
+```text
+Mission
+  → Journal / Tasks
+  → Observations          (facts only — no score)
+  → Hypotheses            (ideas — keep Rejected ones)
+  → Sources               (discovery list + category)
+  → Companies             (candidates / targets / staged)
+  → Signals               (explainable deltas)
+  → Suggested confidence  (proposal, not truth)
+  → CARA Review           (Sources or Companies)
+  → Findings              (validated outcomes)
+  → Export / Knowledge Graph / Situation Room
+```
+
+---
+
+## How to use each screen
+
+### 1. Mission Control — `/`
+
+Start of every investigation.
+
+- See existing missions (after seed: Haarlemmermeer · Painters)
+- Or create a new one: location, country, sector, subsector, goal, notes
+- Click **Open** to enter the workspace
+- Click **Delete** to remove a mission and all its related records (confirm required)
+
+Saves a `Mission` with phase badges (observation, hypothesis, evidence, CARA, …). Early phases are active; company deep-check is stubbed for later.
+
+### 2. Investigation Workspace — `/missions/:id`
+
+Your main research desk (not a chatbot).
+
+| Tab | Meaning | How to use |
+|-----|---------|------------|
+| **Journal** | Notes & tasks | Log what you did / what’s next |
+| **Observations** | Facts only | e.g. “Gemeente site links to ondernemersvereniging” + URL. **No score.** |
+| **Hypotheses** | Claims under test | e.g. “Associations beat commercial directories.” Status: Draft → Testing → Validated / **Rejected** / Archived. Rejected stays — that is knowledge. |
+| **Sources** | Candidate trust sources | KvK, Google Business, local association, etc. Each has a **category** (registry, local_business_association, …). Suggested weight is a **suggestion**, not a decision. |
+| **Companies** | Firms from lists / discovery | Filter candidate / target / staged. Hard **kvk_gate** (pass/fail/unchecked). Link sources, list membership, blacklist flags. Bulk-import paste/CSV. |
+
+Right side: forms to **Add** each of those. Every save is stamped **Producer · Human**.
+
+Top navigation:
+
+- **CARA Review** — human validation  
+- **Signals** — build explainable confidence  
+- **Situation Room** — ops overview  
+- **Knowledge Graph** — browse the chain  
+- **Export investigation** — download full JSON bundle  
+
+**Typical first session:** open seed mission → Companies tab → review seed firms → bulk-import a short list → CARA a company.
+
+### 3. Signals — `/missions/:id/signals`
+
+The reasoning layer.
+
+1. Pick a source (e.g. KvK)  
+2. Add a signal key: `registry`, `longevity`, `association`, …  
+3. Each key has a fixed delta (e.g. longevity +8)  
+4. System recomputes **suggested confidence** from base 50 + sum of deltas  
+5. Explainability panel shows the math in plain text  
+
+Still **not** a final trust score — only a proposal for CARA.
+
+### 4. CARA Review — `/missions/:id/cara`
+
+Human alignment. OmegaClaw must never do this as final authority.
+
+Toggle **Sources** | **Companies**.
+
+1. Pick an item from the queue  
+2. Read suggested confidence (for companies: average of linked sources)  
+3. Choose:  
+   - **Agree** — one click, no reason required  
+   - **Adjust** — set your score + **reason required** (≥ 8 characters)  
+   - **Disagree** — reject + **reason required**  
+
+For **sources**, Agree/Adjust/Disagree also updates source status (`accepted` / `adjusted` / `rejected`).  
+For **companies**, CARA writes Review + Finding only — it does **not** change `candidate` / `target` / `staged` or `kvk_gate`.
+
+You can keep working in Workspace while reviews wait — CARA is not a blocker.
+
+### 5. Situation Room — `/missions/:id/situation`
+
+Operational cockpit:
+
+- Progress bars (observations, hypotheses, sources, companies, CARA, journal)  
+- Attention counts: needs review, company candidates, KvK fail, blacklist flags, rejected hypotheses, missing evidence, weak confidence  
+
+Use it when you ask: “Where should I spend time next?”
+
+### 6. Knowledge Graph — `/missions/:id/graph`
+
+A simple human graph (not Neo4j).
+
+Lists nodes by kind: Mission → Hypothesis → Observation → Source → Company → Review. Click a node to see producer, detail, and id.
+
+Use it to answer: “How did we get to this judgement?”
+
+### 7. Export
+
+From Workspace → **Export investigation**.
+
+Produces a full bundle (mission, observations, hypotheses, sources, signals, reviews, findings, journal, …), downloads it, and writes under `writable/export/`.
+
+That file is what a future OmegaClaw (or another AI) should be able to **reconstruct** the same investigation from.
+
+---
+
+## Where data lives
+
+After seed/use you will see folders like:
+
+```text
+writable/
+  missions/
+  journal/
+  observations/
+  hypotheses/
+  sources/
+  companies/
+  signals/
+  reviews/
+  findings/
+  export/
+```
+
+Each record is one JSON file. You can open them in an editor — the platform is transparent by design.
+
+---
+
+## Who does what
+
+| Step | Human (now) | OmegaClaw (later) |
+|------|-------------|-------------------|
+| Mission | create | suggest only |
+| Journal / observations / hypotheses / sources | write | write same shapes |
+| Signals / suggested confidence | assist | propose |
+| **CARA / final validation** | **yes** | **never** |
+| Pattern promotion | human | propose only |
+
+Today **you are the field researcher**. The UI is already shaped so an agent can fill the same forms later without redesigning screens.
+
+---
+
+## 15-minute walkthrough
+
+1. `pnpm dev` → open http://localhost:5173  
+2. Open **Haarlemmermeer · Painters**  
+3. **Observations** → add one new fact with a URL  
+4. **Hypotheses** → add one claim; set status to Testing  
+5. **Sources** → add e.g. a local association site  
+6. **Signals** → attach `association` to that source; read the explanation  
+7. **CARA** → Agree or Adjust with a real reason  
+8. **Situation Room** → see queue counts move  
+9. **Export** → save the JSON and open it to see your reasoning trail  
+
+If that loop feels natural, the product thesis is working: you ran a trust **investigation**, not a black-box score.
+
+---
+
+## Status: solid vs thin
+
+**Solid now:** Mission Control, Workspace (journal / observations / hypotheses / sources / **companies** + bulk import), Source **category**, Signals + explainability, CARA (sources **and** companies), Situation Room, Knowledge Graph, Export (includes companies), Producer on records, seed mission, local FileStore.
+
+**Thin / next:** Pattern Library promote UI (schema has `PATTERN_MIN_INVESTIGATIONS = 5`), full Investigation Memory screen, richer Evidence tab, Track B fraud / company deep-check phases, live OmegaClaw jobs (API contracts only for now).
+
+---
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE). Part of the H3 Trust / BGI Nexus vision.
