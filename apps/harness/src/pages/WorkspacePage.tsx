@@ -1,94 +1,48 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useOutletContext, useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import {
   DEFAULT_SEARCH_PLAN_VERSION,
   resolveSourceGaps,
-  SOURCE_CATEGORIES,
-  type Company,
   type Hypothesis,
   type HypothesisStatus,
   type JournalEntry,
   type Mission,
   type Observation,
-  type SearchPlan,
   type SearchPlanEntry,
-  type Signal,
   type Source,
-  type SourceCategory,
-  type SourceScope,
-  type SourceType,
 } from "@h3-trust/schema";
 import { api } from "../api";
-import { listSignals } from "../api-extra";
+import type { MissionData } from "../hooks/useMissionData";
 import { CompaniesPanel } from "../components/CompaniesPanel";
 import { ProducerBadge, StatusChip } from "../components/Badges";
 
-type Tab =
-  | "journal"
-  | "observations"
-  | "hypotheses"
-  | "candidates"
-  | "sources"
-  | "companies";
+type Tab = "journal" | "observations" | "hypotheses" | "sources" | "companies";
 
 export function WorkspacePage() {
   const { missionId = "" } = useParams();
-  const [tab, setTab] = useState<Tab>("journal");
-  const [mission, setMission] = useState<Mission | null>(null);
-  const [journal, setJournal] = useState<JournalEntry[]>([]);
-  const [observations, setObservations] = useState<Observation[]>([]);
-  const [hypotheses, setHypotheses] = useState<Hypothesis[]>([]);
-  const [sources, setSources] = useState<Source[]>([]);
-  const [catalogue, setCatalogue] = useState<Source[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [signals, setSignals] = useState<Signal[]>([]);
-  const [searchPlan, setSearchPlan] = useState<SearchPlan | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const data = useOutletContext<MissionData>();
+  const {
+    mission,
+    journal,
+    observations,
+    hypotheses,
+    sources,
+    catalogue,
+    companies,
+    signals,
+    searchPlan,
+    reload,
+  } = data;
 
-  const candidates = useMemo(
-    () => sources.filter((s) => s.status === "candidate"),
+  const [tab, setTab] = useState<Tab>("journal");
+  const [busy, setBusy] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const keptSources = useMemo(
+    () => sources.filter((s) => s.status !== "candidate"),
     [sources],
   );
-
-  const reload = useCallback(async () => {
-    if (!missionId) return;
-    try {
-      setError(null);
-      const [m, j, o, h, s, c, sig, allSrc] = await Promise.all([
-        api.getMission(missionId),
-        api.listJournal(missionId),
-        api.listObservations(missionId),
-        api.listHypotheses(missionId),
-        api.listSources(missionId),
-        api.listCompanies(missionId),
-        listSignals(missionId),
-        api.listAllSources(),
-      ]);
-      setMission(m);
-      setCatalogue(allSrc);
-      setJournal(j);
-      setObservations(o);
-      setHypotheses(h);
-      setSources(s);
-      setCompanies(c);
-      setSignals(sig);
-
-      const planVersion = m.search_plan_version || DEFAULT_SEARCH_PLAN_VERSION;
-      try {
-        setSearchPlan(await api.getSearchPlan(planVersion));
-      } catch {
-        setSearchPlan(await api.getSearchPlan(DEFAULT_SEARCH_PLAN_VERSION));
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load workspace");
-    }
-  }, [missionId]);
-
-  useEffect(() => {
-    void reload();
-  }, [reload]);
 
   async function exportBundle() {
     if (!missionId) return;
@@ -105,88 +59,49 @@ export function WorkspacePage() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Export failed");
+      setLocalError(err instanceof Error ? err.message : "Export failed");
     } finally {
       setBusy(false);
     }
   }
 
-  if (!mission && !error) {
+  if (!mission) {
     return <p className="muted">Loading workspace…</p>;
   }
 
   return (
     <div>
       <div className="row" style={{ marginBottom: "1rem" }}>
-        <Link className="btn secondary small" to="/">
-          ← Mission Control
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/cara`}>
-          CARA Review
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/signals`}>
-          Signals
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/situation`}>
-          Situation Room
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/graph`}>
-          Knowledge Graph
-        </Link>
-        <button className="btn secondary small" type="button" onClick={() => void exportBundle()} disabled={busy}>
+        <div className="mission-meta">
+          <ProducerBadge producer={mission.producer} />
+          <StatusChip label={mission.country} />
+          <StatusChip label={mission.sector} />
+        </div>
+        <button
+          className="btn secondary small"
+          type="button"
+          onClick={() => void exportBundle()}
+          disabled={busy}
+        >
           Export investigation
         </button>
       </div>
 
-      {error ? <div className="error">{error}</div> : null}
+      {localError ? <div className="error">{localError}</div> : null}
 
-      {mission ? (
-        <>
-          <header style={{ marginBottom: "1rem" }}>
-            <h1
-              style={{
-                margin: "0 0 0.35rem",
-                fontFamily: "var(--font-display)",
-                fontSize: "1.8rem",
-              }}
-            >
-              {mission.location} · {mission.subsector}
-            </h1>
-            <p className="muted" style={{ margin: 0 }}>
-              {mission.goal}
-            </p>
-            <div className="mission-meta" style={{ marginTop: "0.75rem" }}>
-              <ProducerBadge producer={mission.producer} />
-              <StatusChip label={mission.country} />
-              <StatusChip label={mission.sector} />
-            </div>
-          </header>
+      <DiscoveryBriefPanel mission={mission} onSaved={reload} />
 
-          <div className="phase-strip">
-            {mission.phases.map((p) => (
-              <StatusChip
-                key={p.key}
-                label={`${p.key} · ${p.status}`}
-                tone={p.status === "active" ? "active" : "waiting"}
-              />
-            ))}
-          </div>
-
-          <DiscoveryBriefPanel mission={mission} onSaved={reload} />
-        </>
-      ) : null}
-
-      <div className="workspace">
+      <div className="workspace" style={{ marginTop: "1rem" }}>
         <nav className="side-nav panel">
           <p className="hint" style={{ marginBottom: "0.5rem" }}>
-            Fase 0: lists first, then companies
+            Fase 0: lists first, then companies. Triage zit op{" "}
+            <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>.
           </p>
           {(
             [
               ["journal", "Journal & tasks"],
               ["observations", "Observations"],
               ["hypotheses", "Hypotheses"],
-              ["candidates", "Kandidatenlijst"],
               ["sources", "Sources"],
               ["companies", "Companies"],
             ] as const
@@ -205,11 +120,9 @@ export function WorkspacePage() {
                     ? observations.length
                     : key === "hypotheses"
                       ? hypotheses.length
-                      : key === "candidates"
-                        ? candidates.length
-                        : key === "sources"
-                          ? sources.length
-                          : companies.length}
+                      : key === "sources"
+                        ? keptSources.length
+                        : companies.length}
               </span>
             </button>
           ))}
@@ -219,8 +132,8 @@ export function WorkspacePage() {
           <div className="panel" style={{ gridColumn: "1 / -1" }}>
             <h2>Companies</h2>
             <p className="hint">
-              Rank by weighted list coverage (trusted lists × their weights). Website deep-check
-              is later — after the portfolio is solid.
+              Rank by weighted list coverage (trusted lists × their weights). Website
+              deep-check is later — after the portfolio is solid.
             </p>
             <CompaniesPanel
               missionId={missionId}
@@ -230,93 +143,73 @@ export function WorkspacePage() {
               onChanged={reload}
             />
           </div>
-        ) : tab === "candidates" && mission ? (
-          <div className="panel" style={{ gridColumn: "1 / -1" }}>
-            <h2>Kandidatenlijst</h2>
-            <p className="hint">
-              Triage vóór bewijs — voeg toe of verwijder per gat-categorie. Geen score hier.
-              Alleen gehouden kandidaten gaan door naar bewijsverzameling en{" "}
-              <span style={{ color: "var(--cara)" }}>CARA (bronnen)</span>.
-            </p>
-            <CandidatesPanel
-              mission={mission}
-              missionId={missionId}
-              sources={sources}
-              catalogue={catalogue}
-              planEntries={searchPlan?.entries ?? []}
-              onChanged={reload}
-            />
-          </div>
         ) : (
-        <div className="workspace-layout">
-          <section className="panel">
-            <h2>
-              {tab === "journal" && "Journal"}
-              {tab === "observations" && "Observations"}
-              {tab === "hypotheses" && "Hypotheses"}
-              {tab === "sources" && "Sources"}
-            </h2>
-            <p className="hint">
-              {tab === "journal" && "Notes and tasks. Producer stamped on every entry."}
-              {tab === "observations" && "Facts only — no judgement, no score."}
-              {tab === "hypotheses" && "Ideas under test. Rejected ones stay — that is knowledge."}
-              {tab === "sources" &&
-                "Gehouden bronnen + bewijs. Weight matters — validate via CARA (bronnen)."}
-            </p>
+          <div className="workspace-layout">
+            <section className="panel">
+              <h2>
+                {tab === "journal" && "Journal"}
+                {tab === "observations" && "Observations"}
+                {tab === "hypotheses" && "Hypotheses"}
+                {tab === "sources" && "Sources"}
+              </h2>
+              <p className="hint">
+                {tab === "journal" &&
+                  "Notes and tasks. Producer stamped on every entry."}
+                {tab === "observations" && "Facts only — no judgement, no score."}
+                {tab === "hypotheses" &&
+                  "Ideas under test. Rejected ones stay — that is knowledge."}
+                {tab === "sources" &&
+                  "Gehouden bronnen + bewijs. Nieuwe kandidaten via ☰ Triage. Weight matters — validate via ◉ CARA (bronnen)."}
+              </p>
 
-            {tab === "journal" && <JournalList items={journal} />}
-            {tab === "observations" && <ObservationList items={observations} />}
-            {tab === "hypotheses" && (
-              <HypothesisList items={hypotheses} onChanged={reload} />
-            )}
-            {tab === "sources" && mission ? (
-              <>
-                <CategoryCoveragePanel
-                  mission={mission}
-                  catalogue={catalogue}
-                  planEntries={searchPlan?.entries ?? []}
-                  planVersion={
-                    mission.search_plan_version || DEFAULT_SEARCH_PLAN_VERSION
-                  }
-                />
-                <SourceList
-                  items={sources.filter((s) => s.status !== "candidate")}
-                  missionId={missionId}
-                  onChanged={reload}
-                />
-              </>
-            ) : null}
-          </section>
+              {tab === "journal" && <JournalList items={journal} />}
+              {tab === "observations" && <ObservationList items={observations} />}
+              {tab === "hypotheses" && (
+                <HypothesisList items={hypotheses} onChanged={reload} />
+              )}
+              {tab === "sources" ? (
+                <>
+                  <CategoryCoveragePanel
+                    mission={mission}
+                    catalogue={catalogue}
+                    planEntries={searchPlan?.entries ?? []}
+                    planVersion={
+                      mission.search_plan_version || DEFAULT_SEARCH_PLAN_VERSION
+                    }
+                  />
+                  <SourceList
+                    items={keptSources}
+                    missionId={missionId}
+                    onChanged={reload}
+                  />
+                </>
+              ) : null}
+            </section>
 
-          <section className="panel">
-            <h2>{tab === "sources" ? "Add or link" : "Add"}</h2>
-            <p className="hint">Writes as Producer · Human (OmegaClaw later).</p>
-            {tab === "journal" && (
-              <JournalForm missionId={missionId} onSaved={reload} />
-            )}
-            {tab === "observations" && (
-              <ObservationForm missionId={missionId} onSaved={reload} />
-            )}
-            {tab === "hypotheses" && (
-              <HypothesisForm missionId={missionId} onSaved={reload} />
-            )}
-            {tab === "sources" && (
-              <>
-                <p className="hint">
-                  Nieuwe voorstellen horen in Kandidatenlijst. Hier link je bestaande
-                  CARA-bronnen of voeg je een bron toe die al voorbij triage is.
-                </p>
-                <SourceForm
-                  missionId={missionId}
-                  onSaved={reload}
-                  defaultStatus="draft"
-                />
-                <hr style={{ margin: "1.25rem 0", borderColor: "var(--line)" }} />
-                <LinkSourceForm missionId={missionId} onSaved={reload} />
-              </>
-            )}
-          </section>
-        </div>
+            <section className="panel">
+              <h2>{tab === "sources" ? "Link existing" : "Add"}</h2>
+              <p className="hint">Writes as Producer · Human (OmegaClaw later).</p>
+              {tab === "journal" && (
+                <JournalForm missionId={missionId} onSaved={reload} />
+              )}
+              {tab === "observations" && (
+                <ObservationForm missionId={missionId} onSaved={reload} />
+              )}
+              {tab === "hypotheses" && (
+                <HypothesisForm missionId={missionId} onSaved={reload} />
+              )}
+              {tab === "sources" && (
+                <>
+                  <p className="hint">
+                    Nieuwe bronnen alleen via{" "}
+                    <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>. Hier
+                    link je bestaande CARA-bronnen uit andere missies.
+                  </p>
+                  <LinkSourceForm missionId={missionId} onSaved={reload} />
+                </>
+              )}
+            </section>
+          </div>
         )}
       </div>
     </div>
@@ -607,322 +500,6 @@ function CategoryCoveragePanel({
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function CandidatesPanel({
-  mission,
-  missionId,
-  sources,
-  catalogue,
-  planEntries,
-  onChanged,
-}: {
-  mission: Mission;
-  missionId: string;
-  sources: Source[];
-  catalogue: Source[];
-  planEntries: SearchPlanEntry[];
-  onChanged: () => Promise<void>;
-}) {
-  const gaps = useMemo(
-    () =>
-      resolveSourceGaps(
-        catalogue,
-        mission.location,
-        mission.sector,
-        planEntries,
-      ).filter((r) => r.status === "gap"),
-    [catalogue, mission.location, mission.sector, planEntries],
-  );
-
-  const gapCategories = useMemo(() => {
-    const seen = new Set<string>();
-    const cats: string[] = [];
-    for (const g of gaps) {
-      if (!seen.has(g.category)) {
-        seen.add(g.category);
-        cats.push(g.category);
-      }
-    }
-    return cats;
-  }, [gaps]);
-
-  const byCategory = useMemo(() => {
-    const map = new Map<string, Source[]>();
-    for (const cat of gapCategories) {
-      map.set(
-        cat,
-        sources.filter((s) => s.status === "candidate" && s.category === cat),
-      );
-    }
-    // Candidates whose category is already covered still show under their category
-    const orphanCats = new Set(
-      sources
-        .filter((s) => s.status === "candidate" && !gapCategories.includes(s.category))
-        .map((s) => s.category),
-    );
-    for (const cat of orphanCats) {
-      map.set(
-        cat,
-        sources.filter((s) => s.status === "candidate" && s.category === cat),
-      );
-    }
-    return map;
-  }, [sources, gapCategories]);
-
-  const [name, setName] = useState("");
-  const [url, setUrl] = useState("");
-  const [category, setCategory] = useState<SourceCategory>("registry");
-  const [scope, setScope] = useState<SourceScope>("regional");
-  const [region, setRegion] = useState(mission.location);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (gapCategories.length && !gapCategories.includes(category)) {
-      setCategory(gapCategories[0] as SourceCategory);
-    }
-  }, [gapCategories, category]);
-
-  async function keep(source: Source) {
-    setBusy(true);
-    setError(null);
-    try {
-      await api.updateEntity("sources", {
-        ...source,
-        status: "draft",
-        updatedAt: new Date().toISOString(),
-      });
-      await onChanged();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Keep failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function remove(source: Source) {
-    setBusy(true);
-    setError(null);
-    try {
-      await api.updateEntity("sources", {
-        ...source,
-        status: "rejected",
-        notes: [source.notes, "Verwijderd bij kandidatentriage."]
-          .filter(Boolean)
-          .join(" "),
-        updatedAt: new Date().toISOString(),
-      });
-      await onChanged();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Remove failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function addManual(e: FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      const now = new Date().toISOString();
-      const entry = planEntries.find((p) => p.category === category);
-      await api.createInMission(missionId, "sources", {
-        id: uuid(),
-        producer: "Human" as const,
-        first_seen_mission: missionId,
-        reused_in_missions: [],
-        name: name.trim() || url.trim() || category,
-        type: "other" as const,
-        category,
-        scope: entry?.layer ?? scope,
-        region: (entry?.layer ?? scope) === "national" ? "" : region.trim(),
-        url: url.trim() || undefined,
-        reason: "Handmatig toegevoegd op kandidatenlijst.",
-        signalIds: [],
-        evidenceIds: [],
-        status: "candidate" as const,
-        createdAt: now,
-        updatedAt: now,
-        v: 1,
-      });
-      setName("");
-      setUrl("");
-      await onChanged();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Add failed");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  const categoriesToShow = [...byCategory.keys()];
-
-  return (
-    <div>
-      {error ? <div className="error">{error}</div> : null}
-
-      {!categoriesToShow.length && !gapCategories.length ? (
-        <div className="empty">
-          Geen gaten en geen kandidaten — zoekplan is gedekt of leeg.
-        </div>
-      ) : null}
-
-      <div className="list" style={{ marginBottom: "1.5rem" }}>
-        {(categoriesToShow.length ? categoriesToShow : gapCategories).map(
-          (cat) => {
-            const nuance = planEntries.find((p) => p.category === cat)?.nuance_rule;
-            const items = byCategory.get(cat) ?? [];
-            const gapLayers = gaps
-              .filter((g) => g.category === cat)
-              .map((g) => g.layer);
-            return (
-              <article key={cat} className="item">
-                <header>
-                  <h4 className="mono">{cat}</h4>
-                  <StatusChip
-                    label={
-                      gapLayers.length
-                        ? `gap · ${gapLayers.join(", ")}`
-                        : "kandidaten"
-                    }
-                    tone={gapLayers.length ? "waiting" : "active"}
-                  />
-                </header>
-                {nuance ? <p className="muted">{nuance}</p> : null}
-                {!items.length ? (
-                  <p className="hint" style={{ marginBottom: 0 }}>
-                    Nog geen kandidaten in deze categorie.
-                  </p>
-                ) : (
-                  <div className="list" style={{ marginTop: "0.5rem" }}>
-                    {items.map((s) => (
-                      <div
-                        key={s.id}
-                        className="row"
-                        style={{
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          gap: "0.75rem",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <div>
-                          <strong>{s.name}</strong>
-                          {s.url ? (
-                            <p className="mono muted" style={{ margin: "0.15rem 0 0" }}>
-                              {s.url}
-                            </p>
-                          ) : null}
-                          <div className="mission-meta" style={{ marginTop: "0.25rem" }}>
-                            <ProducerBadge producer={s.producer} />
-                            <StatusChip label={s.scope} />
-                          </div>
-                        </div>
-                        <div className="row" style={{ gap: "0.35rem" }}>
-                          <button
-                            type="button"
-                            className="btn small"
-                            disabled={busy}
-                            onClick={() => void keep(s)}
-                          >
-                            Houden
-                          </button>
-                          <button
-                            type="button"
-                            className="btn danger small"
-                            disabled={busy}
-                            onClick={() => void remove(s)}
-                          >
-                            Verwijderen
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </article>
-            );
-          },
-        )}
-      </div>
-
-      <section
-        style={{
-          padding: "0.85rem 1rem",
-          borderRadius: 8,
-          border: "1px solid var(--line)",
-        }}
-      >
-        <h3 style={{ margin: "0 0 0.35rem", fontSize: "1rem" }}>
-          Handmatig toevoegen
-        </h3>
-        <p className="hint" style={{ marginTop: 0 }}>
-          Alleen url + categorie — geen score. Producer · Human.
-        </p>
-        <form className="form-stack" onSubmit={(e) => void addManual(e)}>
-          <label>
-            URL
-            <input
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://…"
-              required
-            />
-          </label>
-          <label>
-            Naam (optioneel)
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Wordt uit URL afgeleid als leeg"
-            />
-          </label>
-          <label>
-            Categorie
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as SourceCategory)}
-            >
-              {(gapCategories.length
-                ? gapCategories
-                : SOURCE_CATEGORIES
-              ).map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Scope
-            <select
-              value={scope}
-              onChange={(e) => setScope(e.target.value as SourceScope)}
-            >
-              <option value="national">national</option>
-              <option value="regional">regional</option>
-              <option value="local">local</option>
-            </select>
-          </label>
-          {scope !== "national" ? (
-            <label>
-              Region
-              <input
-                value={region}
-                onChange={(e) => setRegion(e.target.value)}
-                required
-              />
-            </label>
-          ) : null}
-          <button className="btn" type="submit" disabled={busy}>
-            {busy ? "Bezig…" : "Toevoegen als kandidaat"}
-          </button>
-        </form>
-      </section>
     </div>
   );
 }
@@ -1282,149 +859,6 @@ function HypothesisForm({
       </label>
       <button className="btn" type="submit">
         Add hypothesis
-      </button>
-    </form>
-  );
-}
-
-function SourceForm({
-  missionId,
-  onSaved,
-  defaultStatus = "candidate",
-}: {
-  missionId: string;
-  onSaved: () => Promise<void>;
-  defaultStatus?: "candidate" | "draft";
-}) {
-  const [name, setName] = useState("");
-  const [type, setType] = useState<SourceType>("registry");
-  const [category, setCategory] = useState<SourceCategory>("digital_presence");
-  const [scope, setScope] = useState<SourceScope>("regional");
-  const [region, setRegion] = useState("");
-  const [url, setUrl] = useState("");
-  const [reason, setReason] = useState("");
-  const [weight, setWeight] = useState("70");
-
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    const now = new Date().toISOString();
-    await api.createInMission(missionId, "sources", {
-      id: uuid(),
-      producer: "Human" as const,
-      first_seen_mission: missionId,
-      reused_in_missions: [],
-      name,
-      type,
-      category,
-      scope,
-      region: scope === "national" ? "" : region.trim(),
-      url: url || undefined,
-      reason: reason || undefined,
-      suggestedWeight: Number(weight),
-      suggestedConfidence: Number(weight),
-      signalIds: [],
-      evidenceIds: [],
-      status: defaultStatus,
-      createdAt: now,
-      updatedAt: now,
-      v: 1,
-    });
-    setName("");
-    setUrl("");
-    setReason("");
-    setRegion("");
-    await onSaved();
-  }
-
-  return (
-    <form className="form-stack" onSubmit={submit}>
-      <h3 style={{ margin: "0 0 0.5rem", fontSize: "1rem" }}>New source</h3>
-      <label>
-        Source name
-        <input value={name} onChange={(e) => setName(e.target.value)} required />
-      </label>
-      <label>
-        Type
-        <select value={type} onChange={(e) => setType(e.target.value as SourceType)}>
-          {(
-            [
-              "registry",
-              "association",
-              "directory",
-              "website",
-              "municipality",
-              "news",
-              "other",
-            ] as const
-          ).map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Category
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value as SourceCategory)}
-        >
-          {SOURCE_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Scope
-        <select
-          value={scope}
-          onChange={(e) => setScope(e.target.value as SourceScope)}
-        >
-          <option value="national">national</option>
-          <option value="regional">regional</option>
-          <option value="local">local</option>
-        </select>
-      </label>
-      {scope !== "national" ? (
-        <label>
-          Region
-          <input
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-            placeholder="e.g. Haarlemmermeer"
-            required
-          />
-        </label>
-      ) : null}
-      <label>
-        URL
-        <input value={url} onChange={(e) => setUrl(e.target.value)} />
-      </label>
-      <label>
-        Why this source
-        <textarea value={reason} onChange={(e) => setReason(e.target.value)} />
-      </label>
-      <label>
-        Suggested weight (0–100)
-        <input
-          type="number"
-          min={0}
-          max={100}
-          value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-        />
-      </label>
-      <p className="hint">
-        Status <span className="mono">{defaultStatus}</span>
-        {defaultStatus === "draft"
-          ? " — bewijs invullen, daarna "
-          : " — triage eerst via Kandidatenlijst, daarna "}
-        <span style={{ color: "var(--cara)" }}>CARA (bronnen)</span>.
-      </p>
-      <button className="btn" type="submit">
-        Add source
       </button>
     </form>
   );

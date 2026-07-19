@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import type { ConfidenceProposal, Signal, SignalKey, Source } from "@h3-trust/schema";
 import { api } from "../api";
@@ -108,12 +108,6 @@ export function SignalsPage() {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: "1rem" }}>
-        <Link className="btn secondary small" to={`/missions/${missionId}`}>
-          ← Workspace
-        </Link>
-      </div>
-
       <p className="thesis">
         <strong>Signal Engine.</strong> Observation → Evidence → Signal → Suggested
         confidence. Fully explainable. Never a final decision.

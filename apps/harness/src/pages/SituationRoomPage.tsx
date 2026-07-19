@@ -91,15 +91,6 @@ export function SituationRoomPage() {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: "1rem" }}>
-        <Link className="btn secondary small" to={`/missions/${missionId}`}>
-          ← Workspace
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/cara`}>
-          CARA Review
-        </Link>
-      </div>
-
       <h1
         style={{
           fontFamily: "var(--font-display)",

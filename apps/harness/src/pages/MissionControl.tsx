@@ -1,9 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import { DEFAULT_SEARCH_PLAN_VERSION, type Mission } from "@h3-trust/schema";
 import { api } from "../api";
 import { ProducerBadge, StatusChip } from "../components/Badges";
+
+const MODE_KEY = "h3-harness-mode";
+type UiMode = "worker" | "investigator";
 
 const defaultPhases: Mission["phases"] = [
   { key: "observation", status: "active" },
@@ -15,7 +18,19 @@ const defaultPhases: Mission["phases"] = [
   { key: "deep_check", status: "waiting" },
 ];
 
+function readMode(): UiMode {
+  try {
+    const v = localStorage.getItem(MODE_KEY);
+    if (v === "investigator" || v === "worker") return v;
+  } catch {
+    /* ignore */
+  }
+  return "worker";
+}
+
 export function MissionControl() {
+  const navigate = useNavigate();
+  const [mode, setMode] = useState<UiMode>(readMode);
   const [missions, setMissions] = useState<Mission[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -27,6 +42,15 @@ export function MissionControl() {
     goal: "Find trustworthy local painters and validate source reliability.",
     notes: "",
   });
+
+  function switchMode(next: UiMode) {
+    setMode(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* ignore */
+    }
+  }
 
   async function load() {
     try {
@@ -40,6 +64,10 @@ export function MissionControl() {
   useEffect(() => {
     void load();
   }, []);
+
+  function missionPath(id: string) {
+    return mode === "worker" ? `/work/${id}/sources` : `/missions/${id}`;
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -68,6 +96,7 @@ export function MissionControl() {
       await api.createMission(mission);
       setForm((f) => ({ ...f, notes: "" }));
       await load();
+      navigate(missionPath(mission.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create mission");
     } finally {
@@ -92,26 +121,63 @@ export function MissionControl() {
     }
   }
 
+  const isWorker = mode === "worker";
+
   return (
     <div>
+      <div className="mode-toggle" role="group" aria-label="UI mode">
+        <button
+          type="button"
+          className={`mode-toggle-btn ${isWorker ? "active" : ""}`}
+          onClick={() => switchMode("worker")}
+        >
+          Data Worker
+        </button>
+        <button
+          type="button"
+          className={`mode-toggle-btn ${!isWorker ? "active" : ""}`}
+          onClick={() => switchMode("investigator")}
+        >
+          Investigator
+        </button>
+      </div>
+
       <p className="thesis">
-        <strong>The Harness never decides.</strong> It structures investigations,
-        preserves evidence, captures human reasoning, and accumulates validated
-        knowledge. You are the investigator today — OmegaClaw can be one tomorrow.
+        {isWorker ? (
+          <>
+            <strong>Data Worker.</strong> Fill gaps, approve lists, import companies,
+            read trust rankings — a straight path from Painters · Haarlemmermeer to
+            results. No notebook, no graph.
+          </>
+        ) : (
+          <>
+            <strong>The Harness never decides.</strong> It structures investigations,
+            preserves evidence, captures human reasoning, and accumulates validated
+            knowledge. You are the investigator today — OmegaClaw can be one tomorrow.
+          </>
+        )}
       </p>
 
       {error ? <div className="error">{error}</div> : null}
 
       <div className="grid-missions">
         <section className="panel">
-          <h2>Missions</h2>
-          <p className="hint">Open an investigation. No AI required.</p>
+          <h2>{isWorker ? "Jobs" : "Missions"}</h2>
+          <p className="hint">
+            {isWorker
+              ? "Open a data job. Sources → CARA → Import → Results."
+              : "Open an investigation. No AI required."}
+          </p>
           {missions.length === 0 ? (
-            <div className="empty">No missions yet. Create one to begin.</div>
+            <div className="empty">
+              {isWorker
+                ? "No jobs yet. Start one with Painters · Haarlemmermeer defaults."
+                : "No missions yet. Create one to begin."}
+            </div>
           ) : (
             missions.map((m) => (
               <div key={m.id} className="mission-card" style={{ position: "relative" }}>
-                <Link to={`/missions/${m.id}`} style={{ display: "block" }}>
+                <Link to={missionPath(m.id)} style={{ display: "block" }}>
                   <h3>
                     {m.location} · {m.subsector}
                   </h3>
@@ -128,9 +194,24 @@ export function MissionControl() {
                   </div>
                 </Link>
                 <div className="row" style={{ marginTop: "0.75rem" }}>
-                  <Link className="btn small" to={`/missions/${m.id}`}>
-                    Open
+                  <Link className="btn small" to={missionPath(m.id)}>
+                    {isWorker ? "Open job" : "Open"}
                   </Link>
+                  {isWorker ? (
+                    <Link
+                      className="btn secondary small"
+                      to={`/missions/${m.id}`}
+                    >
+                      Investigator
+                    </Link>
+                  ) : (
+                    <Link
+                      className="btn secondary small"
+                      to={`/work/${m.id}/sources`}
+                    >
+                      Data Worker
+                    </Link>
+                  )}
                   <button
                     type="button"
                     className="btn danger small"
@@ -147,8 +228,12 @@ export function MissionControl() {
         </section>
 
         <section className="panel">
-          <h2>New mission</h2>
-          <p className="hint">Mission Control — start research, not a chat.</p>
+          <h2>{isWorker ? "New data job" : "New mission"}</h2>
+          <p className="hint">
+            {isWorker
+              ? "Defaults to Painters · Haarlemmermeer — change if you need another region × sector."
+              : "Mission Control — start research, not a chat."}
+          </p>
           <form className="form-stack" onSubmit={onSubmit}>
             <div className="split-2">
               <label>
@@ -202,7 +287,11 @@ export function MissionControl() {
               />
             </label>
             <button className="btn" type="submit" disabled={saving}>
-              {saving ? "Creating…" : "Start investigation"}
+              {saving
+                ? "Creating…"
+                : isWorker
+                  ? "Start data job"
+                  : "Start investigation"}
             </button>
           </form>
         </section>

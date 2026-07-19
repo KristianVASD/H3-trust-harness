@@ -9,9 +9,17 @@
   --coral: #993c1d;
   --coral-soft: #faece7;
   --amber: #8a6d1d;
-  /* Diagram/legend: two human CARA checkpoints share this mark */
+  /* ① Kandidatenlijst-triage: blauw (selectie, informatief) */
+  --triage: #2563eb;
+  --triage-soft: #dbeafe;
+  /* ② CARA-bronnen: amber (menselijk oordeel over bewijs) */
   --cara: #c47a12;
   --cara-soft: #fde9c8;
+  --cara-source: var(--cara);
+  --cara-source-soft: var(--cara-soft);
+  /* ③ CARA-bedrijven: paars (afgeleid oordeel, andere rol) */
+  --cara-company: #7c3aed;
+  --cara-company-soft: #ede9fe;
   /* Mechanical coverage lookup — never the same as CARA */
   --coverage-check: #6b7280;
   --coverage-check-soft: #eef0f3;
@@ -193,6 +201,12 @@ a {
   opacity: 0.7;
 }
 
+.chip.status-done {
+  background: var(--teal-soft);
+  border-color: #9dccc0;
+  color: var(--teal);
+}
+
 .form-stack {
   display: grid;
   gap: 0.75rem;
@@ -256,6 +270,13 @@ a {
 .btn.small {
   padding: 0.35rem 0.65rem;
   font-size: 0.85rem;
+}
+
+.btn.secondary.active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 700;
 }
 
 .workspace {
@@ -395,3 +416,564 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── ProcesIndicator ─────────────────────────────────────────────── */
+
+.proces-indicator {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  margin-top: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  font-size: 0.85rem;
+}
+
+.proces-fases {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.proces-fase {
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.proces-fase.active {
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.proces-fase.done {
+  color: var(--teal);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.proces-tellers {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.teller {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.teller-triage {
+  background: var(--triage-soft);
+  color: var(--triage);
+  border-color: var(--triage);
+}
+
+.teller-cara-source {
+  background: var(--cara-soft);
+  color: var(--cara);
+  border-color: var(--cara);
+}
+
+.teller-cara-company {
+  background: var(--cara-company-soft);
+  color: var(--cara-company);
+  border-color: var(--cara-company);
+}
+
+.teller-gaps {
+  background: var(--coverage-check-soft);
+  color: var(--coverage-check);
+  border-color: var(--coverage-check);
+}
+
+.proces-next {
+  margin-left: auto;
+}
+
+.next-action {
+  font-weight: 700;
+  color: var(--teal);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.next-action:hover {
+  text-decoration: underline;
+}
+
+/* ── Kandidatenlijst-triage pagina ───────────────────────────────── */
+
+.triage-header {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--triage);
+  background: var(--triage-soft);
+  margin-bottom: 1rem;
+}
+
+.triage-header h2 {
+  margin: 0 0 0.35rem;
+  color: var(--triage);
+}
+
+.triage-header .hint {
+  margin: 0.35rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.triage-icon {
+  margin-right: 0.35rem;
+}
+
+.triage-coverage {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.triage-categories {
+  margin-bottom: 1rem;
+}
+
+.triage-category.is-gap {
+  border-left: 3px solid var(--triage);
+}
+
+.triage-item {
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.triage-keep {
+  background: var(--triage) !important;
+  border-color: var(--triage) !important;
+  color: var(--white) !important;
+}
+
+.triage-keep:hover {
+  background: #1d4ed8 !important;
+}
+
+.triage-add {
+  border-left: 4px solid var(--triage);
+  margin-top: 1.5rem;
+}
+
+/* ── CARA-bronnen vs CARA-bedrijven: visueel onderscheid ─────────── */
+
+.cara-source-panel {
+  border-left: 4px solid var(--cara);
+}
+
+.cara-source-panel h2,
+.cara-source-panel h3 {
+  color: var(--cara);
+}
+
+.cara-company-panel {
+  border-left: 4px solid var(--cara-company);
+}
+
+.cara-company-panel h2,
+.cara-company-panel h3 {
+  color: var(--cara-company);
+}
+
+/* ── MissionLayout ───────────────────────────────────────────────── */
+
+.mission-header {
+  margin-bottom: 1.25rem;
+}
+
+.mission-title {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+}
+
+.mission-goal {
+  margin: 0;
+}
+
+.mission-content {
+  min-height: 60vh;
+}
+
+/* ── Home mode toggle ────────────────────────────────────────────── */
+
+.mode-toggle {
+  display: inline-flex;
+  margin-bottom: 1.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  gap: 0.15rem;
+}
+
+.mode-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.mode-toggle-btn:hover {
+  color: var(--ink);
+}
+
+.mode-toggle-btn.active {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ── Data Worker shell ───────────────────────────────────────────── */
+
+.worker-shell {
+  max-width: 920px;
+  margin: 0 auto;
+  animation: worker-fade-in 0.35s ease;
+}
+
+@keyframes worker-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.worker-header {
+  margin-bottom: 1.5rem;
+}
+
+.worker-header-top {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.worker-eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+
+.worker-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.worker-goal {
+  margin: 0 0 1rem;
+  max-width: 40rem;
+}
+
+.worker-step-rail {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.worker-step {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.worker-step:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
+}
+
+.worker-step.active {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.worker-step.done {
+  border-color: #9dccc0;
+  color: var(--teal);
+}
+
+.worker-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: var(--paper-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.worker-step.active .worker-step-num,
+.worker-step.done .worker-step-num {
+  background: var(--teal);
+  color: var(--white);
+}
+
+.worker-step-meta {
+  font-size: 0.72rem;
+  opacity: 0.75;
+  font-family: var(--font-mono);
+}
+
+.trusted-portfolio-bar {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.trusted-portfolio-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.9rem;
+}
+
+.trusted-portfolio-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  overflow: hidden;
+}
+
+.trusted-portfolio-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--cara);
+  transition: width 0.35s ease;
+}
+
+.trusted-portfolio-fill.unlocked {
+  background: var(--teal);
+}
+
+.worker-content {
+  min-height: 50vh;
+}
+
+.worker-step-page {
+  animation: worker-fade-in 0.3s ease;
+}
+
+.worker-step-intro {
+  margin-bottom: 1.25rem;
+}
+
+.worker-step-intro h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+
+.worker-step-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin-top: 1.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.worker-empty-hero {
+  padding: 2rem 1.25rem;
+}
+
+.worker-locked {
+  border-left: 4px solid var(--cara);
+}
+
+.worker-gap-card {
+  animation: worker-fade-in 0.25s ease;
+}
+
+.worker-gap-card.is-gap {
+  border-left: 4px solid var(--triage);
+}
+
+.worker-gap-card.is-covered {
+  border-left: 4px solid var(--teal);
+}
+
+.worker-gap-card h3 {
+  font-size: 1.05rem;
+}
+
+.worker-source-stack {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.worker-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+}
+
+.worker-source-row.trusted {
+  background: var(--teal-soft);
+  border-color: #9dccc0;
+}
+
+.worker-source-row.draft {
+  background: var(--cara-soft);
+  border-color: var(--cara);
+}
+
+.worker-source-row.candidate {
+  background: var(--triage-soft);
+  border-color: #93c5fd;
+}
+
+.worker-add-form {
+  margin-top: 0.85rem;
+  padding: 0.85rem;
+  border: 1px dashed var(--triage);
+  border-radius: 8px;
+  background: var(--triage-soft);
+}
+
+.worker-cara-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 800px) {
+  .worker-cara-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.worker-queue-item {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  background: var(--white);
+}
+
+.worker-queue-item.selected {
+  border-color: var(--cara);
+  background: var(--cara-soft);
+}
+
+.worker-import-panel {
+  border-left: 4px solid var(--teal);
+}
+
+.worker-thin-warning {
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
+  background: var(--cara-soft);
+  border: 1px solid var(--cara);
+}
+
+.worker-results-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.worker-results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.worker-results-table th,
+.worker-results-table td {
+  padding: 0.75rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.worker-results-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  background: var(--paper);
+}
+
+.worker-results-row {
+  animation: worker-fade-in 0.28s ease;
+}
+
+.worker-results-row:hover {
+  background: rgba(15, 110, 86, 0.04);
+}
+
+.worker-trust-score {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  color: var(--teal);
+}
+
+.worker-mention-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+

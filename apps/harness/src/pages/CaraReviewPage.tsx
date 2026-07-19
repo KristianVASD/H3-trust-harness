@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Link, useOutletContext, useParams, useSearchParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import type { Company, Review, Source, SourceEvidence } from "@h3-trust/schema";
-import { api } from "../api";
-import { createEntity, listReviews, updateEntity } from "../api-extra";
+import { createEntity, updateEntity } from "../api-extra";
+import type { MissionData } from "../hooks/useMissionData";
 import { ProducerBadge, StatusChip } from "../components/Badges";
 
 type CaraTarget = "source" | "company";
@@ -25,75 +25,81 @@ function suggestedForCompany(company: Company, sources: Source[]): number {
 export function CaraReviewPage() {
   const { missionId = "" } = useParams();
   const [searchParams] = useSearchParams();
-  const initialTarget =
+  const data = useOutletContext<MissionData>();
+  const { sources, companies, reviews, reload } = data;
+
+  const urlTarget: CaraTarget =
     searchParams.get("target") === "company" ? "company" : "source";
   const initialId = searchParams.get("id");
 
-  const [mode, setMode] = useState<CaraTarget>(initialTarget);
-  const [sources, setSources] = useState<Source[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [mode, setMode] = useState<CaraTarget>(urlTarget);
   const [selectedId, setSelectedId] = useState<string | null>(initialId);
   const [humanScore, setHumanScore] = useState("70");
   const [reason, setReason] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
-  const reload = useCallback(async () => {
-    const [s, c, r] = await Promise.all([
-      api.listSources(missionId),
-      api.listCompanies(missionId),
-      listReviews(missionId),
-    ]);
-    setSources(s);
-    setCompanies(c);
-    setReviews(r);
-  }, [missionId]);
+  useEffect(() => {
+    setMode(urlTarget);
+  }, [urlTarget]);
 
-  /** Candidates are triaged first — CARA only sees kept sources with/without evidence. */
+  /** Alleen draft + pending_review in de actieve CARA-queue */
   const sourceQueue = useMemo(
     () =>
       sources.filter((s) => s.status === "draft" || s.status === "pending_review"),
     [sources],
   );
 
-  const reviewableSources = useMemo(
-    () => sources.filter((s) => s.status !== "candidate"),
+  /** Al beoordeeld — read-only archief, geen actieknoppen */
+  const reviewedSources = useMemo(
+    () =>
+      sources.filter((s) =>
+        ["accepted", "adjusted", "rejected"].includes(s.status),
+      ),
     [sources],
+  );
+
+  const reviewedCompanyIds = useMemo(
+    () =>
+      new Set(
+        reviews.filter((r) => r.targetType === "company").map((r) => r.targetId),
+      ),
+    [reviews],
   );
 
   const companyQueue = useMemo(
     () =>
       companies.filter(
-        (c) => c.status === "candidate" || c.status === "target",
+        (c) =>
+          (c.status === "candidate" || c.status === "target") &&
+          !reviewedCompanyIds.has(c.id),
       ),
-    [companies],
+    [companies, reviewedCompanyIds],
   );
 
-  useEffect(() => {
-    void reload().catch((err) =>
-      setError(err instanceof Error ? err.message : "Load failed"),
-    );
-  }, [reload]);
+  const reviewedCompanies = useMemo(
+    () =>
+      companies.filter(
+        (c) =>
+          (c.status === "candidate" || c.status === "target") &&
+          reviewedCompanyIds.has(c.id),
+      ),
+    [companies, reviewedCompanyIds],
+  );
 
   useEffect(() => {
     if (mode === "source") {
       setSelectedId((prev) => {
-        const pool =
-          sourceQueue.length > 0 ? sourceQueue : reviewableSources;
-        if (prev && pool.some((s) => s.id === prev)) return prev;
-        return pool[0]?.id ?? null;
+        if (prev && sourceQueue.some((s) => s.id === prev)) return prev;
+        return sourceQueue[0]?.id ?? null;
       });
       return;
     }
     setSelectedId((prev) => {
-      const pool = companies.filter(
-        (c) => c.status === "candidate" || c.status === "target",
-      );
-      if (prev && pool.some((c) => c.id === prev)) return prev;
-      return pool[0]?.id ?? companies[0]?.id ?? null;
+      if (prev && companyQueue.some((c) => c.id === prev)) return prev;
+      return companyQueue[0]?.id ?? null;
     });
-  }, [mode, sources, companies, sourceQueue, reviewableSources]);
+  }, [mode, sourceQueue, companyQueue]);
 
   useEffect(() => {
     if (mode === "source") {
@@ -285,25 +291,18 @@ export function CaraReviewPage() {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: "1rem" }}>
-        <Link className="btn secondary small" to={`/missions/${missionId}`}>
-          ← Workspace
-        </Link>
-        <Link className="btn secondary small" to={`/missions/${missionId}/situation`}>
-          Situation Room
-        </Link>
-      </div>
-
       <p className="thesis">
         <strong>CARA — twee menselijke controlepunten</strong> (na
         kandidatentriage). Suggested confidence is not a decision. Agree =
         bewijs + score kloppen; Adjust/Disagree eisen reden.{" "}
-        <span style={{ color: "var(--cara)", fontWeight: 600 }}>CARA (bronnen)</span>{" "}
+        <span style={{ color: "var(--cara)", fontWeight: 600 }}>◉ CARA (bronnen)</span>{" "}
         and{" "}
-        <span style={{ color: "var(--cara)", fontWeight: 600 }}>CARA (bedrijven)</span>{" "}
-        share the same mechanism. Sources met status{" "}
-        <span className="mono">candidate</span> horen in Workspace →
-        Kandidatenlijst, niet hier.
+        <span style={{ color: "var(--cara-company)", fontWeight: 600 }}>
+          ◆ CARA (bedrijven)
+        </span>{" "}
+        zijn visueel gescheiden. Sources met status{" "}
+        <span className="mono">candidate</span> horen in{" "}
+        <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>, niet hier.
       </p>
 
       <div className="row" style={{ marginBottom: "1rem" }}>
@@ -321,7 +320,7 @@ export function CaraReviewPage() {
           }
           onClick={() => setMode("source")}
         >
-          CARA (bronnen) ({sourceQueue.length} in queue)
+          ◉ CARA (bronnen) ({sourceQueue.length} in queue)
         </button>
         <button
           type="button"
@@ -329,15 +328,15 @@ export function CaraReviewPage() {
           style={
             mode === "company"
               ? {
-                  borderColor: "var(--cara)",
-                  background: "var(--cara-soft)",
+                  borderColor: "var(--cara-company)",
+                  background: "var(--cara-company-soft)",
                   fontWeight: 700,
                 }
               : undefined
           }
           onClick={() => setMode("company")}
         >
-          CARA (bedrijven) ({companyQueue.length})
+          ◆ CARA (bedrijven) ({companyQueue.length})
         </button>
       </div>
 
@@ -349,16 +348,18 @@ export function CaraReviewPage() {
       ) : null}
 
       <div className="workspace-layout">
-        <section className="panel">
+        <section
+          className={`panel ${mode === "source" ? "cara-source-panel" : "cara-company-panel"}`}
+        >
           <h2>
             {mode === "source"
-              ? `CARA (bronnen) — queue (${sourceQueue.length})`
-              : `CARA (bedrijven) — queue (${companyQueue.length})`}
+              ? `◉ CARA (bronnen) — queue (${sourceQueue.length})`
+              : `◆ CARA (bedrijven) — queue (${companyQueue.length})`}
           </h2>
           <p className="hint">Non-blocking — investigation continues in Workspace.</p>
           <div className="list">
             {mode === "source"
-              ? reviewableSources.map((s) => (
+              ? sourceQueue.map((s) => (
                   <button
                     key={s.id}
                     type="button"
@@ -367,7 +368,7 @@ export function CaraReviewPage() {
                       textAlign: "left",
                       cursor: "pointer",
                       width: "100%",
-                      borderColor: selectedId === s.id ? "var(--teal)" : undefined,
+                      borderColor: selectedId === s.id ? "var(--cara)" : undefined,
                     }}
                     onClick={() => {
                       setSelectedId(s.id);
@@ -389,7 +390,7 @@ export function CaraReviewPage() {
                     </p>
                   </button>
                 ))
-              : companies.map((c) => (
+              : companyQueue.map((c) => (
                   <button
                     key={c.id}
                     type="button"
@@ -398,7 +399,8 @@ export function CaraReviewPage() {
                       textAlign: "left",
                       cursor: "pointer",
                       width: "100%",
-                      borderColor: selectedId === c.id ? "var(--teal)" : undefined,
+                      borderColor:
+                        selectedId === c.id ? "var(--cara-company)" : undefined,
                     }}
                     onClick={() => {
                       setSelectedId(c.id);
@@ -415,18 +417,82 @@ export function CaraReviewPage() {
                     </p>
                   </button>
                 ))}
-            {mode === "source" && !reviewableSources.length ? (
+            {mode === "source" && !sourceQueue.length ? (
               <div className="empty">
-                No sources ready for CARA. Keep candidates in Workspace first.
+                Geen bronnen in CARA-queue. Houd kandidaten eerst in{" "}
+                <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>.
               </div>
             ) : null}
-            {mode === "company" && !companies.length ? (
-              <div className="empty">No companies yet.</div>
+            {mode === "company" && !companyQueue.length ? (
+              <div className="empty">Geen bedrijven in CARA-queue.</div>
             ) : null}
           </div>
+
+          {mode === "source" && reviewedSources.length > 0 ? (
+            <details style={{ marginTop: "1rem" }}>
+              <summary className="muted">
+                Eerder beoordeeld ({reviewedSources.length}) — read-only
+              </summary>
+              <div className="list" style={{ marginTop: "0.5rem" }}>
+                {reviewedSources.map((s) => {
+                  const priorReview = reviews.find(
+                    (r) => r.targetId === s.id && r.targetType === "source",
+                  );
+                  return (
+                    <div key={s.id} className="item" style={{ opacity: 0.7 }}>
+                      <strong>{s.name}</strong>{" "}
+                      <StatusChip
+                        label={s.status}
+                        tone={s.status === "rejected" ? "waiting" : "done"}
+                      />
+                      {priorReview ? (
+                        <span className="muted">
+                          {" "}
+                          · {priorReview.action} · score{" "}
+                          {priorReview.humanScore ?? "—"}
+                          {priorReview.reason ? ` · "${priorReview.reason}"` : ""}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </details>
+          ) : null}
+
+          {mode === "company" && reviewedCompanies.length > 0 ? (
+            <details style={{ marginTop: "1rem" }}>
+              <summary className="muted">
+                Eerder beoordeeld ({reviewedCompanies.length}) — read-only
+              </summary>
+              <div className="list" style={{ marginTop: "0.5rem" }}>
+                {reviewedCompanies.map((c) => {
+                  const priorReview = reviews.find(
+                    (r) => r.targetId === c.id && r.targetType === "company",
+                  );
+                  return (
+                    <div key={c.id} className="item" style={{ opacity: 0.7 }}>
+                      <strong>{c.name}</strong>{" "}
+                      <StatusChip label={c.status} />
+                      {priorReview ? (
+                        <span className="muted">
+                          {" "}
+                          · {priorReview.action} · score{" "}
+                          {priorReview.humanScore ?? "—"}
+                          {priorReview.reason ? ` · "${priorReview.reason}"` : ""}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </details>
+          ) : null}
         </section>
 
-        <section className="panel">
+        <section
+          className={`panel ${mode === "source" ? "cara-source-panel" : "cara-company-panel"}`}
+        >
           <h2>Human judgement</h2>
           {mode === "source" && !selectedSource ? (
             <div className="empty">Select a source.</div>

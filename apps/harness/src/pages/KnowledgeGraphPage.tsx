@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type {
   Company,
   Hypothesis,
@@ -103,12 +103,6 @@ export function KnowledgeGraphPage() {
 
   return (
     <div>
-      <div className="row" style={{ marginBottom: "1rem" }}>
-        <Link className="btn secondary small" to={`/missions/${missionId}`}>
-          ← Workspace
-        </Link>
-      </div>
-
       <p className="thesis">
         <strong>Knowledge Graph.</strong> Human-readable chain — click any node.
         Not Neo4j. Mission → Hypothesis → Observation → Source → Company → Review.
