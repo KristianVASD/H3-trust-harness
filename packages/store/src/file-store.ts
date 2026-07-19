@@ -290,6 +290,11 @@ export class FileStore implements Store {
     return this.upsert("missionSources", link);
   }
 
+  async listAllSources(): Promise<Source[]> {
+    const all = await this.readAll("sources");
+    return all.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   async listLinkableSources(
     excludeMissionId: string,
     q = "",

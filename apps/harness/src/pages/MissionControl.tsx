@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { v4 as uuid } from "uuid";
-import type { Mission } from "@h3-trust/schema";
+import { DEFAULT_SEARCH_PLAN_VERSION, type Mission } from "@h3-trust/schema";
 import { api } from "../api";
 import { ProducerBadge, StatusChip } from "../components/Badges";
 
@@ -50,6 +50,7 @@ export function MissionControl() {
         id: uuid(),
         ...form,
         notes: form.notes || undefined,
+        search_plan_version: DEFAULT_SEARCH_PLAN_VERSION,
         discoveryBrief: {
           approach: "",
           candidateListTypes: ["registry", "local_business_association"],

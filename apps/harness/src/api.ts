@@ -7,6 +7,7 @@ import type {
   Mission,
   MissionSource,
   Observation,
+  SearchPlan,
   Source,
 } from "@h3-trust/schema";
 
@@ -45,6 +46,8 @@ export const api = {
     request<Hypothesis[]>(`/missions/${missionId}/hypotheses`),
   listSources: (missionId: string) =>
     request<Source[]>(`/missions/${missionId}/sources`),
+  /** Full catalogue — Check bekende bronnen / resolveSourceGaps. */
+  listAllSources: () => request<Source[]>("/sources"),
   listCompanies: (missionId: string) =>
     request<Company[]>(`/missions/${missionId}/companies`),
   listLinkableSources: (excludeMissionId: string, q = "") => {
@@ -81,4 +84,8 @@ export const api = {
     }),
   exportMission: (missionId: string) =>
     request<ExportBundle>(`/missions/${missionId}/export`),
+  listSearchPlans: () =>
+    request<{ versions: string[]; latest: string }>("/searchplans"),
+  getSearchPlan: (version: string) =>
+    request<SearchPlan>(`/searchplans/${encodeURIComponent(version)}`),
 };

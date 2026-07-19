@@ -1,0 +1,61 @@
+{
+  "version": "default.v1",
+  "label": "Standaard zoekplan — landelijk / regionaal / lokaal",
+  "entries": [
+    {
+      "layer": "national",
+      "category": "registry",
+      "nuance_rule": "KVK/handelsregister is harde identiteit, geen soft trust-signaal. Aanwezigheid telt zwaar; ontbreken is een hard gat, geen nuance."
+    },
+    {
+      "layer": "national",
+      "category": "sector_qualification",
+      "nuance_rule": "Sector-kwalificaties (VCA, Erkend Leerbedrijf, branche-specifieke registraties). Check of de lijst actueel is en of lidmaatschap een drempel heeft — gratis inschrijving ≠ keurmerk."
+    },
+    {
+      "layer": "national",
+      "category": "quality_mark",
+      "nuance_rule": "Keurmerken alleen meewegen als de organisatie zelf traceerbaar en serieus is. Lidmaatschapsdrempel (laag/midden/hoog) bepaalt hoeveel gewicht de lijst mag krijgen."
+    },
+    {
+      "layer": "national",
+      "category": "branch_association",
+      "nuance_rule": "Landelijke branchevereniging: nuttig als discovery + soft trust. Controleer of het echte ledenlijsten publiceert, niet alleen marketing."
+    },
+    {
+      "layer": "national",
+      "category": "labor_market_presence",
+      "nuance_rule": "Stages, traineeships en landelijke vacaturesites. Aanwezigheid toont dat het bedrijf als werkgever zichtbaar is — op zich zwak als trust, sterker als het consistent is met KVK-leeftijd en lokale aanwezigheid."
+    },
+    {
+      "layer": "regional",
+      "category": "labor_market_presence",
+      "nuance_rule": "Regionale vacaturebronnen: zelfde categorie als landelijk, andere scope. Een regio-vacature versterkt lokaliteit; alleen een Indeed-advertentie zonder regio-anker blijft zwak."
+    },
+    {
+      "layer": "regional",
+      "category": "local_media",
+      "nuance_rule": "Advertentie in regionaal dagblad is op zich zwak. Als het bedrijf verdacht is (jong, dun bewijs), is media-aanwezigheid juist een hard nee-signaal (gekkocht zichtbaarheid). Als het bedrijf heel lokaal en al langer actief is, mag het een kleine boost geven — nooit als primaire bron."
+    },
+    {
+      "layer": "local",
+      "category": "local_business_association",
+      "nuance_rule": "Lokale ondernemersvereniging: sterke lokaliteitsbron als de ledenlijst openbaar en meerjarig is. Eenmalige sponsorpagina zonder ledenlijst telt nauwelijks."
+    },
+    {
+      "layer": "local",
+      "category": "sponsorship",
+      "nuance_rule": "Sponsoring van sportclubs/evenementen: zachte lokaliteit. Alleen meewegen als het herhaaldelijk en traceerbaar is — een logo op een shirt zonder andere signalen is cosmetisch."
+    },
+    {
+      "layer": "local",
+      "category": "networking_group",
+      "nuance_rule": "BNI en vergelijkbare netwerkgroepen: lidmaatschap toont sociale inbedding, niet vakbekwaamheid. Drempel en aanwezigheid van echte personen wegen zwaarder dan de groepsnaam."
+    },
+    {
+      "layer": "local",
+      "category": "municipal_initiative",
+      "nuance_rule": "Gemeentelijke of lokale overheidsinitiatieven (ondernemersloket, lokale bedrijvenlijsten). Sterk als de overheid zelf curateert; zwak als het een open inschrijfformulier zonder toets is."
+    }
+  ]
+}

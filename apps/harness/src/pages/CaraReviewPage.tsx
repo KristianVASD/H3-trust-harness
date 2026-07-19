@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { v4 as uuid } from "uuid";
-import type { Company, Review, Source } from "@h3-trust/schema";
+import type { Company, Review, Source, SourceEvidence } from "@h3-trust/schema";
 import { api } from "../api";
 import { createEntity, listReviews, updateEntity } from "../api-extra";
 import { ProducerBadge, StatusChip } from "../components/Badges";
@@ -50,6 +50,26 @@ export function CaraReviewPage() {
     setReviews(r);
   }, [missionId]);
 
+  /** Candidates are triaged first — CARA only sees kept sources with/without evidence. */
+  const sourceQueue = useMemo(
+    () =>
+      sources.filter((s) => s.status === "draft" || s.status === "pending_review"),
+    [sources],
+  );
+
+  const reviewableSources = useMemo(
+    () => sources.filter((s) => s.status !== "candidate"),
+    [sources],
+  );
+
+  const companyQueue = useMemo(
+    () =>
+      companies.filter(
+        (c) => c.status === "candidate" || c.status === "target",
+      ),
+    [companies],
+  );
+
   useEffect(() => {
     void reload().catch((err) =>
       setError(err instanceof Error ? err.message : "Load failed"),
@@ -59,8 +79,10 @@ export function CaraReviewPage() {
   useEffect(() => {
     if (mode === "source") {
       setSelectedId((prev) => {
-        if (prev && sources.some((s) => s.id === prev)) return prev;
-        return sources[0]?.id ?? null;
+        const pool =
+          sourceQueue.length > 0 ? sourceQueue : reviewableSources;
+        if (prev && pool.some((s) => s.id === prev)) return prev;
+        return pool[0]?.id ?? null;
       });
       return;
     }
@@ -71,7 +93,7 @@ export function CaraReviewPage() {
       if (prev && pool.some((c) => c.id === prev)) return prev;
       return pool[0]?.id ?? companies[0]?.id ?? null;
     });
-  }, [mode, sources, companies]);
+  }, [mode, sources, companies, sourceQueue, reviewableSources]);
 
   useEffect(() => {
     if (mode === "source") {
@@ -86,20 +108,6 @@ export function CaraReviewPage() {
     const co = companies.find((c) => c.id === selectedId);
     if (co) setHumanScore(String(suggestedForCompany(co, sources)));
   }, [mode, selectedId, sources, companies]);
-
-  const sourceQueue = useMemo(
-    () =>
-      sources.filter((s) => s.status === "draft" || s.status === "pending_review"),
-    [sources],
-  );
-
-  const companyQueue = useMemo(
-    () =>
-      companies.filter(
-        (c) => c.status === "candidate" || c.status === "target",
-      ),
-    [companies],
-  );
 
   const selectedSource =
     mode === "source" ? sources.find((s) => s.id === selectedId) ?? null : null;
@@ -287,9 +295,15 @@ export function CaraReviewPage() {
       </div>
 
       <p className="thesis">
-        <strong>CARA Review.</strong> Suggested confidence is not a decision.
-        Only a human can agree, adjust, or reject — with versioned reasoning.
-        Company reviews do not change kvk_gate or candidate/target/staged.
+        <strong>CARA — twee menselijke controlepunten</strong> (na
+        kandidatentriage). Suggested confidence is not a decision. Agree =
+        bewijs + score kloppen; Adjust/Disagree eisen reden.{" "}
+        <span style={{ color: "var(--cara)", fontWeight: 600 }}>CARA (bronnen)</span>{" "}
+        and{" "}
+        <span style={{ color: "var(--cara)", fontWeight: 600 }}>CARA (bedrijven)</span>{" "}
+        share the same mechanism. Sources met status{" "}
+        <span className="mono">candidate</span> horen in Workspace →
+        Kandidatenlijst, niet hier.
       </p>
 
       <div className="row" style={{ marginBottom: "1rem" }}>
@@ -298,24 +312,32 @@ export function CaraReviewPage() {
           className="btn secondary small"
           style={
             mode === "source"
-              ? { borderColor: "var(--teal)", fontWeight: 700 }
+              ? {
+                  borderColor: "var(--cara)",
+                  background: "var(--cara-soft)",
+                  fontWeight: 700,
+                }
               : undefined
           }
           onClick={() => setMode("source")}
         >
-          Sources ({sourceQueue.length} in queue)
+          CARA (bronnen) ({sourceQueue.length} in queue)
         </button>
         <button
           type="button"
           className="btn secondary small"
           style={
             mode === "company"
-              ? { borderColor: "var(--teal)", fontWeight: 700 }
+              ? {
+                  borderColor: "var(--cara)",
+                  background: "var(--cara-soft)",
+                  fontWeight: 700,
+                }
               : undefined
           }
           onClick={() => setMode("company")}
         >
-          Companies ({companyQueue.length})
+          CARA (bedrijven) ({companyQueue.length})
         </button>
       </div>
 
@@ -330,13 +352,13 @@ export function CaraReviewPage() {
         <section className="panel">
           <h2>
             {mode === "source"
-              ? `Review queue (${sourceQueue.length})`
-              : `Companies (${companyQueue.length})`}
+              ? `CARA (bronnen) — queue (${sourceQueue.length})`
+              : `CARA (bedrijven) — queue (${companyQueue.length})`}
           </h2>
           <p className="hint">Non-blocking — investigation continues in Workspace.</p>
           <div className="list">
             {mode === "source"
-              ? sources.map((s) => (
+              ? reviewableSources.map((s) => (
                   <button
                     key={s.id}
                     type="button"
@@ -361,6 +383,9 @@ export function CaraReviewPage() {
                     <p className="muted">
                       {s.category} · suggested{" "}
                       {s.suggestedConfidence ?? s.suggestedWeight ?? "—"}
+                      {s.evidence?.summary_reasons?.length
+                        ? ` · ${s.evidence.summary_reasons.length} evidence notes`
+                        : ""}
                     </p>
                   </button>
                 ))
@@ -390,8 +415,10 @@ export function CaraReviewPage() {
                     </p>
                   </button>
                 ))}
-            {mode === "source" && !sources.length ? (
-              <div className="empty">No sources to review.</div>
+            {mode === "source" && !reviewableSources.length ? (
+              <div className="empty">
+                No sources ready for CARA. Keep candidates in Workspace first.
+              </div>
             ) : null}
             {mode === "company" && !companies.length ? (
               <div className="empty">No companies yet.</div>
@@ -415,6 +442,7 @@ export function CaraReviewPage() {
               meta={`${selectedSource.category} · ${selectedSource.type}`}
               body={selectedSource.reason || "No reason recorded yet."}
               url={selectedSource.url}
+              evidence={selectedSource.evidence}
               suggested={
                 selectedSource.suggestedConfidence ??
                 selectedSource.suggestedWeight ??
@@ -442,6 +470,7 @@ export function CaraReviewPage() {
                   : "No list membership."
               }
               url={undefined}
+              evidence={undefined}
               suggested={suggestedForCompany(selectedCompany, sources)}
               humanScore={humanScore}
               setHumanScore={setHumanScore}
@@ -465,6 +494,7 @@ function JudgementForm({
   meta,
   body,
   url,
+  evidence,
   suggested,
   humanScore,
   setHumanScore,
@@ -480,6 +510,7 @@ function JudgementForm({
   meta: string;
   body: string;
   url?: string;
+  evidence?: SourceEvidence;
   suggested: string | number;
   humanScore: string;
   setHumanScore: (v: string) => void;
@@ -499,6 +530,7 @@ function JudgementForm({
       <h3 style={{ marginTop: 0 }}>{title}</h3>
       <p>{body}</p>
       {url ? <p className="mono">{url}</p> : null}
+      {evidence ? <EvidenceBlock evidence={evidence} /> : null}
       <p className="muted">Suggested confidence: {suggested}</p>
 
       <form
@@ -555,4 +587,79 @@ function JudgementForm({
       </div>
     </>
   );
+}
+
+function EvidenceBlock({ evidence }: { evidence: SourceEvidence }) {
+  const rwp = evidence.real_world_presence;
+  return (
+    <div
+      style={{
+        margin: "0.75rem 0",
+        padding: "0.65rem 0.75rem",
+        borderRadius: 6,
+        border: "1px solid var(--line)",
+        background: "var(--panel-soft, transparent)",
+      }}
+    >
+      <h4 style={{ margin: "0 0 0.35rem", fontSize: "0.95rem" }}>
+        Structured evidence
+      </h4>
+      <div className="mission-meta" style={{ marginBottom: "0.35rem" }}>
+        {evidence.checked_at ? (
+          <StatusChip label={`checked ${evidence.checked_at.slice(0, 10)}`} />
+        ) : null}
+        {evidence.domain_age ? (
+          <StatusChip label={`domain ${evidence.domain_age}`} />
+        ) : null}
+        {evidence.org_age ? (
+          <StatusChip label={`org ${evidence.org_age}`} />
+        ) : null}
+        {evidence.membership_threshold ? (
+          <StatusChip label={`drempel ${evidence.membership_threshold}`} />
+        ) : null}
+        {evidence.content_consistency ? (
+          <StatusChip
+            label={
+              evidence.content_consistency.ok
+                ? "content OK"
+                : "content inconsistent"
+            }
+            tone={evidence.content_consistency.ok ? "active" : "waiting"}
+          />
+        ) : null}
+      </div>
+      {evidence.host_info ? (
+        <p className="muted" style={{ margin: "0.25rem 0" }}>
+          Host: {evidence.host_info}
+        </p>
+      ) : null}
+      {evidence.content_consistency?.note ? (
+        <p style={{ margin: "0.25rem 0" }}>{evidence.content_consistency.note}</p>
+      ) : null}
+      {rwp ? (
+        <p className="muted" style={{ margin: "0.25rem 0", fontSize: "0.9rem" }}>
+          Real-world: events {yn(rwp.events)} · news {yn(rwp.news)} · LinkedIn{" "}
+          {yn(rwp.linkedin)} · Facebook {yn(rwp.facebook)}
+          {rwp.notes ? ` — ${rwp.notes}` : ""}
+        </p>
+      ) : null}
+      {evidence.summary_reasons?.length ? (
+        <ul style={{ margin: "0.35rem 0 0", paddingLeft: "1.1rem" }}>
+          {evidence.summary_reasons.map((r) => (
+            <li key={r}>{r}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="hint" style={{ marginBottom: 0 }}>
+          Geen summary_reasons — bewijs nog dun.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function yn(v: boolean | undefined): string {
+  if (v === true) return "ja";
+  if (v === false) return "nee";
+  return "?";
 }

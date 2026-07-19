@@ -46,6 +46,7 @@ export function SituationRoomPage() {
     const pending = sources.filter(
       (s) => s.status === "draft" || s.status === "pending_review",
     ).length;
+    const sourceCandidates = sources.filter((s) => s.status === "candidate").length;
     const trusted = sources.filter(
       (s) => s.status === "accepted" || s.status === "adjusted",
     ).length;
@@ -65,6 +66,7 @@ export function SituationRoomPage() {
       .length;
     return {
       pending,
+      sourceCandidates,
       trusted,
       reused,
       rejectedHyp,
@@ -78,6 +80,7 @@ export function SituationRoomPage() {
 
   const bars = [
     { label: "Trusted lists (CARA)", value: metrics.trusted, max: 5 },
+    { label: "Source candidates (triage)", value: metrics.sourceCandidates, max: 8 },
     { label: "Sources (portfolio)", value: sources.length, max: 12 },
     { label: "Observation", value: observations.length, max: 10 },
     { label: "Hypothesis", value: hypotheses.length, max: 8 },
@@ -162,6 +165,11 @@ export function SituationRoomPage() {
         <section className="panel">
           <h2>Needs attention</h2>
           <div className="list">
+            <Issue
+              label="Source candidates (triage)"
+              count={metrics.sourceCandidates}
+              to={`/missions/${missionId}`}
+            />
             <Issue
               label="Needs human review (sources)"
               count={metrics.pending}

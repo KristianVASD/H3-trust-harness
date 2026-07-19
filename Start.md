@@ -874,7 +874,16 @@ Human now; OmegaClaw later. Output: Source + reason + evidence refs + suggested 
 
 Chain: Observation → Evidence → Signal → Suggested confidence. Fully explainable (e.g. site since 2003 → longevity signal → confidence +8). Explainability panel required.
 
-7. CARA Review
+7. CARA — twee menselijke controlepunten
+
+Niet één eindknop. Twee expliciete human gates met hetzelfde mechanisme
+(CARA-tab: Sources-toggle / Companies-toggle), **zelfde markering** in elk diagram:
+
+- **CARA (bronnen)** — bronwaardering → status accepted / adjusted / rejected
+- **CARA (bedrijven)** — bedrijfsreview → Review + Finding
+
+**Check bekende bronnen** (mechanische dekking) krijgt een **neutrale** markering —
+nooit dezelfde kleur als CARA. Alleen accepted/adjusted bronnen tellen als covered.
 
 Richer than score adjust. Review chain in UI (simple, not heavy):
 
@@ -883,23 +892,16 @@ Observation → Hypothesis → Evidence → Suggested confidence
 
 Non-blocking UX preserved:
 
-
-
-
-
 One-click Agree (no reason)
-
-
 
 Adjust / Disagree requires reason
 
-
-
 Queue optional; investigation continues in Workspace
 
-
-
 CARA-only producers for final validation acts
+
+Hergebruik van een bron erft altijd een eerder menselijk CARA-oordeel —
+het omzeilt er nooit een.
 
 8. Investigation Memory
 

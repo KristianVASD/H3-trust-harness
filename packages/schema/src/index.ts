@@ -50,6 +50,11 @@ export const MissionSchema = z.object({
   subsector: z.string().min(1),
   goal: z.string().min(1),
   notes: z.string().optional(),
+  /**
+   * Which shared search plan this mission uses (stem, e.g. "default.v1").
+   * Lives outside writable/ so plans can evolve independently of missions.
+   */
+  search_plan_version: z.string().min(1).default("default.v1"),
   discoveryBrief: DiscoveryBriefSchema.default({
     approach: "",
     candidateListTypes: [],
@@ -117,6 +122,8 @@ export const SourceTypeSchema = z.enum([
 export type SourceType = z.infer<typeof SourceTypeSchema>;
 
 export const SourceStatusSchema = z.enum([
+  /** Proposed by OmegaClaw or human — triage before evidence/CARA. */
+  "candidate",
   "draft",
   "pending_review",
   "accepted",
@@ -125,6 +132,10 @@ export const SourceStatusSchema = z.enum([
 ]);
 export type SourceStatus = z.infer<typeof SourceStatusSchema>;
 
+/** Geographic reuse scope — required for warm-start coverage matching. */
+export const SourceScopeSchema = z.enum(["national", "regional", "local"]);
+export type SourceScope = z.infer<typeof SourceScopeSchema>;
+
 /** Trust-source taxonomy for discovery lists (separate from legacy Source.type). */
 export const SourceCategorySchema = z.enum([
   "registry",
@@ -132,15 +143,59 @@ export const SourceCategorySchema = z.enum([
   "quality_mark",
   "local_business_association",
   "internship_market",
+  "labor_market_presence",
+  "sector_qualification",
   "trade_fair",
   "sponsorship",
   "local_media",
   "peer_referral",
   "digital_presence",
+  "networking_group",
+  "municipal_initiative",
 ]);
 export type SourceCategory = z.infer<typeof SourceCategorySchema>;
 
 export const SOURCE_CATEGORIES = SourceCategorySchema.options;
+
+/** Membership barrier for quality orgs / associations / networking groups. */
+export const MembershipThresholdSchema = z.enum([
+  "laag",
+  "midden",
+  "hoog",
+  "onbekend",
+]);
+export type MembershipThreshold = z.infer<typeof MembershipThresholdSchema>;
+
+export const RealWorldPresenceSchema = z.object({
+  events: z.boolean().optional(),
+  news: z.boolean().optional(),
+  linkedin: z.boolean().optional(),
+  facebook: z.boolean().optional(),
+  notes: z.string().optional(),
+});
+export type RealWorldPresence = z.infer<typeof RealWorldPresenceSchema>;
+
+/**
+ * Structured evidence on a Source — what CARA (bronnen) reacts to.
+ * Distinct from the mission-scoped Evidence collection (observation snippets).
+ */
+export const SourceEvidenceSchema = z.object({
+  checked_at: IsoDateSchema.optional(),
+  url: z.string().optional(),
+  domain_age: z.string().optional(),
+  org_age: z.string().optional(),
+  host_info: z.string().optional(),
+  membership_threshold: MembershipThresholdSchema.optional(),
+  content_consistency: z
+    .object({
+      ok: z.boolean(),
+      note: z.string().optional(),
+    })
+    .optional(),
+  real_world_presence: RealWorldPresenceSchema.optional(),
+  summary_reasons: z.array(z.string()).default([]),
+});
+export type SourceEvidence = z.infer<typeof SourceEvidenceSchema>;
 
 const sourceObjectSchema = z.object({
   id: z.string().uuid(),
@@ -156,13 +211,23 @@ const sourceObjectSchema = z.object({
   type: SourceTypeSchema,
   /** Migrates missing values to digital_presence on parse. */
   category: SourceCategorySchema.default("digital_presence"),
+  /**
+   * Reuse scope. Required on create; missing legacy rows default to regional
+   * so they never silently match as national coverage.
+   */
+  scope: SourceScopeSchema.default("regional"),
+  /** Region label for regional/local sources; ignored when scope is national. */
+  region: z.string().default(""),
   url: z.string().optional(),
   reason: z.string().optional(),
   suggestedWeight: z.number().min(0).max(100).optional(),
   suggestedConfidence: z.number().min(0).max(100).optional(),
   signalIds: z.array(z.string().uuid()).default([]),
   evidenceIds: z.array(z.string().uuid()).default([]),
-  status: SourceStatusSchema.default("draft"),
+  /** Structured proof OmegaClaw/human fills after triage — CARA reacts to this. */
+  evidence: SourceEvidenceSchema.optional(),
+  /** New proposals start as candidate; kept ones move to draft → CARA. */
+  status: SourceStatusSchema.default("candidate"),
   notes: z.string().optional(),
   /** Legacy owner field — stripped after migrate. */
   missionId: z.string().uuid().optional(),
@@ -180,6 +245,12 @@ export const SourceSchema = z.preprocess((raw) => {
   }
   if (!Array.isArray(o.reused_in_missions)) {
     o.reused_in_missions = [];
+  }
+  if (o.scope == null || o.scope === "") {
+    o.scope = "regional";
+  }
+  if (typeof o.region !== "string") {
+    o.region = "";
   }
   return o;
 }, sourceObjectSchema.transform(({ missionId: _legacy, ...rest }) => rest));
@@ -390,3 +461,5 @@ export type CollectionName = z.infer<typeof CollectionNameSchema>;
 
 export * from "./agent-contracts";
 export * from "./list-coverage";
+export * from "./resolve-source-gaps";
+export * from "./search-plan";

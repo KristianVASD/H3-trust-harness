@@ -138,11 +138,12 @@ The reasoning layer.
 
 Still **not** a final trust score — only a proposal for CARA.
 
-### 4. CARA Review — `/missions/:id/cara`
+### 4. CARA Review — `/missions/:id/cara` (twee controlepunten)
 
 Human alignment. OmegaClaw must never do this as final authority.
 
-Toggle **Sources** | **Companies**.
+Toggle **CARA (bronnen)** | **CARA (bedrijven)** — same agree/adjust/disagree mechanism, same mark in every overview.  
+**Check bekende bronnen** (Workspace → Sources coverage panel) is a separate mechanical lookup: only `accepted` / `adjusted` sources count as covered.
 
 1. Pick an item from the queue  
 2. Read suggested confidence (for companies: average of linked sources)  
@@ -153,6 +154,8 @@ Toggle **Sources** | **Companies**.
 
 For **sources**, Agree/Adjust/Disagree also updates source status (`accepted` / `adjusted` / `rejected`).  
 For **companies**, CARA writes Review + Finding only — it does **not** change `candidate` / `target` / `staged` or `kvk_gate`.
+
+Reuse of a source always inherits a prior human CARA judgement — it never bypasses one.
 
 You can keep working in Workspace while reviews wait — CARA is not a blocker.
 

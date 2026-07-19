@@ -1,3 +1,4 @@
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { serve } from "@hono/node-server";
@@ -5,16 +6,46 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import {
   CollectionNameSchema,
+  DEFAULT_SEARCH_PLAN_VERSION,
+  SearchPlanSchema,
   type CollectionName,
   type Mission,
   type Producer,
+  type SearchPlan,
   type Source,
 } from "@h3-trust/schema";
 import { FileStore } from "@h3-trust/store";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const writableRoot = path.resolve(__dirname, "../../../writable");
+const searchPlansRoot = path.resolve(__dirname, "../../../searchplans");
 const store = new FileStore(writableRoot);
+
+async function listSearchPlanVersions(): Promise<string[]> {
+  try {
+    const files = await readdir(searchPlansRoot);
+    return files
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => f.replace(/\.json$/i, ""))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+async function loadSearchPlan(version: string): Promise<SearchPlan | null> {
+  const safe = version.replace(/[^a-zA-Z0-9._-]/g, "");
+  if (!safe) return null;
+  try {
+    const raw = await readFile(
+      path.join(searchPlansRoot, `${safe}.json`),
+      "utf8",
+    );
+    return SearchPlanSchema.parse(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
 
 const app = new Hono();
 
@@ -28,6 +59,21 @@ app.use(
 app.get("/api/health", (c) =>
   c.json({ ok: true, service: "h3-trust-harness", writableRoot }),
 );
+
+/** Shared (non-mission) search plans — versioned under /searchplans. */
+app.get("/api/searchplans", async (c) => {
+  const versions = await listSearchPlanVersions();
+  const latest = versions.includes(DEFAULT_SEARCH_PLAN_VERSION)
+    ? DEFAULT_SEARCH_PLAN_VERSION
+    : (versions[versions.length - 1] ?? DEFAULT_SEARCH_PLAN_VERSION);
+  return c.json({ versions, latest });
+});
+
+app.get("/api/searchplans/:version", async (c) => {
+  const plan = await loadSearchPlan(c.req.param("version"));
+  if (!plan) return c.json({ error: "Search plan not found" }, 404);
+  return c.json(plan);
+});
 
 app.get("/api/missions", async (c) => {
   const missions = await store.listMissions();
@@ -107,6 +153,11 @@ app.get("/api/sources/linkable", async (c) => {
   const q = c.req.query("q") ?? "";
   const items = await store.listLinkableSources(excludeMission, q);
   return c.json(items);
+});
+
+/** Full catalogue for mechanical coverage queries. */
+app.get("/api/sources", async (c) => {
+  return c.json(await store.listAllSources());
 });
 
 const missionCollections = CollectionNameSchema.options.filter(

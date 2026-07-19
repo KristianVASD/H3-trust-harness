@@ -84,4 +84,7 @@ export interface Store {
     excludeMissionId: string,
     q?: string,
   ): Promise<Source[]>;
+
+  /** Full catalogue — for mechanical coverage (Check bekende bronnen). */
+  listAllSources(): Promise<Source[]>;
 }

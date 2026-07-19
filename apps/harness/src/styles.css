@@ -9,6 +9,12 @@
   --coral: #993c1d;
   --coral-soft: #faece7;
   --amber: #8a6d1d;
+  /* Diagram/legend: two human CARA checkpoints share this mark */
+  --cara: #c47a12;
+  --cara-soft: #fde9c8;
+  /* Mechanical coverage lookup — never the same as CARA */
+  --coverage-check: #6b7280;
+  --coverage-check-soft: #eef0f3;
   --white: #faf8f3;
   --shadow: 0 12px 40px rgba(26, 31, 28, 0.08);
   --font-display: "Newsreader", Georgia, serif;

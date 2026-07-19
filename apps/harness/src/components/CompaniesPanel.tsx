@@ -390,6 +390,8 @@ function CompanyBulkImport({
           name: newSourceName.trim(),
           type: "association" as const,
           category: newCategory,
+          scope: "regional" as const,
+          region: "",
           reason: `Bulk import source: ${listLabel}`,
           signalIds: [],
           evidenceIds: [],
