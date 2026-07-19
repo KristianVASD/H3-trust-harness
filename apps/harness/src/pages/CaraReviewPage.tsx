@@ -292,17 +292,17 @@ export function CaraReviewPage() {
   return (
     <div>
       <p className="thesis">
-        <strong>CARA — twee menselijke controlepunten</strong> (na
-        kandidatentriage). Suggested confidence is not a decision. Agree =
-        bewijs + score kloppen; Adjust/Disagree eisen reden.{" "}
-        <span style={{ color: "var(--cara)", fontWeight: 600 }}>◉ CARA (bronnen)</span>{" "}
+        <strong>CARA — two human checkpoints</strong> (after candidate triage).
+        Suggested confidence is not a decision. Agree = evidence + score look
+        right; Adjust/Disagree require a reason.{" "}
+        <span style={{ color: "var(--cara)", fontWeight: 600 }}>◉ CARA (sources)</span>{" "}
         and{" "}
         <span style={{ color: "var(--cara-company)", fontWeight: 600 }}>
-          ◆ CARA (bedrijven)
+          ◆ CARA (companies)
         </span>{" "}
-        zijn visueel gescheiden. Sources met status{" "}
-        <span className="mono">candidate</span> horen in{" "}
-        <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>, niet hier.
+        are visually separate. Sources with status{" "}
+        <span className="mono">candidate</span> belong in{" "}
+        <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>, not here.
       </p>
 
       <div className="row" style={{ marginBottom: "1rem" }}>
@@ -320,7 +320,7 @@ export function CaraReviewPage() {
           }
           onClick={() => setMode("source")}
         >
-          ◉ CARA (bronnen) ({sourceQueue.length} in queue)
+          ◉ CARA (sources) ({sourceQueue.length} in queue)
         </button>
         <button
           type="button"
@@ -336,7 +336,7 @@ export function CaraReviewPage() {
           }
           onClick={() => setMode("company")}
         >
-          ◆ CARA (bedrijven) ({companyQueue.length})
+          ◆ CARA (companies) ({companyQueue.length})
         </button>
       </div>
 
@@ -353,8 +353,8 @@ export function CaraReviewPage() {
         >
           <h2>
             {mode === "source"
-              ? `◉ CARA (bronnen) — queue (${sourceQueue.length})`
-              : `◆ CARA (bedrijven) — queue (${companyQueue.length})`}
+              ? `◉ CARA (sources) — queue (${sourceQueue.length})`
+              : `◆ CARA (companies) — queue (${companyQueue.length})`}
           </h2>
           <p className="hint">Non-blocking — investigation continues in Workspace.</p>
           <div className="list">
@@ -419,19 +419,19 @@ export function CaraReviewPage() {
                 ))}
             {mode === "source" && !sourceQueue.length ? (
               <div className="empty">
-                Geen bronnen in CARA-queue. Houd kandidaten eerst in{" "}
+                No sources in the CARA queue. Keep candidates first in{" "}
                 <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>.
               </div>
             ) : null}
             {mode === "company" && !companyQueue.length ? (
-              <div className="empty">Geen bedrijven in CARA-queue.</div>
+              <div className="empty">No companies in the CARA queue.</div>
             ) : null}
           </div>
 
           {mode === "source" && reviewedSources.length > 0 ? (
             <details style={{ marginTop: "1rem" }}>
               <summary className="muted">
-                Eerder beoordeeld ({reviewedSources.length}) — read-only
+                Previously reviewed ({reviewedSources.length}) — read-only
               </summary>
               <div className="list" style={{ marginTop: "0.5rem" }}>
                 {reviewedSources.map((s) => {
@@ -463,7 +463,7 @@ export function CaraReviewPage() {
           {mode === "company" && reviewedCompanies.length > 0 ? (
             <details style={{ marginTop: "1rem" }}>
               <summary className="muted">
-                Eerder beoordeeld ({reviewedCompanies.length}) — read-only
+                Previously reviewed ({reviewedCompanies.length}) — read-only
               </summary>
               <div className="list" style={{ marginTop: "0.5rem" }}>
                 {reviewedCompanies.map((c) => {
@@ -717,7 +717,7 @@ function EvidenceBlock({ evidence }: { evidence: SourceEvidence }) {
         </ul>
       ) : (
         <p className="hint" style={{ marginBottom: 0 }}>
-          Geen summary_reasons — bewijs nog dun.
+          No summary reasons yet — evidence is still thin.
         </p>
       )}
     </div>

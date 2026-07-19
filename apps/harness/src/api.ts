@@ -46,7 +46,7 @@ export const api = {
     request<Hypothesis[]>(`/missions/${missionId}/hypotheses`),
   listSources: (missionId: string) =>
     request<Source[]>(`/missions/${missionId}/sources`),
-  /** Full catalogue — Check bekende bronnen / resolveSourceGaps. */
+  /** Full catalogue — Check known sources / resolveSourceGaps. */
   listAllSources: () => request<Source[]>("/sources"),
   listCompanies: (missionId: string) =>
     request<Company[]>(`/missions/${missionId}/companies`),

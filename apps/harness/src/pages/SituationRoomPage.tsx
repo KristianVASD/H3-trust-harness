@@ -101,21 +101,57 @@ export function SituationRoomPage() {
         Situation Room
       </h1>
       <p className="muted">
-        Fase 0: build a suitable list portfolio first. Reuse proves the method transfers.
+        Phase 0: build a suitable list portfolio first. Reuse proves the method transfers.
       </p>
 
       {error ? <div className="error">{error}</div> : null}
 
       <section className="panel" style={{ marginBottom: "1rem" }}>
+        <h2 style={{ marginTop: 0 }}>Data Worker status</h2>
+        <p className="hint" style={{ marginTop: 0 }}>
+          Linear production line — gaps, CARA lists, import, ranked results.
+        </p>
+        <div className="mission-meta" style={{ marginBottom: "0.75rem" }}>
+          <StatusChip
+            label={`${metrics.trusted}/5 trusted lists`}
+            tone={metrics.trusted >= 5 ? "done" : "waiting"}
+          />
+          <StatusChip
+            label={`${metrics.pending} in CARA queue`}
+            tone={metrics.pending ? "active" : "waiting"}
+          />
+          <StatusChip
+            label={`${metrics.sourceCandidates} candidates`}
+            tone={metrics.sourceCandidates ? "active" : "waiting"}
+          />
+          <StatusChip
+            label={`${companies.length} companies`}
+            tone={companies.length ? "active" : "waiting"}
+          />
+        </div>
+        <div className="row" style={{ gap: "0.5rem", flexWrap: "wrap" }}>
+          <Link className="btn small" to={`/work/${missionId}/sources`}>
+            ⚡ Open Data Worker
+          </Link>
+          <Link className="btn secondary small" to={`/work/${missionId}/cara`}>
+            CARA queue
+          </Link>
+          <Link className="btn secondary small" to={`/work/${missionId}/results`}>
+            Results
+          </Link>
+        </div>
+      </section>
+
+      <section className="panel" style={{ marginBottom: "1rem" }}>
         <h2 style={{ marginTop: 0 }}>Source reuse</h2>
         <p style={{ marginBottom: 0, fontSize: "1.15rem" }}>
           <strong className="mono">
-            {metrics.reused} van {sources.length}
+            {metrics.reused} of {sources.length}
           </strong>{" "}
-          sources in deze missie hergebruikt uit eerdere missies
+          sources in this mission reused from earlier missions
         </p>
         <p className="hint">
-          X = first_seen_mission ≠ deze missie. Dat is het generalisatie-bewijs.
+          X = first_seen_mission ≠ this mission. That is the generalisation proof.
         </p>
       </section>
 
@@ -159,17 +195,17 @@ export function SituationRoomPage() {
             <Issue
               label="Source candidates (triage)"
               count={metrics.sourceCandidates}
-              to={`/missions/${missionId}`}
+              to={`/work/${missionId}/sources`}
             />
             <Issue
               label="Needs human review (sources)"
               count={metrics.pending}
-              to={`/missions/${missionId}/cara`}
+              to={`/work/${missionId}/cara`}
             />
             <Issue
               label="Trusted lists (accepted/adjusted)"
               count={metrics.trusted}
-              to={`/missions/${missionId}/cara`}
+              to={`/work/${missionId}/cara`}
             />
             <Issue
               label="Company candidates"

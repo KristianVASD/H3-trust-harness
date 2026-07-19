@@ -158,12 +158,16 @@ export type SourceCategory = z.infer<typeof SourceCategorySchema>;
 export const SOURCE_CATEGORIES = SourceCategorySchema.options;
 
 /** Membership barrier for quality orgs / associations / networking groups. */
-export const MembershipThresholdSchema = z.enum([
-  "laag",
-  "midden",
-  "hoog",
-  "onbekend",
-]);
+export const MembershipThresholdSchema = z.preprocess((raw) => {
+  if (typeof raw !== "string") return raw;
+  const legacy: Record<string, string> = {
+    laag: "low",
+    midden: "medium",
+    hoog: "high",
+    onbekend: "unknown",
+  };
+  return legacy[raw] ?? raw;
+}, z.enum(["low", "medium", "high", "unknown"]));
 export type MembershipThreshold = z.infer<typeof MembershipThresholdSchema>;
 
 export const RealWorldPresenceSchema = z.object({
@@ -176,7 +180,7 @@ export const RealWorldPresenceSchema = z.object({
 export type RealWorldPresence = z.infer<typeof RealWorldPresenceSchema>;
 
 /**
- * Structured evidence on a Source — what CARA (bronnen) reacts to.
+ * Structured evidence on a Source — what CARA (sources) reacts to.
  * Distinct from the mission-scoped Evidence collection (observation snippets).
  */
 export const SourceEvidenceSchema = z.object({

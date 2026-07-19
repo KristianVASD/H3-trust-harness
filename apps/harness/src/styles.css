@@ -879,6 +879,75 @@ a {
 .worker-source-row.candidate {
   background: var(--triage-soft);
   border-color: #93c5fd;
+  align-items: flex-start;
+}
+
+.worker-candidate-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.worker-candidate-toggle:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.worker-candidate-toggle-hint {
+  font-size: 0.8rem;
+}
+
+.worker-source-url {
+  color: var(--triage);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  word-break: break-all;
+}
+
+.worker-source-url:hover {
+  color: var(--ink);
+}
+
+.worker-proposal-reason {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.worker-proposal-reason.compact {
+  margin-top: 0.25rem;
+}
+
+.worker-proposal-notes {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+}
+
+.worker-proposal-details {
+  margin-top: 0.65rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.worker-proposal-evidence {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+}
+
+.worker-proposal-evidence h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
 }
 
 .worker-add-form {
@@ -976,4 +1045,88 @@ a {
   color: var(--ink-soft);
   font-size: 0.85rem;
 }
+
+.worker-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+}
+
+.worker-gap-actions {
+  margin-top: 0.75rem;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.worker-evidence-form {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+  padding: 0.65rem;
+  border: 1px dashed var(--line);
+  background: var(--paper);
+}
+
+.worker-evidence-form label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.worker-evidence-checks {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.worker-evidence-checks legend {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.check-inline {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.worker-evidence-summary {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}
+
+.worker-cara-evidence {
+  margin: 0.75rem 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--paper-2);
+}
+
+.worker-human-check {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 180px;
+}
+
+.worker-human-check label {
+  display: grid;
+  gap: 0.15rem;
+  font-size: 0.8rem;
+}
+
+.worker-human-check textarea,
+.worker-human-check input {
+  font-size: 0.85rem;
+}
+
 

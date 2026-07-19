@@ -36,6 +36,21 @@ Sample bulk-import files: [`fixtures/samples/`](fixtures/samples/).
 
 ---
 
+## BGI Open Build — 3-Minute Demo
+
+1. `pnpm install && pnpm seed && pnpm dev`
+2. Open http://localhost:5173
+3. Click **Haarlemmermeer · Painters** → **⚡ Data Worker**
+4. See: trusted sources, gap board, CARA queue — then Import → Results
+5. On Results: ranked trust scores, list mentions, human check (Agree / Adjust / Disagree)
+6. Click **Export investigation** → open the JSON → full reasoning trail
+
+This is Trust Discovery: evidence-based, human-validated, AI-ready.
+
+**Two UIs, one system:** Data Worker = linear production line. Investigator = notebook, Situation Room, graph. Switch anytime via **⚡ Data Worker** / **← Investigation**.
+
+---
+
 ## Design thesis
 
 Human investigators work today. OmegaClaw becomes another investigator tomorrow. Every object carries a **Producer**. OmegaClaw never performs final CARA validation.
@@ -138,12 +153,12 @@ The reasoning layer.
 
 Still **not** a final trust score — only a proposal for CARA.
 
-### 4. CARA Review — `/missions/:id/cara` (twee controlepunten)
+### 4. CARA Review — `/missions/:id/cara` (two checkpoints)
 
 Human alignment. OmegaClaw must never do this as final authority.
 
-Toggle **CARA (bronnen)** | **CARA (bedrijven)** — same agree/adjust/disagree mechanism, same mark in every overview.  
-**Check bekende bronnen** (Workspace → Sources coverage panel) is a separate mechanical lookup: only `accepted` / `adjusted` sources count as covered.
+Toggle **CARA (sources)** | **CARA (companies)** — same agree/adjust/disagree mechanism, same mark in every overview.  
+**Check known sources** (Workspace → Sources coverage panel) is a separate mechanical lookup: only `accepted` / `adjusted` sources count as covered.
 
 1. Pick an item from the queue  
 2. Read suggested confidence (for companies: average of linked sources)  

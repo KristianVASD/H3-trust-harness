@@ -3,14 +3,150 @@ import { v4 as uuid } from "uuid";
 import {
   resolveSourceGaps,
   type CategoryCoverage,
+  type MembershipThreshold,
   type Mission,
   type SearchPlanEntry,
   type Source,
   type SourceCategory,
+  type SourceEvidence,
   type SourceScope,
 } from "@h3-trust/schema";
 import { api } from "../../api";
 import { ProducerBadge, StatusChip } from "../Badges";
+
+type EvidenceDraft = {
+  domain_age: string;
+  org_age: string;
+  membership_threshold: MembershipThreshold;
+  events: boolean;
+  news: boolean;
+  linkedin: boolean;
+  summary: string;
+};
+
+function evidenceToDraft(ev?: SourceEvidence): EvidenceDraft {
+  return {
+    domain_age: ev?.domain_age ?? "",
+    org_age: ev?.org_age ?? "",
+    membership_threshold: ev?.membership_threshold ?? "unknown",
+    events: ev?.real_world_presence?.events ?? false,
+    news: ev?.real_world_presence?.news ?? false,
+    linkedin: ev?.real_world_presence?.linkedin ?? false,
+    summary: ev?.summary_reasons?.[0] ?? "",
+  };
+}
+
+function draftToEvidence(d: EvidenceDraft, url?: string): SourceEvidence {
+  const now = new Date().toISOString();
+  const reasons = d.summary.trim() ? [d.summary.trim()] : [];
+  return {
+    checked_at: now,
+    url: url || undefined,
+    domain_age: d.domain_age.trim() || undefined,
+    org_age: d.org_age.trim() || undefined,
+    membership_threshold: d.membership_threshold,
+    real_world_presence: {
+      events: d.events,
+      news: d.news,
+      linkedin: d.linkedin,
+    },
+    summary_reasons: reasons,
+  };
+}
+
+function hasEvidencePayload(ev?: SourceEvidence): boolean {
+  if (!ev) return false;
+  return Boolean(
+    ev.domain_age ||
+      ev.org_age ||
+      ev.host_info ||
+      ev.membership_threshold ||
+      ev.content_consistency ||
+      ev.real_world_presence ||
+      (ev.summary_reasons?.length ?? 0) > 0,
+  );
+}
+
+function evidenceTeaser(ev?: SourceEvidence): string | null {
+  if (!ev) return null;
+  const parts = [
+    ev.domain_age ? `domain ${ev.domain_age}` : null,
+    ev.org_age ? `org ${ev.org_age}` : null,
+    ev.host_info ? `host ${ev.host_info}` : null,
+    ev.membership_threshold && ev.membership_threshold !== "unknown"
+      ? `membership ${ev.membership_threshold}`
+      : null,
+    ev.summary_reasons?.[0],
+  ].filter(Boolean);
+  return parts.length ? parts.join(" · ") : null;
+}
+
+function SourceProposalDetails({ source }: { source: Source }) {
+  const ev = source.evidence;
+  const presence = ev?.real_world_presence
+    ? [
+        ev.real_world_presence.events ? "events" : null,
+        ev.real_world_presence.news ? "news" : null,
+        ev.real_world_presence.linkedin ? "linkedin" : null,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
+  return (
+    <div className="worker-proposal-details">
+      {source.reason ? (
+        <p className="worker-proposal-reason">{source.reason}</p>
+      ) : (
+        <p className="hint" style={{ margin: 0 }}>
+          No proposal reason recorded.
+        </p>
+      )}
+      {source.notes ? <p className="muted worker-proposal-notes">{source.notes}</p> : null}
+
+      {hasEvidencePayload(ev) ? (
+        <div className="worker-proposal-evidence">
+          <h4>Why this source</h4>
+          <ul className="worker-mention-list">
+            {ev?.domain_age ? <li>Domain age: {ev.domain_age}</li> : null}
+            {ev?.org_age ? <li>Org age: {ev.org_age}</li> : null}
+            {ev?.host_info ? <li>Host: {ev.host_info}</li> : null}
+            {ev?.membership_threshold ? (
+              <li>Membership: {ev.membership_threshold}</li>
+            ) : null}
+            {ev?.content_consistency ? (
+              <li>
+                Content consistency:{" "}
+                {ev.content_consistency.ok ? "ok" : "weak"}
+                {ev.content_consistency.note
+                  ? ` — ${ev.content_consistency.note}`
+                  : ""}
+              </li>
+            ) : null}
+            {presence ? <li>Real-world: {presence}</li> : null}
+            {ev?.real_world_presence?.notes ? (
+              <li>{ev.real_world_presence.notes}</li>
+            ) : null}
+            {(ev?.summary_reasons ?? []).map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p className="hint worker-thin-warning" style={{ marginBottom: 0 }}>
+          No structured evidence yet — open the URL and judge carefully before
+          Keep.
+        </p>
+      )}
+    </div>
+  );
+}
+
+const OMEGA_STUB_NAMES = [
+  "Regional trade directory (OmegaClaw)",
+  "Local chamber listing (OmegaClaw)",
+  "Sector membership scrape (OmegaClaw)",
+];
 
 export function GapFillBoard({
   missionId,
@@ -44,6 +180,12 @@ export function GapFillBoard({
   const [url, setUrl] = useState("");
   const [name, setName] = useState("");
   const [weight, setWeight] = useState("70");
+  const [evidenceOpenId, setEvidenceOpenId] = useState<string | null>(null);
+  const [evidenceDraft, setEvidenceDraft] = useState<EvidenceDraft>(
+    evidenceToDraft(),
+  );
+  const [inspectOpenId, setInspectOpenId] = useState<string | null>(null);
+  const [omegaBusyCat, setOmegaBusyCat] = useState<string | null>(null);
 
   const missionSourcesByCat = useMemo(() => {
     const map = new Map<string, Source[]>();
@@ -54,6 +196,11 @@ export function GapFillBoard({
     }
     return map;
   }, [sources]);
+
+  const draftCount = useMemo(
+    () => sources.filter((s) => s.status === "draft").length,
+    [sources],
+  );
 
   async function addCandidate(
     e: FormEvent,
@@ -151,7 +298,108 @@ export function GapFillBoard({
     }
   }
 
-  // Group coverage rows by category for multi-layer display
+  async function sendAllDrafts() {
+    const drafts = sources.filter((s) => s.status === "draft");
+    if (!drafts.length) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const now = new Date().toISOString();
+      for (const s of drafts) {
+        await api.updateEntity("sources", {
+          ...s,
+          status: "pending_review",
+          updatedAt: now,
+        });
+      }
+      await onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Bulk send failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function openEvidence(source: Source) {
+    setEvidenceOpenId(source.id);
+    setEvidenceDraft(evidenceToDraft(source.evidence));
+  }
+
+  async function saveEvidence(source: Source) {
+    setBusy(true);
+    setError(null);
+    try {
+      await api.updateEntity("sources", {
+        ...source,
+        evidence: draftToEvidence(evidenceDraft, source.url),
+        updatedAt: new Date().toISOString(),
+      });
+      setEvidenceOpenId(null);
+      await onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save evidence failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Stub — UI-ready for OmegaClaw; later a real API call. */
+  async function askOmegaClaw(category: SourceCategory, layer: SourceScope) {
+    setOmegaBusyCat(category);
+    setError(null);
+    try {
+      await new Promise((r) => setTimeout(r, 1200));
+      const now = new Date().toISOString();
+      const picks = OMEGA_STUB_NAMES.slice(0, 2);
+      for (const [i, label] of picks.entries()) {
+        await api.createInMission(missionId, "sources", {
+          id: uuid(),
+          producer: "OmegaClaw" as const,
+          first_seen_mission: missionId,
+          reused_in_missions: [],
+          name: `${label} · ${category}`,
+          type: "directory" as const,
+          category,
+          scope: layer,
+          region: layer === "national" ? "" : mission.location,
+          url: `https://example.com/omegaclaw/${category}/${i + 1}`,
+          reason: `OmegaClaw suggestion for ${category} gap (${layer}). Matches mission sector/location heuristics.`,
+          suggestedWeight: 45 + i * 5,
+          suggestedConfidence: 45 + i * 5,
+          signalIds: [],
+          evidenceIds: [],
+          status: "candidate" as const,
+          notes: "Stub proposal — replace with live OmegaClaw later.",
+          evidence: {
+            checked_at: now,
+            url: `https://example.com/omegaclaw/${category}/${i + 1}`,
+            domain_age: i === 0 ? "8+ years" : "2 years",
+            membership_threshold: i === 0 ? "medium" : "low",
+            real_world_presence: {
+              events: i === 0,
+              news: true,
+              linkedin: false,
+            },
+            summary_reasons: [
+              `✓ Fills ${category} / ${layer} gap`,
+              i === 0
+                ? "✓ Directory has named member listings"
+                : "? Thin scrape — verify before keep",
+            ],
+          },
+          createdAt: now,
+          updatedAt: now,
+          v: 1,
+        });
+      }
+      await onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "OmegaClaw stub failed");
+    } finally {
+      setOmegaBusyCat(null);
+    }
+  }
+
   const byCategory = useMemo(() => {
     const map = new Map<string, CategoryCoverage[]>();
     for (const row of coverage) {
@@ -165,6 +413,22 @@ export function GapFillBoard({
   return (
     <div className="gap-fill-board">
       {error ? <div className="error">{error}</div> : null}
+
+      {draftCount > 0 ? (
+        <div className="worker-bulk-bar">
+          <p className="muted" style={{ margin: 0 }}>
+            {draftCount} draft{draftCount === 1 ? "" : "s"} waiting for CARA
+          </p>
+          <button
+            type="button"
+            className="btn small"
+            disabled={busy}
+            onClick={() => void sendAllDrafts()}
+          >
+            Send all drafts to CARA
+          </button>
+        </div>
+      ) : null}
 
       {!coverage.length ? (
         <div className="empty">No search plan loaded for this mission.</div>
@@ -184,6 +448,7 @@ export function GapFillBoard({
               rows[0]?.layer ??
               "regional") as SourceScope;
             const addKey = category;
+            const omegaBusy = omegaBusyCat === category;
 
             return (
               <article
@@ -239,28 +504,178 @@ export function GapFillBoard({
                   <div className="worker-source-stack">
                     {drafts.map((s) => (
                       <div key={s.id} className="worker-source-row draft">
-                        <div>
+                        <div style={{ flex: 1 }}>
                           <strong>{s.name}</strong>
                           {s.url ? (
                             <p className="mono muted" style={{ margin: "0.1rem 0 0" }}>
-                              {s.url}
+                              <a
+                                href={s.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="worker-source-url"
+                              >
+                                {s.url}
+                              </a>
                             </p>
                           ) : null}
                           <div className="mission-meta" style={{ marginTop: "0.25rem" }}>
                             <ProducerBadge producer={s.producer} />
                             <StatusChip label={s.status} />
+                            {hasEvidencePayload(s.evidence) ? (
+                              <StatusChip label="evidence" tone="done" />
+                            ) : (
+                              <StatusChip label="no evidence" tone="waiting" />
+                            )}
                           </div>
+
+                          {evidenceOpenId === s.id ? (
+                            <div className="worker-evidence-form">
+                              <label>
+                                Domain age
+                                <input
+                                  value={evidenceDraft.domain_age}
+                                  onChange={(e) =>
+                                    setEvidenceDraft((d) => ({
+                                      ...d,
+                                      domain_age: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="e.g. 12 years / 3 months"
+                                />
+                              </label>
+                              <label>
+                                Org age
+                                <input
+                                  value={evidenceDraft.org_age}
+                                  onChange={(e) =>
+                                    setEvidenceDraft((d) => ({
+                                      ...d,
+                                      org_age: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="e.g. since 1998"
+                                />
+                              </label>
+                              <label>
+                                Membership
+                                <select
+                                  value={evidenceDraft.membership_threshold}
+                                  onChange={(e) =>
+                                    setEvidenceDraft((d) => ({
+                                      ...d,
+                                      membership_threshold: e.target
+                                        .value as MembershipThreshold,
+                                    }))
+                                  }
+                                >
+                                  <option value="low">low</option>
+                                  <option value="medium">medium</option>
+                                  <option value="high">high</option>
+                                  <option value="unknown">unknown</option>
+                                </select>
+                              </label>
+                              <fieldset className="worker-evidence-checks">
+                                <legend>Real-world</legend>
+                                <label className="check-inline">
+                                  <input
+                                    type="checkbox"
+                                    checked={evidenceDraft.events}
+                                    onChange={(e) =>
+                                      setEvidenceDraft((d) => ({
+                                        ...d,
+                                        events: e.target.checked,
+                                      }))
+                                    }
+                                  />
+                                  events
+                                </label>
+                                <label className="check-inline">
+                                  <input
+                                    type="checkbox"
+                                    checked={evidenceDraft.news}
+                                    onChange={(e) =>
+                                      setEvidenceDraft((d) => ({
+                                        ...d,
+                                        news: e.target.checked,
+                                      }))
+                                    }
+                                  />
+                                  news
+                                </label>
+                                <label className="check-inline">
+                                  <input
+                                    type="checkbox"
+                                    checked={evidenceDraft.linkedin}
+                                    onChange={(e) =>
+                                      setEvidenceDraft((d) => ({
+                                        ...d,
+                                        linkedin: e.target.checked,
+                                      }))
+                                    }
+                                  />
+                                  linkedin
+                                </label>
+                              </fieldset>
+                              <label>
+                                Summary
+                                <input
+                                  value={evidenceDraft.summary}
+                                  onChange={(e) =>
+                                    setEvidenceDraft((d) => ({
+                                      ...d,
+                                      summary: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="One-line reason for CARA"
+                                />
+                              </label>
+                              <div className="row" style={{ gap: "0.35rem" }}>
+                                <button
+                                  type="button"
+                                  className="btn small"
+                                  disabled={busy}
+                                  onClick={() => void saveEvidence(s)}
+                                >
+                                  Save evidence
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn secondary small"
+                                  onClick={() => setEvidenceOpenId(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : evidenceTeaser(s.evidence) ? (
+                            <p className="hint worker-evidence-summary">
+                              {evidenceTeaser(s.evidence)}
+                            </p>
+                          ) : null}
                         </div>
-                        <div className="row" style={{ gap: "0.35rem" }}>
+                        <div
+                          className="row"
+                          style={{ gap: "0.35rem", flexWrap: "wrap" }}
+                        >
                           {s.status === "draft" ? (
-                            <button
-                              type="button"
-                              className="btn secondary small"
-                              disabled={busy}
-                              onClick={() => void markReady(s)}
-                            >
-                              Ready for CARA
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                className="btn secondary small"
+                                disabled={busy}
+                                onClick={() => openEvidence(s)}
+                              >
+                                {s.evidence ? "Edit evidence" : "Add evidence"}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn secondary small"
+                                disabled={busy}
+                                onClick={() => void markReady(s)}
+                              >
+                                Ready for CARA
+                              </button>
+                            </>
                           ) : null}
                           <button
                             type="button"
@@ -278,36 +693,103 @@ export function GapFillBoard({
 
                 {candidates.length > 0 ? (
                   <div className="worker-source-stack">
-                    {candidates.map((s) => (
-                      <div key={s.id} className="worker-source-row candidate">
-                        <div>
-                          <strong>{s.name}</strong>
-                          {s.url ? (
-                            <p className="mono muted" style={{ margin: "0.1rem 0 0" }}>
-                              {s.url}
-                            </p>
-                          ) : null}
-                        </div>
-                        <div className="row" style={{ gap: "0.35rem" }}>
-                          <button
-                            type="button"
-                            className="btn small triage-keep"
-                            disabled={busy}
-                            onClick={() => void keep(s)}
+                    {candidates.map((s) => {
+                      const open = inspectOpenId === s.id;
+                      const teaser =
+                        evidenceTeaser(s.evidence) ||
+                        s.reason ||
+                        s.notes ||
+                        null;
+                      return (
+                        <div key={s.id} className="worker-source-row candidate">
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <button
+                              type="button"
+                              className="worker-candidate-toggle"
+                              aria-expanded={open}
+                              onClick={() =>
+                                setInspectOpenId(open ? null : s.id)
+                              }
+                            >
+                              <strong>{s.name}</strong>
+                              <span className="muted worker-candidate-toggle-hint">
+                                {open ? "Hide details" : "Show why chosen"}
+                              </span>
+                            </button>
+                            {s.url ? (
+                              <p
+                                className="mono muted"
+                                style={{ margin: "0.15rem 0 0" }}
+                              >
+                                <a
+                                  href={s.url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="worker-source-url"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {s.url}
+                                </a>
+                              </p>
+                            ) : null}
+                            {!open && s.reason ? (
+                              <p className="worker-proposal-reason compact">
+                                {s.reason}
+                              </p>
+                            ) : null}
+                            {!open && teaser && teaser !== s.reason ? (
+                              <p className="hint worker-evidence-summary">
+                                {teaser}
+                              </p>
+                            ) : null}
+                            <div
+                              className="mission-meta"
+                              style={{ marginTop: "0.25rem" }}
+                            >
+                              <ProducerBadge producer={s.producer} />
+                              {s.scope ? <StatusChip label={s.scope} /> : null}
+                              {s.region ? <StatusChip label={s.region} /> : null}
+                              {hasEvidencePayload(s.evidence) ? (
+                                <StatusChip label="evidence" tone="done" />
+                              ) : (
+                                <StatusChip label="no evidence" tone="waiting" />
+                              )}
+                            </div>
+                            {open ? <SourceProposalDetails source={s} /> : null}
+                          </div>
+                          <div
+                            className="row"
+                            style={{ gap: "0.35rem", flexWrap: "wrap" }}
                           >
-                            Keep → draft
-                          </button>
-                          <button
-                            type="button"
-                            className="btn danger small"
-                            disabled={busy}
-                            onClick={() => void remove(s)}
-                          >
-                            Remove
-                          </button>
+                            {!open ? (
+                              <button
+                                type="button"
+                                className="btn secondary small"
+                                onClick={() => setInspectOpenId(s.id)}
+                              >
+                                Inspect
+                              </button>
+                            ) : null}
+                            <button
+                              type="button"
+                              className="btn small triage-keep"
+                              disabled={busy}
+                              onClick={() => void keep(s)}
+                            >
+                              Keep → draft
+                            </button>
+                            <button
+                              type="button"
+                              className="btn danger small"
+                              disabled={busy}
+                              onClick={() => void remove(s)}
+                            >
+                              Remove
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : null}
 
@@ -360,18 +842,34 @@ export function GapFillBoard({
                     </div>
                   </form>
                 ) : (
-                  <button
-                    type="button"
-                    className="btn secondary small"
-                    style={{ marginTop: "0.75rem" }}
-                    onClick={() => {
-                      setAddingFor(addKey);
-                      setUrl("");
-                      setName("");
-                    }}
-                  >
-                    + Add source{anyGap ? " for gap" : " (extra)"}
-                  </button>
+                  <div className="row worker-gap-actions">
+                    <button
+                      type="button"
+                      className="btn secondary small"
+                      onClick={() => {
+                        setAddingFor(addKey);
+                        setUrl("");
+                        setName("");
+                      }}
+                    >
+                      + Add source{anyGap ? " for gap" : " (extra)"}
+                    </button>
+                    {anyGap ? (
+                      <button
+                        type="button"
+                        className="btn secondary small"
+                        disabled={busy || omegaBusy}
+                        onClick={() =>
+                          void askOmegaClaw(
+                            category as SourceCategory,
+                            primaryLayer,
+                          )
+                        }
+                      >
+                        {omegaBusy ? "OmegaClaw thinking…" : "Ask OmegaClaw"}
+                      </button>
+                    ) : null}
+                  </div>
                 )}
               </article>
             );

@@ -67,7 +67,7 @@ export function WorkerLayout() {
             className="btn secondary small"
             title="Open full investigator UI"
           >
-            Investigator
+            ← Investigation
           </NavLink>
         </div>
 

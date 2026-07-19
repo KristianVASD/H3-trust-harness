@@ -3,8 +3,8 @@ import { useMissionData } from "../hooks/useMissionData";
 import { ProcesIndicator } from "../components/ProcesIndicator";
 
 /**
- * Gedeeld layout voor alle /missions/:missionId/* routes.
- * Rendert: missienaam, procesindicator, navigatie, en de pagina zelf via <Outlet>.
+ * Shared layout for all /missions/:missionId/* routes.
+ * Renders mission name, process indicator, navigation, and page via <Outlet>.
  */
 export function MissionLayout() {
   const { missionId = "" } = useParams();
@@ -31,7 +31,10 @@ export function MissionLayout() {
             </h1>
             {mission ? <p className="muted mission-goal">{mission.goal}</p> : null}
           </div>
-          <div className="row" style={{ gap: "0.35rem" }}>
+          <div className="row" style={{ gap: "0.35rem", flexWrap: "wrap" }}>
+            <NavLink className="btn small" to={`/work/${missionId}/sources`}>
+              ⚡ Data Worker
+            </NavLink>
             <NavLink className={navClass} end to={`/missions/${missionId}`}>
               Workspace
             </NavLink>
@@ -39,10 +42,10 @@ export function MissionLayout() {
               ☰ Triage
             </NavLink>
             <NavLink className={navClass} to={`/missions/${missionId}/cara?target=source`}>
-              ◉ CARA bronnen
+              ◉ CARA sources
             </NavLink>
             <NavLink className={navClass} to={`/missions/${missionId}/cara?target=company`}>
-              ◆ CARA bedrijven
+              ◆ CARA companies
             </NavLink>
             <NavLink className={navClass} to={`/missions/${missionId}/signals`}>
               Signals

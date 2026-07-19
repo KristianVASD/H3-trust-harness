@@ -94,7 +94,7 @@ export function WorkspacePage() {
       <div className="workspace" style={{ marginTop: "1rem" }}>
         <nav className="side-nav panel">
           <p className="hint" style={{ marginBottom: "0.5rem" }}>
-            Fase 0: lists first, then companies. Triage zit op{" "}
+            Phase 0: lists first, then companies. Triage is on{" "}
             <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>.
           </p>
           {(
@@ -159,7 +159,7 @@ export function WorkspacePage() {
                 {tab === "hypotheses" &&
                   "Ideas under test. Rejected ones stay — that is knowledge."}
                 {tab === "sources" &&
-                  "Gehouden bronnen + bewijs. Nieuwe kandidaten via ☰ Triage. Weight matters — validate via ◉ CARA (bronnen)."}
+                  "Kept sources + evidence. New candidates via ☰ Triage. Weight matters — validate via ◉ CARA (sources)."}
               </p>
 
               {tab === "journal" && <JournalList items={journal} />}
@@ -201,9 +201,9 @@ export function WorkspacePage() {
               {tab === "sources" && (
                 <>
                   <p className="hint">
-                    Nieuwe bronnen alleen via{" "}
-                    <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>. Hier
-                    link je bestaande CARA-bronnen uit andere missies.
+                    New sources only via{" "}
+                    <Link to={`/missions/${missionId}/triage`}>☰ Triage</Link>. Here
+                    you link existing CARA sources from other missions.
                   </p>
                   <LinkSourceForm missionId={missionId} onSaved={reload} />
                 </>
@@ -455,15 +455,15 @@ function CategoryCoveragePanel({
       }}
     >
       <h3 style={{ margin: "0 0 0.35rem", fontSize: "1rem" }}>
-        Dekking per categorie
+        Coverage by category
       </h3>
       <p className="hint" style={{ marginTop: 0 }}>
-        Check bekende bronnen — zoekplan{" "}
-        <span className="mono">{planVersion}</span>. Alleen accepted/adjusted
-        tellen. candidate telt nooit als covered.
+        Check known sources — search plan{" "}
+        <span className="mono">{planVersion}</span>. Only accepted/adjusted
+        count. candidate never counts as covered.
       </p>
       {!planEntries.length ? (
-        <div className="empty">Geen zoekplan geladen.</div>
+        <div className="empty">No search plan loaded.</div>
       ) : (
         <div className="list" style={{ gap: "0.35rem" }}>
           {rows.map((row) => (
@@ -536,7 +536,7 @@ function SourceList({
               ) : null}
               <StatusChip label={item.status} tone="waiting" />
               {reused ? (
-                <StatusChip label="hergebruikt" tone="active" />
+                <StatusChip label="reused" tone="active" />
               ) : (
                 <StatusChip label="first seen here" />
               )}
@@ -578,7 +578,7 @@ function SourceEvidenceForm({
   const [domainAge, setDomainAge] = useState(ev?.domain_age ?? "");
   const [orgAge, setOrgAge] = useState(ev?.org_age ?? "");
   const [hostInfo, setHostInfo] = useState(ev?.host_info ?? "");
-  const [threshold, setThreshold] = useState(ev?.membership_threshold ?? "onbekend");
+  const [threshold, setThreshold] = useState(ev?.membership_threshold ?? "unknown");
   const [consistent, setConsistent] = useState(ev?.content_consistency?.ok ?? true);
   const [consistentNote, setConsistentNote] = useState(
     ev?.content_consistency?.note ?? "",
@@ -602,10 +602,10 @@ function SourceEvidenceForm({
           org_age: orgAge || undefined,
           host_info: hostInfo || undefined,
           membership_threshold: threshold as
-            | "laag"
-            | "midden"
-            | "hoog"
-            | "onbekend",
+            | "low"
+            | "medium"
+            | "high"
+            | "unknown",
           content_consistency: {
             ok: consistent,
             note: consistentNote || undefined,
@@ -638,7 +638,7 @@ function SourceEvidenceForm({
       }}
     >
       <p className="hint" style={{ margin: 0 }}>
-        Bewijs invullen → klaar voor CARA (bronnen)
+        Fill evidence → ready for CARA (sources)
       </p>
       <div className="row" style={{ gap: "0.75rem", flexWrap: "wrap" }}>
         <label style={{ flex: 1, minWidth: "8rem" }}>
@@ -660,10 +660,10 @@ function SourceEvidenceForm({
           value={threshold}
           onChange={(e) => setThreshold(e.target.value as typeof threshold)}
         >
-          <option value="laag">laag</option>
-          <option value="midden">midden</option>
-          <option value="hoog">hoog</option>
-          <option value="onbekend">onbekend</option>
+          <option value="low">low</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+          <option value="unknown">unknown</option>
         </select>
       </label>
       <label className="row" style={{ gap: "0.5rem", alignItems: "center" }}>
@@ -682,11 +682,11 @@ function SourceEvidenceForm({
         />
       </label>
       <label>
-        Summary reasons (één per regel)
+        Summary reasons (one per line)
         <textarea
           value={reasons}
           onChange={(e) => setReasons(e.target.value)}
-          placeholder={"✓ KVK 14 jaar\n⚠ website pas 6 maanden oud"}
+          placeholder={"✓ KvK 14 years\n⚠ website only 6 months old"}
           style={{ minHeight: "3.5rem" }}
         />
       </label>

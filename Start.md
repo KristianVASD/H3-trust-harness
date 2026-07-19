@@ -1,50 +1,50 @@
-Ik zou dit project hernoemen
+I would rename this project
 
-Niet
+Not
 
 OmegaClaw
 
-maar
+but
 
 OmegaClaw Harness
 
-of
+or
 
 OmegaClaw Workbench
 
-of zelfs
+or even
 
 OmegaClaw Studio
 
-Want dat is wat je nu eigenlijk maakt.
+Because that is what you are actually building now.
 
-Niet de AI.
+Not the AI.
 
-Maar de omgeving waarin AI en mensen samenwerken.
+But the environment in which AI and people collaborate.
 
-Eigenlijk bouw je vijf schermen
+In practice you are building five screens
 
-Niet honderd.
+Not a hundred.
 
-Vijf.
+Five.
 
-Meer niet.
+No more.
 
 1. Mission Control
 
-Hier begint alles.
+Everything starts here.
 
-Geen AI.
+No AI.
 
-Alleen opdracht.
+Only the assignment.
 
-Locatie
+Location
 
 Haarlemmermeer
 
-Land
+Country
 
-Nederland
+Netherlands
 
 Sector
 
@@ -56,11 +56,11 @@ Painters
 
 Start
 
-Klik.
+Click.
 
-Project wordt aangemaakt.
+Project is created.
 
-Daarna zie je links:
+Then you see on the left:
 
 Phase 1
 
@@ -78,29 +78,29 @@ Phase 4
 
 waiting
 
-Dit is letterlijk Mission Control.
+This is literally Mission Control.
 
 2. Omega Workspace
 
-Dit is waar "OmegaClaw" normaal zou werken.
+This is where "OmegaClaw" would normally work.
 
-Maar voorlopig...
+But for now...
 
-werk jij.
+you work.
 
-Scherm bestaat uit twee panelen.
+The screen consists of two panels.
 
-Links:
+Left:
 
 Prompt
 
-Notities
+Notes
 
 Brainstorm
 
-Taken
+Tasks
 
-Rechts:
+Right:
 
 Structured Output
 
@@ -118,56 +118,56 @@ Suggested Weight
 
 Notes
 
-Elke bron die jij vindt...
+Every source you find...
 
-komt hierin.
+goes in here.
 
-Dus jij bent de AI.
+So you are the AI.
 
-Maar de UI doet alsof OmegaClaw bestaat.
+But the UI pretends OmegaClaw exists.
 
-Later vervang je alleen de invoer.
+Later you only replace the input.
 
-Niet de architectuur.
+Not the architecture.
 
-Dat is enorm.
+That is enormous.
 
 3. Source Review
 
-Nu begint CURA.
+Now CARA begins.
 
-Je ziet alle bronnen.
+You see all sources.
 
 Google Business
 
 80
 
-Waarom?
+Why?
 
 ....
 
-KVK
+KvK
 
 95
 
-Waarom?
+Why?
 
 ....
 
-Ondernemersvereniging
+Entrepreneurs association
 
 70
 
-Waarom?
+Why?
 
 ....
 
 
-Klik.
+Click.
 
 Open.
 
-Onderin.
+At the bottom.
 
 Agree
 
@@ -178,15 +178,15 @@ Adjust score
 Reason
 
 
-Dat IS Human in the Loop.
+That IS Human in the Loop.
 
-Niet ingewikkelder maken.
+Do not make it more complicated.
 
 4. Situation Room
 
-Dit wordt mijn favoriete scherm.
+This becomes my favourite screen.
 
-Links:
+Left:
 
 Pipeline
 
@@ -198,7 +198,7 @@ Pipeline
 
 █ Phase 4
 
-Midden:
+Centre:
 
 Live Metrics
 
@@ -222,7 +222,7 @@ Rejected
 
 13
 
-Rechts
+Right
 
 Issues
 
@@ -235,19 +235,19 @@ Human review needed
 Conflicting evidence
 
 
-Dit wordt jouw command center.
+This becomes your command centre.
 
-Niet technisch.
+Not technical.
 
-Operationeel.
+Operational.
 
 5. Knowledge Graph
 
-Niet Neo4J.
+Not Neo4J.
 
-Niet ingewikkeld.
+Not complicated.
 
-Gewoon.
+Just.
 
 Source
 
@@ -271,58 +271,58 @@ Human Feedback
 
 New Weight
 
-Klik.
+Click.
 
-Alles open.
+Everything opens.
 
-Je kunt precies volgen.
+You can follow exactly.
 
-Waarom.
+Why.
 
-En dan komt het mooie.
+And then the beautiful part.
 
-Iedere actie wordt opgeslagen.
+Every action is stored.
 
-Niet alleen data.
+Not only data.
 
-Maar denken.
+But thinking.
 
-Bijvoorbeeld.
+For example.
 
 Mission
 
 Home Maintenance Haarlem
 
 
-Bron.
+Source.
 
-Ondernemersvereniging Haarlem
+Entrepreneurs association Haarlem
 
 
-Omega zegt
+Omega says
 
 score 70
 
 
-Mens zegt
+Human says
 
 85
 
 
-Waarom?
+Why?
 
-Deze vereniging organiseert
-al twintig jaar lokale bijeenkomsten.
+This association has been organising
+local meetings for twenty years.
 
-Dat wordt opgeslagen.
+That is stored.
 
-Niet als tekst.
+Not as text.
 
-Maar als
+But as
 
 Learning
 
-Dan krijg je iets als
+Then you get something like
 Learning
 
 ID
@@ -362,63 +362,63 @@ Approved
 Yes
 
 
-DAT
+THAT
 
 is reinforcement.
 
-Niet GPT finetunen.
+Not GPT fine-tuning.
 
-Maar menselijke wijsheid verzamelen.
+But collecting human wisdom.
 
-Dan de volgende laag.
+Then the next layer.
 
-Die mis ik nog.
+I am still missing that.
 
-Ik zou hem toevoegen.
+I would add it.
 
 Omega Memory
 
-Niet voor datasets.
+Not for datasets.
 
-Voor inzichten.
+For insights.
 
-Bijvoorbeeld.
-
-Insight
-
-
-"Lokale ondernemersverenigingen
-met minimaal 15 jaar geschiedenis
-bleken in 82% van de gevallen
-sterke indicatoren."
-
-Of
+For example.
 
 Insight
 
 
-"Nieuwe keurmerken
-zonder bestuursinformatie
-bleken vaak weinig waarde te hebben."
+"Local entrepreneurs associations
+with at least 15 years of history
+proved to be strong indicators
+in 82% of cases."
 
-Of
+Or
 
 Insight
 
 
-"DNS leeftijd
-bleek minder voorspellend
-dan lokale samenwerking."
+"New quality marks
+without board information
+often turned out to have little value."
 
-Dit zijn geen datasets.
+Or
 
-Dit zijn
+Insight
+
+
+"DNS age
+proved less predictive
+than local collaboration."
+
+These are not datasets.
+
+These are
 
 Patterns.
 
-En dat is precies wat OmegaClaw later zou moeten gebruiken.
+And that is exactly what OmegaClaw should use later.
 
-Dan ontstaat deze architectuur
+Then this architecture emerges
 Mission
 
 ↓
@@ -453,37 +453,37 @@ Knowledge Base
 
 Future OmegaClaws
 
-En hier gebeurt iets heel interessants.
+And here something very interesting happens.
 
-Je bent geen AI aan het trainen.
+You are not training an AI.
 
-Je bent een redenatiebibliotheek aan het bouwen.
+You are building a reasoning library.
 
-Een toekomstige OmegaClaw hoeft niet alleen te weten dat een ondernemersvereniging vaak belangrijk is; hij kan terugzien welke argumenten mensen daarvoor gaven, in welke context, en hoe die beoordeling zich in de praktijk hield.
+A future OmegaClaw does not only need to know that an entrepreneurs association is often important; it can look back at which arguments people gave for that, in which context, and how that assessment held up in practice.
 
 Cursor Build Plan (MVP Harness)
 
-Ik zou Cursor één opdracht geven:
+I would give Cursor one assignment:
 
-"Bouw geen AI-agent. Bouw een Human-AI Research Harness."
+"Do not build an AI agent. Build a Human-AI Research Harness."
 
 Modules:
 
-Mission Control – nieuwe opdrachten starten (locatie, sector, status).
-Phase Workspace – per fase een werkruimte met invoer, notities en gestructureerde output.
-Evidence Registry – alle bronnen, bedrijven en bewijsstukken centraal opgeslagen.
-CARA Review Queue – menselijke beoordeling, score-aanpassing en verplichte motivatie.
-Learning Ledger – iedere wijziging wordt als leerpunt opgeslagen.
-Pattern Library – geabstraheerde inzichten die uit meerdere reviews ontstaan.
-Situation Room – live voortgang, statistieken, knelpunten en reviewwachtrijen.
-Knowledge Graph Viewer – visuele relaties tussen bronnen, bedrijven, bewijs en beslissingen.
-Export API – alle data als JSON beschikbaar voor een toekomstige OmegaClaw.
+Mission Control – start new assignments (location, sector, status).
+Phase Workspace – a workspace per phase with input, notes and structured output.
+Evidence Registry – all sources, companies and evidence snippets stored centrally.
+CARA Review Queue – human assessment, score adjustment and mandatory rationale.
+Learning Ledger – every change is stored as a learning point.
+Pattern Library – abstracted insights that emerge from multiple reviews.
+Situation Room – live progress, statistics, bottlenecks and review queues.
+Knowledge Graph Viewer – visual relations between sources, companies, evidence and decisions.
+Export API – all data available as JSON for a future OmegaClaw.
 
-De belangrijkste ontwerpregel zou ik bovenaan README.md zetten:
+I would put the most important design rule at the top of README.md:
 
 The Harness never decides. It records, structures, explains and learns. Decision support comes from human reasoning today, and from OmegaClaw tomorrow.
 
-Dat is volgens mij de grote doorbraak in je architectuur. Je bouwt geen systeem dat afhankelijk is van één AI-model. Je bouwt een omgeving waarin mensen en toekomstige AI's op dezelfde transparante manier kunnen samenwerken, leren en verbeteren. Dat maakt de kennis duurzaam, herbruikbaar en overdraagbaar naar meerdere OmegaClaws en zelfs andere AI-systemen.
+That is, in my view, the big breakthrough in your architecture. You are not building a system that depends on one AI model. You are building an environment in which people and future AIs can collaborate, learn and improve in the same transparent way. That makes the knowledge durable, reusable and transferable to multiple OmegaClaws and even other AI systems.
 
 H3 Trust — OmegaClaw Harness (Masterplan)
 
@@ -497,14 +497,12 @@ We are building a Trust Investigation Platform.
 
 
 
-
-
-
 Role
 
 
 
 What it is
+
 
 
 
@@ -520,11 +518,13 @@ The investigation environment
 
 
 
+
 Human
 
 
 
 An investigator (today)
+
 
 
 
@@ -540,11 +540,13 @@ Another investigator (tomorrow)
 
 
 
+
 Other AIs
 
 
 
 Additional investigators (later)
+
 
 
 
@@ -576,6 +578,7 @@ Producer: Human | OmegaClaw | ExternalAI | ImportedDataset
 This is not cosmetic. Later you must reconstruct: this hypothesis came from Omega; this observation from me; this confidence from the signal engine; this validation from CARA.
 
 Locked technical choices
+
 
 
 
@@ -618,6 +621,7 @@ Separation that matters:
 
 
 
+
 Observations = facts only (no judgement, no score)
 
 
@@ -647,7 +651,6 @@ Where OmegaClaw plugs in later
 
 
 
-
 Step
 
 
@@ -657,6 +660,7 @@ Human
 
 
 OmegaClaw later
+
 
 
 
@@ -690,6 +694,7 @@ yes
 
 
 
+
 Observations
 
 
@@ -699,6 +704,7 @@ yes
 
 
 yes
+
 
 
 
@@ -718,6 +724,7 @@ yes
 
 
 
+
 Source discovery
 
 
@@ -727,6 +734,7 @@ yes
 
 
 yes
+
 
 
 
@@ -746,6 +754,7 @@ yes
 
 
 
+
 Signal interpretation
 
 
@@ -755,6 +764,7 @@ assist
 
 
 yes
+
 
 
 
@@ -774,6 +784,7 @@ yes
 
 
 
+
 CARA Review
 
 
@@ -788,6 +799,7 @@ never
 
 
 
+
 Final validation
 
 
@@ -797,6 +809,7 @@ yes
 
 
 never
+
 
 
 
@@ -874,16 +887,16 @@ Human now; OmegaClaw later. Output: Source + reason + evidence refs + suggested 
 
 Chain: Observation → Evidence → Signal → Suggested confidence. Fully explainable (e.g. site since 2003 → longevity signal → confidence +8). Explainability panel required.
 
-7. CARA — twee menselijke controlepunten
+7. CARA — two human control points
 
-Niet één eindknop. Twee expliciete human gates met hetzelfde mechanisme
-(CARA-tab: Sources-toggle / Companies-toggle), **zelfde markering** in elk diagram:
+Not one final button. Two explicit human gates with the same mechanism
+(CARA tab: Sources toggle / Companies toggle), **same marking** in every diagram:
 
-- **CARA (bronnen)** — bronwaardering → status accepted / adjusted / rejected
-- **CARA (bedrijven)** — bedrijfsreview → Review + Finding
+- **CARA (sources)** — source rating → status accepted / adjusted / rejected
+- **CARA (companies)** — company review → Review + Finding
 
-**Check bekende bronnen** (mechanische dekking) krijgt een **neutrale** markering —
-nooit dezelfde kleur als CARA. Alleen accepted/adjusted bronnen tellen als covered.
+**Check known sources** (mechanical coverage) gets a **neutral** marking —
+never the same colour as CARA. Only accepted/adjusted sources count as covered.
 
 Richer than score adjust. Review chain in UI (simple, not heavy):
 
@@ -900,8 +913,8 @@ Queue optional; investigation continues in Workspace
 
 CARA-only producers for final validation acts
 
-Hergebruik van een bron erft altijd een eerder menselijk CARA-oordeel —
-het omzeilt er nooit een.
+Reusing a source always inherits a prior human CARA judgement —
+it never bypasses one.
 
 8. Investigation Memory
 
@@ -962,11 +975,12 @@ Relation to SANTA and process diagram
 
 
 
+
 SANTA remains the proof that structured evidence + export works; company-level deep check is a later mission phase, not the platform’s center of gravity.
 
 
 
-omegaclaw_santa_process.svg Track A Fase 1–2 maps to Mission → Observations/Hypotheses → Source Discovery → Signals. Fase 3–4 (companies / deep check) and Track B (fraud) stay as phase placeholders until Investigation Memory is solid for sources/lists.
+omegaclaw_santa_process.svg Track A Phase 1–2 maps to Mission → Observations/Hypotheses → Source Discovery → Signals. Phase 3–4 (companies / deep check) and Track B (fraud) stay as phase placeholders until Investigation Memory is solid for sources/lists.
 
 Build roadmap (6 sprints)
 
@@ -995,6 +1009,7 @@ Sprint 6 — OmegaClaw Ready
 Agent API contracts, Producer = OmegaClaw payloads, async job stubs. Harness runs the same workflow with human input or future agent input. No live agent required to call Sprint 6 “done” — contracts + fixtures suffice.
 
 Success criteria
+
 
 
 

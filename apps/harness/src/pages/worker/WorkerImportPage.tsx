@@ -163,7 +163,7 @@ export function WorkerImportPage() {
               <textarea
                 value={raw}
                 onChange={(e) => onPasteChange(e.target.value)}
-                placeholder={"Schilderbedrijf A\nSchilderbedrijf B"}
+                placeholder={"Painter Co A\nPainter Co B"}
                 style={{ minHeight: "8rem" }}
               />
             </label>

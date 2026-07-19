@@ -33,7 +33,7 @@ export type CategoryCoverage =
     };
 
 /**
- * Human-confirmed via CARA (bronnen). Only these statuses count as coverage.
+ * Human-confirmed via CARA (sources). Only these statuses count as coverage.
  * candidate / draft / pending_review / rejected (and any other) are gaps —
  * even if the source already exists and was harvested before.
  */
@@ -56,7 +56,7 @@ function scopeMatchesLayer(
 }
 
 /**
- * Mechanical coverage query for "Check bekende bronnen".
+ * Mechanical coverage query for "Check known sources".
  * Categories come from the active search plan (not a hardcoded list).
  * Per plan entry: covered only when a CARA-confirmed Source matches
  * category + layer (national → category only; regional|local → + region).

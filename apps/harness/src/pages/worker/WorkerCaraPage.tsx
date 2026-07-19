@@ -222,6 +222,51 @@ export function WorkerCaraPage() {
                   {selected.suggestedConfidence ?? selected.suggestedWeight ?? "—"}
                 </p>
 
+                {selected.evidence ? (
+                  <div className="worker-cara-evidence">
+                    <h4 style={{ margin: "0 0 0.35rem" }}>Evidence</h4>
+                    <ul className="worker-mention-list">
+                      {selected.evidence.domain_age ? (
+                        <li>Domain age: {selected.evidence.domain_age}</li>
+                      ) : null}
+                      {selected.evidence.org_age ? (
+                        <li>Org age: {selected.evidence.org_age}</li>
+                      ) : null}
+                      {selected.evidence.membership_threshold ? (
+                        <li>
+                          Membership: {selected.evidence.membership_threshold}
+                        </li>
+                      ) : null}
+                      {selected.evidence.real_world_presence ? (
+                        <li>
+                          Real-world:{" "}
+                          {[
+                            selected.evidence.real_world_presence.events
+                              ? "events"
+                              : null,
+                            selected.evidence.real_world_presence.news
+                              ? "news"
+                              : null,
+                            selected.evidence.real_world_presence.linkedin
+                              ? "linkedin"
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(", ") || "none marked"}
+                        </li>
+                      ) : null}
+                      {(selected.evidence.summary_reasons ?? []).map((r) => (
+                        <li key={r}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="hint worker-thin-warning">
+                    No structured evidence yet — rate carefully, or add evidence
+                    on Sources first.
+                  </p>
+                )}
+
                 <form
                   className="form-stack"
                   onSubmit={(e: FormEvent) => e.preventDefault()}

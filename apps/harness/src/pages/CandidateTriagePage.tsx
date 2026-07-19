@@ -14,12 +14,8 @@ import type { MissionData } from "../hooks/useMissionData";
 import { ProducerBadge, StatusChip } from "../components/Badges";
 
 /**
- * Kandidatenlijst-triage — Controlepunt ①.
- *
- * Hier beslist de mens welke voorgestelde bronnen het onderzoeken waard zijn.
- * GEEN score, GEEN bewijs, GEEN CARA. Alleen: houden → draft, of verwijderen → rejected.
- *
- * Visueel: blauw (--triage), ☰ icoon, eigen route /missions/:id/triage.
+ * Candidate-list triage — checkpoint ①.
+ * Keep → draft, or remove → rejected. No score, no evidence, no CARA here.
  */
 export function CandidateTriagePage() {
   const { missionId = "" } = useParams();
@@ -123,7 +119,7 @@ export function CandidateTriagePage() {
       await api.updateEntity("sources", {
         ...source,
         status: "rejected",
-        notes: [source.notes, "Verwijderd bij kandidatentriage."]
+        notes: [source.notes, "Removed during candidate triage."]
           .filter(Boolean)
           .join(" "),
         updatedAt: new Date().toISOString(),
@@ -155,7 +151,7 @@ export function CandidateTriagePage() {
         scope: entry?.layer ?? scope,
         region: (entry?.layer ?? scope) === "national" ? "" : region.trim(),
         url: url.trim() || undefined,
-        reason: "Handmatig toegevoegd op kandidatenlijst.",
+        reason: "Added manually on the candidate list.",
         signalIds: [],
         evidenceIds: [],
         status: "candidate" as const,
@@ -180,17 +176,17 @@ export function CandidateTriagePage() {
     <div className="triage-page">
       <div className="triage-header">
         <h2>
-          <span className="triage-icon">☰</span> Kandidatenlijst-triage
+          <span className="triage-icon">☰</span> Candidate list triage
         </h2>
         <p className="hint">
-          Controlepunt ① — Triage vóór bewijs. Houden of verwijderen per categorie.{" "}
-          <strong>Geen score hier.</strong> Alleen gehouden kandidaten (→ draft) gaan
-          door naar bewijsverzameling en CARA (bronnen).
+          Checkpoint ① — triage before evidence. Keep or remove per category.{" "}
+          <strong>No score here.</strong> Only kept candidates (→ draft) move on to
+          evidence collection and CARA (sources).
         </p>
         <p className="hint">
-          Zoekplan <span className="mono">{planVersion}</span> ·{" "}
-          {gaps.length} van {coverage.length} categorieën hebben nog geen CARA-bron ·{" "}
-          {totalCandidates} kandidaten wachten
+          Search plan <span className="mono">{planVersion}</span> ·{" "}
+          {gaps.length} of {coverage.length} categories still lack a CARA source ·{" "}
+          {totalCandidates} candidates waiting
         </p>
       </div>
 
@@ -198,7 +194,7 @@ export function CandidateTriagePage() {
 
       <details className="triage-coverage" open={gaps.length > 0}>
         <summary>
-          Dekking per categorie ({gaps.length} gaps / {coverage.length} totaal)
+          Coverage by category ({gaps.length} gaps / {coverage.length} total)
         </summary>
         <div className="list" style={{ gap: "0.25rem", marginTop: "0.5rem" }}>
           {coverage.map((row) => (
@@ -215,7 +211,7 @@ export function CandidateTriagePage() {
                   ✓ {row.sourceName} ({row.matchType})
                 </span>
               ) : (
-                <span style={{ color: "var(--triage)" }}>gap — kandidaat nodig</span>
+                <span style={{ color: "var(--triage)" }}>gap — candidate needed</span>
               )}
             </div>
           ))}
@@ -224,8 +220,8 @@ export function CandidateTriagePage() {
 
       {!categoriesToShow.length ? (
         <div className="empty">
-          Geen kandidaten. Voeg handmatig toe, of link een bron uit een andere missie
-          via Workspace → Sources.
+          No candidates. Add manually, or link a source from another mission via
+          Workspace → Sources.
         </div>
       ) : (
         <div className="list triage-categories">
@@ -242,7 +238,7 @@ export function CandidateTriagePage() {
                 <header>
                   <h4 className="mono">{cat}</h4>
                   <StatusChip
-                    label={isGap ? "gap — bron nodig" : `${items.length} kandidaten`}
+                    label={isGap ? "gap — source needed" : `${items.length} candidates`}
                     tone={isGap ? "waiting" : "active"}
                   />
                 </header>
@@ -250,7 +246,7 @@ export function CandidateTriagePage() {
 
                 {!items.length ? (
                   <p className="hint" style={{ marginBottom: 0 }}>
-                    Nog geen kandidaten in deze categorie.
+                    No candidates in this category yet.
                   </p>
                 ) : (
                   <div className="list" style={{ marginTop: "0.5rem" }}>
@@ -276,7 +272,7 @@ export function CandidateTriagePage() {
                             disabled={busy}
                             onClick={() => void keep(s)}
                           >
-                            Houden → draft
+                            Keep → draft
                           </button>
                           <button
                             type="button"
@@ -284,7 +280,7 @@ export function CandidateTriagePage() {
                             disabled={busy}
                             onClick={() => void remove(s)}
                           >
-                            Verwijderen
+                            Remove
                           </button>
                         </div>
                       </div>
@@ -299,11 +295,11 @@ export function CandidateTriagePage() {
 
       <section className="panel triage-add">
         <h3 style={{ margin: "0 0 0.35rem", fontSize: "1rem" }}>
-          Handmatig toevoegen als kandidaat
+          Add candidate manually
         </h3>
         <p className="hint" style={{ marginTop: 0 }}>
-          Alleen URL + categorie — geen score, geen bewijs. Producer · Human. Status
-          wordt <span className="mono">candidate</span> (triage hierna).
+          URL + category only — no score, no evidence. Producer · Human. Status
+          becomes <span className="mono">candidate</span> (triage next).
         </p>
         <form className="form-stack" onSubmit={(e) => void addManual(e)}>
           <label>
@@ -316,15 +312,15 @@ export function CandidateTriagePage() {
             />
           </label>
           <label>
-            Naam (optioneel)
+            Name (optional)
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Wordt uit URL afgeleid als leeg"
+              placeholder="Derived from URL if empty"
             />
           </label>
           <label>
-            Categorie
+            Category
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as SourceCategory)}
@@ -360,7 +356,7 @@ export function CandidateTriagePage() {
             </label>
           ) : null}
           <button className="btn triage-keep" type="submit" disabled={busy}>
-            {busy ? "Bezig…" : "Toevoegen als kandidaat"}
+            {busy ? "Working…" : "Add as candidate"}
           </button>
         </form>
       </section>

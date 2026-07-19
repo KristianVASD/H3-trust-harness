@@ -1,31 +1,61 @@
 /**
- * Full mock walkthrough for every investigation step.
+ * Full mock walkthrough for every investigation step + Data Worker demo.
  * Run: pnpm seed
  * Opens as Mission Control → "Haarlemmermeer · Painters (DEMO)"
+ *
+ * Worker portfolio (sources/companies/reviews/missionSources) lives in
+ * seed-data/worker-demo.json — regenerate via scripts/extract-worker-seed.mjs
  */
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { FileStore } from "@h3-trust/store";
-import type {
-  Company,
-  ConfidenceProposal,
-  Evidence,
-  Finding,
-  Hypothesis,
-  Investigation,
-  JournalEntry,
-  Mission,
-  MissionSource,
-  Observation,
-  Pattern,
-  Review,
-  Signal,
-  Source,
+import {
+  CompanySchema,
+  MissionSourceSchema,
+  ReviewSchema,
+  SourceSchema,
+  type Company,
+  type ConfidenceProposal,
+  type Evidence,
+  type Finding,
+  type Hypothesis,
+  type Investigation,
+  type JournalEntry,
+  type Mission,
+  type MissionSource,
+  type Observation,
+  type Pattern,
+  type Review,
+  type Signal,
+  type Source,
 } from "@h3-trust/schema";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const writableRoot = path.resolve(__dirname, "../../../writable");
 const store = new FileStore(writableRoot);
+
+const workerDemoRaw = JSON.parse(
+  readFileSync(path.join(__dirname, "seed-data/worker-demo.json"), "utf8"),
+) as {
+  sources: unknown[];
+  missionSources: unknown[];
+  companies: unknown[];
+  reviews: unknown[];
+};
+
+const sources: Source[] = workerDemoRaw.sources.map((row) =>
+  SourceSchema.parse(row),
+);
+const missionSources: MissionSource[] = workerDemoRaw.missionSources.map((row) =>
+  MissionSourceSchema.parse(row),
+);
+const companies: Company[] = workerDemoRaw.companies.map((row) =>
+  CompanySchema.parse(row),
+);
+const reviews: Review[] = workerDemoRaw.reviews.map((row) =>
+  ReviewSchema.parse(row),
+);
 
 const now = new Date().toISOString();
 const earlier = new Date(Date.now() - 3600_000).toISOString();
@@ -34,95 +64,77 @@ const later = new Date(Date.now() - 600_000).toISOString();
 /** Stable IDs so re-seed is deterministic and links stay valid. */
 const ids = {
   mission: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  // journal
   journalKickoff: "11111111-1111-4111-8111-111111111101",
   journalTaskKvK: "11111111-1111-4111-8111-111111111102",
   journalNoteLists: "11111111-1111-4111-8111-111111111103",
   journalTaskCara: "11111111-1111-4111-8111-111111111104",
-  // observations
   obsGemeente: "22222222-2222-4222-8222-222222222201",
   obsKvK: "22222222-2222-4222-8222-222222222202",
   obsAssoc: "22222222-2222-4222-8222-222222222203",
   obsDns: "22222222-2222-4222-8222-222222222204",
-  // hypotheses
   hypAssoc: "33333333-3333-4333-8333-333333333301",
   hypGbp: "33333333-3333-4333-8333-333333333302",
   hypRejected: "33333333-3333-4333-8333-333333333303",
-  // sources
   srcKvK: "b2c3d4e5-f6a7-8901-bcde-f12345678901",
   srcGbp: "c3d4e5f6-a7b8-9012-cdef-123456789012",
   srcAssoc: "d4e5f6a7-b8c9-0123-def0-234567890abc",
   srcFair: "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
-  srcCandidateMedia: "f5a6b7c8-d9e0-4123-af12-456789012cde",
-  srcCandidateBni: "a6b7c8d9-e0f1-4234-bf23-567890123def",
-  // evidence
+  srcSeoFarm: "33333333-3333-4333-8333-333333333333",
   evKvK: "44444444-4444-4444-8444-444444444401",
   evAssoc: "44444444-4444-4444-8444-444444444402",
   evSite: "44444444-4444-4444-8444-444444444403",
-  // signals
   sigRegistry: "55555555-5555-4555-8555-555555555501",
   sigLongevity: "55555555-5555-4555-8555-555555555502",
   sigAssoc: "55555555-5555-4555-8555-555555555503",
   sigInfraNeg: "55555555-5555-4555-8555-555555555504",
-  // confidence
   confKvK: "66666666-6666-4666-8666-666666666601",
   confAssoc: "66666666-6666-4666-8666-666666666602",
   confGbp: "66666666-6666-4666-8666-666666666603",
-  // companies
   coVoorbeeld: "d4e5f6a7-b8c9-0123-def0-234567890123",
-  coQuick: "e5f6a7b8-c9d0-1234-ef01-345678901234",
-  coDeWit: "f6a7b8c9-d0e1-2345-f012-456789012cde",
   coBlack: "a7b8c9d0-e1f2-3456-0123-567890123def",
   coTarget: "b8c9d0e1-f2a3-4567-1234-678901234efa",
-  // reviews / findings
-  revKvK: "77777777-7777-4777-8777-777777777701",
-  revCompany: "77777777-7777-4777-8777-777777777702",
+  revKvK: "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+  revCompany: "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+  revBlacklist: "2b2b2b2b-2b2b-42b2-82b2-2b2b2b2b2b2b",
   findKvK: "88888888-8888-4888-8888-888888888801",
   findCompany: "88888888-8888-4888-8888-888888888802",
-  // investigation / pattern
   inv1: "99999999-9999-4999-8999-999999999901",
   inv2: "99999999-9999-4999-8999-999999999902",
   inv3: "99999999-9999-4999-8999-999999999903",
   inv4: "99999999-9999-4999-8999-999999999904",
   inv5: "99999999-9999-4999-8999-999999999905",
   pattern1: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1",
-  // missionSources
-  msKvK: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
-  msGbp: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
-  msAssoc: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
-  msFair: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
-  msCandidateMedia: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5",
-  msCandidateBni: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb6",
 } as const;
 
 const mission: Mission = {
   id: ids.mission,
   location: "Haarlemmermeer",
-  country: "Nederland",
+  country: "Netherlands",
   sector: "Home Maintenance",
   subsector: "Painters (DEMO)",
-  goal: "DEMO walkthrough: every pipeline step filled with mock data so you can click through Journal → CARA → Export.",
+  goal: "DEMO: Data Worker portfolio — 5 trusted lists, 18 companies, CARA trail. Also clickable as full investigator.",
   notes: "Safe to delete. Re-run `pnpm seed` to reset this mission.",
   search_plan_version: "default.v1",
   discoveryBrief: {
     approach:
-      "Fase 0: inventariseer geschikte lijsten voor Haarlemmermeer × schilders (KvK, lokale OV, keurmerken). CARA op sources vóór company deep-check.",
+      "Phase 0: inventory suitable lists for Haarlemmermeer x painters (KvK, local business association, quality marks). CARA on sources before company deep-check.",
     candidateListTypes: [
       "registry",
       "local_business_association",
       "quality_mark",
+      "branch_association",
       "trade_fair",
     ],
     successCriteria:
-      "≥3 CARA-accepted/adjusted lists; then rank companies by weighted list coverage.",
-    notes: "Website/positionering = later (fase 2).",
+      ">=5 CARA-accepted/adjusted lists; then rank companies by weighted list coverage.",
+    notes: "Data Worker unlocks Import at 5 trusted lists.",
     producer: "Human",
     updatedAt: earlier,
   },
   phases: [
     { key: "observation", status: "done" },
     { key: "hypothesis", status: "done" },
-    { key: "evidence", status: "active" },
+    { key: "evidence", status: "done" },
     { key: "cara", status: "active" },
     { key: "patterns", status: "waiting" },
     { key: "companies", status: "active" },
@@ -175,7 +187,7 @@ const journal: JournalEntry[] = [
     producer: "Human",
     kind: "task",
     title: "CARA: finish pending sources + company candidates",
-    body: "Agree/adjust GBP; review Schilderbedrijf De Wit as target.",
+    body: "GBP still pending_review; drafts (BNI + Netwerk) ready for CARA. Import unlocked at 5 trusted lists.",
     done: false,
     createdAt: later,
     updatedAt: later,
@@ -275,213 +287,6 @@ const hypotheses: Hypothesis[] = [
     rationale:
       "Rejected: longevity helps as a signal, never as a sole decision. Kept as knowledge.",
     createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-];
-
-const sources: Source[] = [
-  {
-    id: ids.srcKvK,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "Human",
-    name: "KvK Handelsregister",
-    type: "registry",
-    category: "registry",
-    scope: "national",
-    region: "",
-    url: "https://www.kvk.nl",
-    reason: "Official company registry for the Netherlands.",
-    suggestedWeight: 95,
-    suggestedConfidence: 90,
-    signalIds: [ids.sigRegistry],
-    evidenceIds: [ids.evKvK],
-    status: "accepted",
-    notes: "CARA (bronnen) agreed in DEMO seed.",
-    evidence: {
-      checked_at: later,
-      url: "https://www.kvk.nl",
-      domain_age: "decennia (overheid)",
-      org_age: "sinds 1921 (KvK-stelsel)",
-      membership_threshold: "hoog",
-      content_consistency: { ok: true, note: "Officieel register" },
-      real_world_presence: {
-        events: true,
-        news: true,
-        linkedin: true,
-        facebook: false,
-        notes: "Overheidsinstantie — eigenaren N/A",
-      },
-      summary_reasons: [
-        "✓ Officieel Nederlands handelsregister",
-        "✓ Harde identiteitspoort, geen soft trust",
-      ],
-    },
-    createdAt: earlier,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.srcGbp,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "Human",
-    name: "Google Business Profile",
-    type: "directory",
-    category: "digital_presence",
-    scope: "national",
-    region: "",
-    url: "https://business.google.com",
-    reason: "Widely used but commercially influenced.",
-    suggestedWeight: 55,
-    suggestedConfidence: 47,
-    signalIds: [ids.sigInfraNeg],
-    evidenceIds: [],
-    status: "pending_review",
-    notes: "Not CARA-confirmed — must not count as coverage until accepted/adjusted.",
-    createdAt: earlier,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.srcAssoc,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "Human",
-    name: "Ondernemersvereniging Haarlemmermeer",
-    type: "association",
-    category: "local_business_association",
-    scope: "regional",
-    region: "Haarlemmermeer",
-    url: "https://example.com/ovh",
-    reason: "Local association with multi-year member archive.",
-    suggestedWeight: 80,
-    suggestedConfidence: 78,
-    signalIds: [ids.sigAssoc, ids.sigLongevity],
-    evidenceIds: [ids.evAssoc],
-    status: "adjusted",
-    notes: "CARA (bronnen) adjusted — still a trusted list for coverage.",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.srcFair,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "Human",
-    name: "BouwBeurs deelnemerslijst 2024",
-    type: "other",
-    category: "trade_fair",
-    scope: "national",
-    region: "",
-    url: "https://example.com/bouwbeurs",
-    reason: "Trade fair exhibitor list — useful for discovery, weak as trust alone.",
-    suggestedWeight: 40,
-    suggestedConfidence: 40,
-    signalIds: [],
-    evidenceIds: [],
-    status: "accepted",
-    notes: "CARA (bronnen) accepted as weak-but-valid discovery list (low weight).",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.srcCandidateMedia,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "OmegaClaw",
-    name: "Haarlems Dagblad — bedrijfspagina",
-    type: "news",
-    category: "local_media",
-    scope: "regional",
-    region: "Haarlemmermeer",
-    url: "https://example.com/haarlems-dagblad/bedrijven",
-    reason: "OmegaClaw-voorstel uit zoekplan (regional · local_media).",
-    signalIds: [],
-    evidenceIds: [],
-    status: "candidate",
-    notes: "Triage op Kandidatenlijst — nog geen bewijs.",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.srcCandidateBni,
-    first_seen_mission: ids.mission,
-    reused_in_missions: [],
-    producer: "Human",
-    name: "BNI Haarlemmermeer chapter",
-    type: "association",
-    category: "networking_group",
-    scope: "local",
-    region: "Haarlemmermeer",
-    url: "https://example.com/bni-haarlemmermeer",
-    reason: "Handmatig toegevoegd op kandidatenlijst.",
-    signalIds: [],
-    evidenceIds: [],
-    status: "candidate",
-    notes: "Nog niet gehouden — zie Workspace → Kandidatenlijst.",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-];
-
-const missionSources: MissionSource[] = [
-  {
-    id: ids.msKvK,
-    mission_id: ids.mission,
-    source_id: ids.srcKvK,
-    added_at: earlier,
-    producer: "Human",
-    updatedAt: earlier,
-    v: 1,
-  },
-  {
-    id: ids.msGbp,
-    mission_id: ids.mission,
-    source_id: ids.srcGbp,
-    added_at: earlier,
-    producer: "Human",
-    updatedAt: earlier,
-    v: 1,
-  },
-  {
-    id: ids.msAssoc,
-    mission_id: ids.mission,
-    source_id: ids.srcAssoc,
-    added_at: later,
-    producer: "Human",
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.msFair,
-    mission_id: ids.mission,
-    source_id: ids.srcFair,
-    added_at: later,
-    producer: "Human",
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.msCandidateMedia,
-    mission_id: ids.mission,
-    source_id: ids.srcCandidateMedia,
-    added_at: later,
-    producer: "OmegaClaw",
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.msCandidateBni,
-    mission_id: ids.mission,
-    source_id: ids.srcCandidateBni,
-    added_at: later,
-    producer: "Human",
     updatedAt: later,
     v: 1,
   },
@@ -637,147 +442,12 @@ const confidenceProposals: ConfidenceProposal[] = [
   },
 ];
 
-const companies: Company[] = [
-  {
-    id: ids.coVoorbeeld,
-    missionId: ids.mission,
-    producer: "Human",
-    name: "Schilderbedrijf Voorbeeld BV",
-    address: "Hoofdweg 12, Hoofddorp",
-    region: "Haarlemmermeer",
-    sector: "Painters",
-    kvk_number: "12345678",
-    kvk_gate: "pass",
-    // High-weight lists: KvK (95) + OVH (80) = 175 of 215 trusted weight
-    source_ids: [ids.srcKvK, ids.srcAssoc],
-    list_membership: ["OVH ledenlijst 2024", "Seed registry check"],
-    blacklist_flags: [],
-    status: "candidate",
-    createdAt: earlier,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.coDeWit,
-    missionId: ids.mission,
-    producer: "Human",
-    name: "Schildersbedrijf T. de Wit",
-    address: "Kerkstraat 4, Nieuw-Vennep",
-    region: "Haarlemmermeer",
-    sector: "Painters",
-    kvk_number: "87654321",
-    kvk_gate: "pass",
-    // Also on 2 trusted lists, but lower weights: OVH (80) + Fair (40) = 120
-    source_ids: [ids.srcAssoc, ids.srcFair],
-    list_membership: ["OVH ledenlijst 2024", "BouwBeurs 2024"],
-    blacklist_flags: [],
-    status: "target",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.coTarget,
-    missionId: ids.mission,
-    producer: "Human",
-    name: "Van der Laan Schilderwerken",
-    address: "Stationsweg 9, Hoofddorp",
-    region: "Haarlemmermeer",
-    sector: "Painters",
-    kvk_number: "11223344",
-    kvk_gate: "unchecked",
-    source_ids: [ids.srcAssoc],
-    list_membership: ["OVH ledenlijst 2024"],
-    blacklist_flags: [],
-    status: "candidate",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.coQuick,
-    missionId: ids.mission,
-    producer: "Human",
-    name: "QuickPaint Online",
-    address: "",
-    region: "Haarlemmermeer",
-    sector: "Painters",
-    kvk_gate: "unchecked",
-    source_ids: [ids.srcGbp],
-    list_membership: ["Google Business scrape sample"],
-    blacklist_flags: [],
-    status: "staged",
-    createdAt: earlier,
-    updatedAt: earlier,
-    v: 1,
-  },
-  {
-    id: ids.coBlack,
-    missionId: ids.mission,
-    producer: "Human",
-    name: "FlashCoat Express",
-    address: "Onbekend",
-    region: "Haarlemmermeer",
-    sector: "Painters",
-    kvk_gate: "fail",
-    source_ids: [ids.srcGbp],
-    list_membership: ["Google Business scrape sample"],
-    blacklist_flags: ["no_kvk_match", "complaint_cluster_rumor"],
-    status: "staged",
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-];
-
-const reviews: Review[] = [
-  {
-    id: ids.revKvK,
-    missionId: ids.mission,
-    producer: "Human",
-    targetType: "source",
-    targetId: ids.srcKvK,
-    action: "agree",
-    originalScore: 90,
-    humanScore: 90,
-    reason: undefined,
-    valueTags: [],
-    observationIds: [ids.obsKvK],
-    hypothesisIds: [],
-    evidenceIds: [ids.evKvK],
-    version: 1,
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-  {
-    id: ids.revCompany,
-    missionId: ids.mission,
-    producer: "Human",
-    targetType: "company",
-    targetId: ids.coVoorbeeld,
-    action: "adjust",
-    originalScore: 84,
-    humanScore: 88,
-    reason:
-      "Association longevity underestimated; OVH membership since 2011 strengthens confidence.",
-    valueTags: ["locality", "accountability"],
-    observationIds: [ids.obsAssoc],
-    hypothesisIds: [ids.hypAssoc],
-    evidenceIds: [ids.evAssoc],
-    version: 1,
-    createdAt: later,
-    updatedAt: later,
-    v: 1,
-  },
-];
-
 const findings: Finding[] = [
   {
     id: ids.findKvK,
     missionId: ids.mission,
     producer: "Human",
-    summary: "Agreed source KvK Handelsregister at suggested 90 (DEMO).",
+    summary: "Agreed source KvK Handelsregister (DEMO worker portfolio).",
     status: "Validated",
     confidence: 90,
     reviewIds: [ids.revKvK],
@@ -795,9 +465,9 @@ const findings: Finding[] = [
     missionId: ids.mission,
     producer: "Human",
     summary:
-      "Adjusted company Schilderbedrijf Voorbeeld BV from 84 to 88: association longevity underestimated.",
+      "Agreed company Schilderbedrijf Voorbeeld BV — on all 5 trusted lists.",
     status: "Validated",
-    confidence: 88,
+    confidence: 90,
     reviewIds: [ids.revCompany],
     observationIds: [ids.obsAssoc],
     hypothesisIds: [ids.hypAssoc],
@@ -887,14 +557,14 @@ const investigations: Investigation[] = [
     id: ids.inv5,
     missionId: ids.mission,
     producer: "Human",
-    title: "Blacklist flags on FlashCoat Express",
+    title: "Blacklist flags on SnelSchilder Direct",
     observationIds: [],
     hypothesisIds: [],
     evidenceIds: [],
-    sourceIds: [ids.srcGbp],
-    reviewIds: [],
+    sourceIds: [ids.srcSeoFarm],
+    reviewIds: [ids.revBlacklist],
     findingIds: [],
-    outcome: "Staged with kvk_gate fail + blacklist flags — not a mission target.",
+    outcome: "Disagree + blacklist: only on rejected SEO-farm list; kvk_gate fail.",
     confidence: 15,
     status: "NeedsMoreEvidence",
     createdAt: later,
@@ -951,7 +621,7 @@ async function seed() {
     console.log("Wrote committed fixture:", out);
   }
 
-  console.log("DEMO seed complete — every pipeline step has mock data.");
+  console.log("DEMO seed complete — investigator walkthrough + Data Worker portfolio (5 trusted / 18 companies).");
   console.log("Mission:", mission.location, "/", mission.subsector);
   console.log("Mission ID:", ids.mission);
   console.log({

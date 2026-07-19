@@ -36,7 +36,7 @@ export function MissionControl() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     location: "Haarlemmermeer",
-    country: "Nederland",
+    country: "Netherlands",
     sector: "Home Maintenance",
     subsector: "Painters",
     goal: "Find trustworthy local painters and validate source reliability.",
@@ -202,14 +202,14 @@ export function MissionControl() {
                       className="btn secondary small"
                       to={`/missions/${m.id}`}
                     >
-                      Investigator
+                      ← Investigation
                     </Link>
                   ) : (
                     <Link
-                      className="btn secondary small"
+                      className="btn small"
                       to={`/work/${m.id}/sources`}
                     >
-                      Data Worker
+                      ⚡ Data Worker
                     </Link>
                   )}
                   <button

@@ -19,8 +19,8 @@ interface Props {
 }
 
 /**
- * Persistente procesindicator — zichtbaar op elke Mission-pagina.
- * Leest uitsluitend bestaande velden. Geen nieuwe databronnen.
+ * Persistent process indicator — visible on every Mission page.
+ * Reads existing fields only. No new data sources.
  */
 export function ProcesIndicator({
   mission,
@@ -61,19 +61,19 @@ export function ProcesIndicator({
     const activePhase =
       mission.phases.find((p) => p.status === "active")?.key ?? "observation";
 
-    let nextAction = "Geen openstaande acties";
+    let nextAction = "No open actions";
     let nextLink = `/missions/${missionId}`;
     if (triageQueue > 0) {
-      nextAction = `Triage ${triageQueue} kandidaat${triageQueue > 1 ? "en" : ""}`;
+      nextAction = `Triage ${triageQueue} candidate${triageQueue > 1 ? "s" : ""}`;
       nextLink = `/missions/${missionId}/triage`;
     } else if (caraSourceQueue > 0) {
-      nextAction = `CARA ${caraSourceQueue} bron${caraSourceQueue > 1 ? "nen" : ""}`;
+      nextAction = `CARA ${caraSourceQueue} source${caraSourceQueue > 1 ? "s" : ""}`;
       nextLink = `/missions/${missionId}/cara?target=source`;
     } else if (caraCompanyQueue > 0) {
-      nextAction = `CARA ${caraCompanyQueue} bedrijf${caraCompanyQueue > 1 ? "en" : ""}`;
+      nextAction = `CARA ${caraCompanyQueue} compan${caraCompanyQueue > 1 ? "ies" : "y"}`;
       nextLink = `/missions/${missionId}/cara?target=company`;
     } else if (gapCount > 0) {
-      nextAction = `${gapCount} categorie${gapCount > 1 ? "ën" : ""} nog zonder bron`;
+      nextAction = `${gapCount} categor${gapCount > 1 ? "ies" : "y"} still without a source`;
       nextLink = `/missions/${missionId}/triage`;
     }
 
@@ -122,7 +122,7 @@ export function ProcesIndicator({
         <NavLink
           to={`/missions/${missionId}/triage`}
           className="teller teller-triage"
-          title="Kandidatenlijst-triage"
+          title="Candidate list triage"
         >
           ☰ {stats.triageQueue} triage
         </NavLink>
@@ -130,20 +130,20 @@ export function ProcesIndicator({
         <NavLink
           to={`/missions/${missionId}/cara?target=source`}
           className="teller teller-cara-source"
-          title="CARA bronnen"
+          title="CARA sources"
         >
-          ◉ {stats.caraSourceQueue} bronnen
+          ◉ {stats.caraSourceQueue} sources
         </NavLink>
 
         <NavLink
           to={`/missions/${missionId}/cara?target=company`}
           className="teller teller-cara-company"
-          title="CARA bedrijven"
+          title="CARA companies"
         >
-          ◆ {stats.caraCompanyQueue} bedrijven
+          ◆ {stats.caraCompanyQueue} companies
         </NavLink>
 
-        <span className="teller teller-gaps" title="Open categorieën zonder CARA-bron">
+        <span className="teller teller-gaps" title="Open categories without a CARA source">
           {stats.gapCount}/{stats.totalCategories} gaps
         </span>
       </div>

@@ -1,25 +1,27 @@
 {
-  "exportedAt": "2026-07-18T17:08:50.246Z",
+  "exportedAt": "2026-07-19T19:01:07.602Z",
   "mission": {
     "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
     "location": "Haarlemmermeer",
-    "country": "Nederland",
+    "country": "Netherlands",
     "sector": "Home Maintenance",
     "subsector": "Painters (DEMO)",
-    "goal": "DEMO walkthrough: every pipeline step filled with mock data so you can click through Journal → CARA → Export.",
+    "goal": "DEMO: Data Worker portfolio — 5 trusted lists, 18 companies, CARA trail. Also clickable as full investigator.",
     "notes": "Safe to delete. Re-run `pnpm seed` to reset this mission.",
+    "search_plan_version": "default.v1",
     "discoveryBrief": {
-      "approach": "Fase 0: inventariseer geschikte lijsten voor Haarlemmermeer × schilders (KvK, lokale OV, keurmerken). CARA op sources vóór company deep-check.",
+      "approach": "Phase 0: inventory suitable lists for Haarlemmermeer x painters (KvK, local business association, quality marks). CARA on sources before company deep-check.",
       "candidateListTypes": [
         "registry",
         "local_business_association",
         "quality_mark",
+        "branch_association",
         "trade_fair"
       ],
-      "successCriteria": "≥3 CARA-accepted/adjusted lists; then rank companies by weighted list coverage.",
-      "notes": "Website/positionering = later (fase 2).",
+      "successCriteria": ">=5 CARA-accepted/adjusted lists; then rank companies by weighted list coverage.",
+      "notes": "Data Worker unlocks Import at 5 trusted lists.",
       "producer": "Human",
-      "updatedAt": "2026-07-18T16:08:50.124Z"
+      "updatedAt": "2026-07-19T18:01:07.313Z"
     },
     "phases": [
       {
@@ -32,7 +34,7 @@
       },
       {
         "key": "evidence",
-        "status": "active"
+        "status": "done"
       },
       {
         "key": "cara",
@@ -52,8 +54,8 @@
       }
     ],
     "producer": "Human",
-    "createdAt": "2026-07-18T16:08:50.124Z",
-    "updatedAt": "2026-07-18T17:08:50.176Z",
+    "createdAt": "2026-07-19T18:01:07.313Z",
+    "updatedAt": "2026-07-19T19:01:07.441Z",
     "v": 1
   },
   "investigations": [
@@ -61,19 +63,21 @@
       "id": "99999999-9999-4999-8999-999999999905",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.217Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.533Z",
       "v": 1,
-      "title": "Blacklist flags on FlashCoat Express",
+      "title": "Blacklist flags on SnelSchilder Direct",
       "observationIds": [],
       "hypothesisIds": [],
       "evidenceIds": [],
       "sourceIds": [
-        "c3d4e5f6-a7b8-9012-cdef-123456789012"
+        "33333333-3333-4333-8333-333333333333"
       ],
-      "reviewIds": [],
+      "reviewIds": [
+        "2b2b2b2b-2b2b-42b2-82b2-2b2b2b2b2b2b"
+      ],
       "findingIds": [],
-      "outcome": "Staged with kvk_gate fail + blacklist flags — not a mission target.",
+      "outcome": "Disagree + blacklist: only on rejected SEO-farm list; kvk_gate fail.",
       "confidence": 15,
       "status": "NeedsMoreEvidence"
     },
@@ -81,8 +85,8 @@
       "id": "99999999-9999-4999-8999-999999999904",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.216Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.531Z",
       "v": 1,
       "title": "Trade fair list discovery value",
       "observationIds": [],
@@ -101,8 +105,8 @@
       "id": "99999999-9999-4999-8999-999999999903",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.215Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.530Z",
       "v": 1,
       "title": "DNS age as sole trust metric",
       "observationIds": [
@@ -125,8 +129,8 @@
       "id": "99999999-9999-4999-8999-999999999902",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.214Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.529Z",
       "v": 1,
       "title": "Local association vs commercial directory",
       "observationIds": [
@@ -144,7 +148,7 @@
         "c3d4e5f6-a7b8-9012-cdef-123456789012"
       ],
       "reviewIds": [
-        "77777777-7777-4777-8777-777777777702"
+        "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6"
       ],
       "findingIds": [
         "88888888-8888-4888-8888-888888888802"
@@ -157,8 +161,8 @@
       "id": "99999999-9999-4999-8999-999999999901",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.213Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.528Z",
       "v": 1,
       "title": "KvK as primary registry source",
       "observationIds": [
@@ -172,7 +176,7 @@
         "b2c3d4e5-f6a7-8901-bcde-f12345678901"
       ],
       "reviewIds": [
-        "77777777-7777-4777-8777-777777777701"
+        "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1"
       ],
       "findingIds": [
         "88888888-8888-4888-8888-888888888801"
@@ -187,8 +191,8 @@
       "id": "22222222-2222-4222-8222-222222222204",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.184Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.451Z",
       "v": 1,
       "statement": "Company site schilderbedrijfvoorbeeld.nl has WHOIS creation date 2003-04-11.",
       "evidenceUrls": [
@@ -203,29 +207,11 @@
       ]
     },
     {
-      "id": "22222222-2222-4222-8222-222222222202",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.183Z",
-      "v": 1,
-      "statement": "KvK Handelsregister lists active chamber registration numbers for Dutch companies.",
-      "evidenceUrls": [
-        "https://www.kvk.nl"
-      ],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444401"
-      ],
-      "tags": [
-        "registry"
-      ]
-    },
-    {
       "id": "22222222-2222-4222-8222-222222222203",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.183Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.450Z",
       "v": 1,
       "statement": "Ondernemersvereniging Haarlemmermeer publishes a public member directory for painters.",
       "evidenceUrls": [
@@ -240,11 +226,29 @@
       ]
     },
     {
+      "id": "22222222-2222-4222-8222-222222222202",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.449Z",
+      "v": 1,
+      "statement": "KvK Handelsregister lists active chamber registration numbers for Dutch companies.",
+      "evidenceUrls": [
+        "https://www.kvk.nl"
+      ],
+      "evidenceIds": [
+        "44444444-4444-4444-8444-444444444401"
+      ],
+      "tags": [
+        "registry"
+      ]
+    },
+    {
       "id": "22222222-2222-4222-8222-222222222201",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.182Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.448Z",
       "v": 1,
       "statement": "Gemeente Haarlemmermeer website links to local ondernemersvereniging pages.",
       "evidenceUrls": [
@@ -259,29 +263,11 @@
   ],
   "evidence": [
     {
-      "id": "44444444-4444-4444-8444-444444444402",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.197Z",
-      "v": 1,
-      "title": "OVH member directory screenshot / PDF page",
-      "url": "https://example.com/ovh-leden",
-      "snippet": "Voorbeeld BV and De Wit listed as painting members since 2011.",
-      "observationIds": [
-        "22222222-2222-4222-8222-222222222203"
-      ],
-      "sourceIds": [
-        "d4e5f6a7-b8c9-0123-def0-234567890abc"
-      ],
-      "capturedAt": "2026-07-18T16:58:50.124Z"
-    },
-    {
       "id": "44444444-4444-4444-8444-444444444403",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.197Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.484Z",
       "v": 1,
       "title": "WHOIS / DNS creation note",
       "url": "https://schilderbedrijfvoorbeeld.nl",
@@ -292,14 +278,32 @@
       "sourceIds": [
         "d4e5f6a7-b8c9-0123-def0-234567890abc"
       ],
-      "capturedAt": "2026-07-18T16:58:50.124Z"
+      "capturedAt": "2026-07-19T18:51:07.313Z"
+    },
+    {
+      "id": "44444444-4444-4444-8444-444444444402",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.483Z",
+      "v": 1,
+      "title": "OVH member directory screenshot / PDF page",
+      "url": "https://example.com/ovh-leden",
+      "snippet": "Voorbeeld BV and De Wit listed as painting members since 2011.",
+      "observationIds": [
+        "22222222-2222-4222-8222-222222222203"
+      ],
+      "sourceIds": [
+        "d4e5f6a7-b8c9-0123-def0-234567890abc"
+      ],
+      "capturedAt": "2026-07-19T18:51:07.313Z"
     },
     {
       "id": "44444444-4444-4444-8444-444444444401",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.196Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.482Z",
       "v": 1,
       "title": "KvK extract — Schilderbedrijf Voorbeeld BV",
       "url": "https://www.kvk.nl",
@@ -310,7 +314,7 @@
       "sourceIds": [
         "b2c3d4e5-f6a7-8901-bcde-f12345678901"
       ],
-      "capturedAt": "2026-07-18T16:08:50.124Z"
+      "capturedAt": "2026-07-19T18:01:07.313Z"
     }
   ],
   "hypotheses": [
@@ -318,8 +322,8 @@
       "id": "33333333-3333-4333-8333-333333333303",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.187Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.455Z",
       "v": 1,
       "statement": "DNS age alone is sufficient to certify trustworthiness.",
       "status": "Rejected",
@@ -332,8 +336,8 @@
       "id": "33333333-3333-4333-8333-333333333302",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.186Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.454Z",
       "v": 1,
       "statement": "Google Business Profile alone is a weak primary trust source for painters.",
       "status": "Draft",
@@ -344,8 +348,8 @@
       "id": "33333333-3333-4333-8333-333333333301",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.185Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.453Z",
       "v": 1,
       "statement": "Local business associations are better trust indicators than commercial directories.",
       "status": "Testing",
@@ -358,249 +362,1000 @@
   ],
   "sources": [
     {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "producer": "Human",
+      "createdAt": "2026-07-17T15:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.469Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "Netwerk Vakschilders Haarlemmermeer",
+      "type": "association",
+      "category": "municipal_initiative",
+      "scope": "local",
+      "region": "Haarlemmermeer",
+      "url": "https://netwerkvakschilders-hm.nl",
+      "reason": "Local initiative for cooperation among independent painters.",
+      "suggestedWeight": 55,
+      "suggestedConfidence": 65,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T12:00:00.000Z",
+        "url": "https://netwerkvakschilders-hm.nl",
+        "domain_age": "3 years",
+        "org_age": "since 2021",
+        "host_info": "TransIP",
+        "membership_threshold": "medium",
+        "content_consistency": {
+          "ok": true,
+          "note": "Local initiative; list is complete but lacks a formal audit"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": false,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Local networking meetings in Hoofddorp"
+        },
+        "summary_reasons": [
+          "✓ Locally known initiative",
+          "✓ Active LinkedIn and Facebook pages",
+          "? Lacks formal independent audit for trusted status"
+        ]
+      },
+      "status": "draft",
+      "notes": "Waiting for member-list audit before treating as trusted."
+    },
+    {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "producer": "OmegaClaw",
+      "createdAt": "2026-07-18T02:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.467Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "TopSchildersGids.nl",
+      "type": "directory",
+      "category": "digital_presence",
+      "scope": "national",
+      "region": "",
+      "url": "https://topschildersgids.nl",
+      "reason": "Auto-generated directory, possible SEO farm.",
+      "suggestedWeight": 15,
+      "suggestedConfidence": 20,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T14:00:00.000Z",
+        "url": "https://topschildersgids.nl",
+        "domain_age": "4 months",
+        "org_age": "unknown",
+        "host_info": "GoDaddy, privacy protected",
+        "membership_threshold": "low",
+        "content_consistency": {
+          "ok": false,
+          "note": "Generic copy, no specific company info, many external affiliate links"
+        },
+        "real_world_presence": {
+          "events": false,
+          "news": false,
+          "linkedin": false,
+          "facebook": false,
+          "notes": "No trace of physical activity or mentions outside its own site"
+        },
+        "summary_reasons": [
+          "✗ Domain registered < 6 months ago",
+          "✗ No KvK details found",
+          "✗ Typical affiliate / link-farm structure",
+          "✗ No real-world presence"
+        ]
+      },
+      "status": "rejected",
+      "notes": "Rejected for lack of real-world presence and young domain age."
+    },
+    {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "producer": "Human",
+      "createdAt": "2026-07-15T08:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.464Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "De Betere Schilder",
+      "type": "registry",
+      "category": "quality_mark",
+      "scope": "national",
+      "region": "",
+      "url": "https://www.betereschilder.nl",
+      "reason": "Quality organisation with strict admission rules and periodic audits.",
+      "suggestedWeight": 75,
+      "suggestedConfidence": 90,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://www.betereschilder.nl",
+        "domain_age": "15 years",
+        "org_age": "since 2008",
+        "host_info": "Valid SSL, Dutch hosting",
+        "membership_threshold": "high",
+        "content_consistency": {
+          "ok": true,
+          "note": "Clear admission rules, annual re-certification"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": true,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Active quality organisation with in-person meetings"
+        },
+        "summary_reasons": [
+          "✓ Well-regarded national quality mark",
+          "✓ Strict admission rules and periodic audits"
+        ]
+      },
+      "status": "accepted",
+      "notes": "The leading quality mark for painters in the Netherlands."
+    },
+    {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "producer": "Human",
+      "createdAt": "2026-07-15T08:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.463Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "Nederlandse Schilders Bond",
+      "type": "association",
+      "category": "branch_association",
+      "scope": "national",
+      "region": "",
+      "url": "https://nederlandseschildersbond.nl",
+      "reason": "Independent trade organisation for consumers and craftspeople.",
+      "suggestedWeight": 80,
+      "suggestedConfidence": 85,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://nederlandseschildersbond.nl",
+        "domain_age": "10 years",
+        "org_age": "since 2010",
+        "host_info": "Dutch hosting",
+        "membership_threshold": "high",
+        "content_consistency": {
+          "ok": true,
+          "note": "Clear statutes and member register"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": true,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Active advocacy"
+        },
+        "summary_reasons": [
+          "✓ Recognised in the trade",
+          "✓ Vetting of member companies"
+        ]
+      },
+      "status": "accepted",
+      "notes": "Well-regarded national association."
+    },
+    {
+      "id": "a6b7c8d9-e0f1-4234-bf23-567890123def",
+      "producer": "Human",
+      "createdAt": "2026-07-16T14:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.462Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "BNI Haarlemmermeer chapter",
+      "type": "association",
+      "category": "networking_group",
+      "scope": "local",
+      "region": "Haarlemmermeer",
+      "url": "https://www.bni.nl",
+      "reason": "Local network of entrepreneurs who refer each other.",
+      "suggestedWeight": 60,
+      "suggestedConfidence": 70,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T16:00:00.000Z",
+        "url": "https://www.bni.nl",
+        "domain_age": "20+ years",
+        "org_age": "since 1985",
+        "host_info": "Professional hosting",
+        "membership_threshold": "high",
+        "content_consistency": {
+          "ok": true,
+          "note": "Strict membership requirements per chapter"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": false,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Weekly meetings"
+        },
+        "summary_reasons": [
+          "✓ Strict admission barriers",
+          "✓ Active local community",
+          "? Member list not always public"
+        ]
+      },
+      "status": "draft",
+      "notes": "Waiting for formal approval of the chapter list."
+    },
+    {
+      "id": "f5a6b7c8-d9e0-4123-af12-456789012cde",
+      "producer": "ExternalAI",
+      "createdAt": "2026-07-17T09:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.461Z",
+      "v": 1,
+      "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "reused_in_missions": [],
+      "name": "Haarlems Dagblad — bedrijfspagina",
+      "type": "news",
+      "category": "local_media",
+      "scope": "regional",
+      "region": "Haarlemmermeer",
+      "url": "https://www.haarlemsdagblad.nl",
+      "reason": "Local media attention can indicate real-world presence.",
+      "suggestedWeight": 50,
+      "suggestedConfidence": 65,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://www.haarlemsdagblad.nl",
+        "domain_age": "20+ years",
+        "org_age": "since 1893",
+        "host_info": "DPG Media",
+        "membership_threshold": "unknown",
+        "content_consistency": {
+          "ok": true,
+          "note": "Professional news publisher"
+        },
+        "real_world_presence": {
+          "events": false,
+          "news": true,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Major regional newspaper"
+        },
+        "summary_reasons": [
+          "✓ Reliable publisher",
+          "? Company listings are often paid or shallow"
+        ]
+      },
+      "status": "candidate",
+      "notes": "Waiting for linkage of specific company mentions."
+    },
+    {
       "id": "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.192Z",
+      "createdAt": "2026-07-15T12:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.460Z",
       "v": 1,
       "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "reused_in_missions": [],
       "name": "BouwBeurs deelnemerslijst 2024",
       "type": "other",
       "category": "trade_fair",
-      "url": "https://example.com/bouwbeurs",
-      "reason": "Trade fair exhibitor list — useful for discovery, weak as trust alone.",
+      "scope": "national",
+      "region": "",
+      "url": "https://www.bouwbeurs.nl",
+      "reason": "Trade-fair exhibitors show professional ambition.",
       "suggestedWeight": 40,
       "suggestedConfidence": 40,
       "signalIds": [],
       "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://www.bouwbeurs.nl",
+        "domain_age": "15 years",
+        "org_age": "since 1999",
+        "host_info": "Professional hosting",
+        "membership_threshold": "low",
+        "content_consistency": {
+          "ok": true,
+          "note": "Official fair organiser"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": true,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Large annual physical event"
+        },
+        "summary_reasons": [
+          "✓ Well-known trade fair",
+          "✗ Participation does not guarantee quality"
+        ]
+      },
       "status": "accepted",
-      "notes": "Accepted as weak-but-valid discovery list (low weight)."
+      "notes": "Low weight accepted; one-off participation without strict screening."
     },
     {
       "id": "d4e5f6a7-b8c9-0123-def0-234567890abc",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.191Z",
+      "createdAt": "2026-07-15T10:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.459Z",
       "v": 1,
       "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "reused_in_missions": [],
       "name": "Ondernemersvereniging Haarlemmermeer",
       "type": "association",
       "category": "local_business_association",
-      "url": "https://example.com/ovh",
-      "reason": "Local association with multi-year member archive.",
-      "suggestedWeight": 80,
-      "suggestedConfidence": 78,
-      "signalIds": [
-        "55555555-5555-4555-8555-555555555503",
-        "55555555-5555-4555-8555-555555555502"
-      ],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444402"
-      ],
+      "scope": "local",
+      "region": "Haarlemmermeer",
+      "url": "https://www.ovhaarlemmermeer.nl",
+      "reason": "Local network of active companies in the region.",
+      "suggestedWeight": 65,
+      "suggestedConfidence": 65,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://www.ovhaarlemmermeer.nl",
+        "domain_age": "8 years",
+        "org_age": "since 2010",
+        "host_info": "Dutch hosting",
+        "membership_threshold": "medium",
+        "content_consistency": {
+          "ok": true,
+          "note": "Active association with member list"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": true,
+          "linkedin": true,
+          "facebook": true,
+          "notes": "Regular meetings in Hoofddorp"
+        },
+        "summary_reasons": [
+          "✓ Active local association",
+          "✓ In-person meetings",
+          "? Member list not always 100% current"
+        ]
+      },
       "status": "adjusted",
-      "notes": "CARA adjusted — still a trusted list for coverage."
+      "notes": "Weight lowered from 80 to 65 due to limited local coverage."
     },
     {
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.190Z",
+      "producer": "ExternalAI",
+      "createdAt": "2026-07-16T11:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.458Z",
       "v": 1,
       "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "reused_in_missions": [],
       "name": "Google Business Profile",
-      "type": "directory",
+      "type": "website",
       "category": "digital_presence",
-      "url": "https://business.google.com",
-      "reason": "Widely used but commercially influenced.",
-      "suggestedWeight": 55,
-      "suggestedConfidence": 47,
-      "signalIds": [
-        "55555555-5555-4555-8555-555555555504"
-      ],
+      "scope": "national",
+      "region": "",
+      "url": "https://www.google.com/maps",
+      "reason": "Digital discoverability and reviews, but easy to manipulate.",
+      "suggestedWeight": 30,
+      "suggestedConfidence": 50,
+      "signalIds": [],
       "evidenceIds": [],
-      "status": "pending_review"
+      "evidence": {
+        "checked_at": "2026-07-18T14:00:00.000Z",
+        "url": "https://www.google.com/maps",
+        "domain_age": "20+ years",
+        "org_age": "n/a",
+        "host_info": "Google LLC",
+        "membership_threshold": "low",
+        "content_consistency": {
+          "ok": true,
+          "note": "Platform is reliable; individual profiles are not necessarily"
+        },
+        "real_world_presence": {
+          "events": false,
+          "news": true,
+          "linkedin": false,
+          "facebook": false,
+          "notes": "Reliable at platform level; entry-level verification only"
+        },
+        "summary_reasons": [
+          "✓ Large platform",
+          "✗ Individual claims often unverified"
+        ]
+      },
+      "status": "pending_review",
+      "notes": "Do not treat as trusted without extra verification."
     },
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.188Z",
+      "producer": "ImportedDataset",
+      "createdAt": "2026-07-15T09:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.456Z",
       "v": 1,
       "first_seen_mission": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "reused_in_missions": [],
       "name": "KvK Handelsregister",
       "type": "registry",
       "category": "registry",
+      "scope": "national",
+      "region": "",
       "url": "https://www.kvk.nl",
-      "reason": "Official company registry for the Netherlands.",
+      "reason": "Official base registry of all Dutch companies.",
       "suggestedWeight": 95,
-      "suggestedConfidence": 90,
-      "signalIds": [
-        "55555555-5555-4555-8555-555555555501"
-      ],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444401"
-      ],
+      "suggestedConfidence": 99,
+      "signalIds": [],
+      "evidenceIds": [],
+      "evidence": {
+        "checked_at": "2026-07-18T10:00:00.000Z",
+        "url": "https://www.kvk.nl",
+        "domain_age": "25+ years",
+        "org_age": "since 1925",
+        "host_info": "Dutch government hosting",
+        "membership_threshold": "high",
+        "content_consistency": {
+          "ok": true,
+          "note": "Legally required registration"
+        },
+        "real_world_presence": {
+          "events": true,
+          "news": true,
+          "linkedin": true,
+          "facebook": false,
+          "notes": "Official government body"
+        },
+        "summary_reasons": [
+          "✓ Legal base registry",
+          "✓ High reliability"
+        ]
+      },
       "status": "accepted",
-      "notes": "CARA agreed in DEMO seed."
+      "notes": "Gold standard for company existence."
     }
   ],
   "missionSources": [
     {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbba",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "44444444-4444-4444-8444-444444444444",
+      "added_at": "2026-07-17T15:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.481Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb9",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "33333333-3333-4333-8333-333333333333",
+      "added_at": "2026-07-18T02:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.480Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb8",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "22222222-2222-4222-8222-222222222222",
+      "added_at": "2026-07-15T08:30:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.479Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb7",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "11111111-1111-4111-8111-111111111111",
+      "added_at": "2026-07-15T08:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.478Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb6",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "a6b7c8d9-e0f1-4234-bf23-567890123def",
+      "added_at": "2026-07-16T14:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.477Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb5",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "f5a6b7c8-d9e0-4123-af12-456789012cde",
+      "added_at": "2026-07-17T09:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.476Z",
+      "v": 1
+    },
+    {
       "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb4",
       "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "source_id": "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
-      "added_at": "2026-07-18T16:58:50.124Z",
+      "added_at": "2026-07-15T12:00:00.000Z",
       "producer": "Human",
-      "updatedAt": "2026-07-18T17:08:50.195Z",
+      "updatedAt": "2026-07-19T19:01:07.475Z",
       "v": 1
     },
     {
       "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb3",
       "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "source_id": "d4e5f6a7-b8c9-0123-def0-234567890abc",
-      "added_at": "2026-07-18T16:58:50.124Z",
+      "added_at": "2026-07-15T10:00:00.000Z",
       "producer": "Human",
-      "updatedAt": "2026-07-18T17:08:50.194Z",
-      "v": 1
-    },
-    {
-      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
-      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "source_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "added_at": "2026-07-18T16:08:50.124Z",
-      "producer": "Human",
-      "updatedAt": "2026-07-18T17:08:50.193Z",
+      "updatedAt": "2026-07-19T19:01:07.472Z",
       "v": 1
     },
     {
       "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2",
       "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "source_id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
-      "added_at": "2026-07-18T16:08:50.124Z",
+      "added_at": "2026-07-16T11:00:00.000Z",
       "producer": "Human",
-      "updatedAt": "2026-07-18T17:08:50.193Z",
+      "updatedAt": "2026-07-19T19:01:07.471Z",
+      "v": 1
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1",
+      "mission_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "source_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "added_at": "2026-07-15T09:00:00.000Z",
+      "producer": "Human",
+      "updatedAt": "2026-07-19T19:01:07.470Z",
       "v": 1
     }
   ],
   "companies": [
     {
-      "id": "a7b8c9d0-e1f2-3456-0123-567890123def",
+      "id": "10101010-1010-4101-8101-101010101010",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.209Z",
+      "producer": "ImportedDataset",
+      "createdAt": "2026-07-18T02:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.514Z",
       "v": 1,
-      "name": "FlashCoat Express",
-      "address": "Onbekend",
+      "name": "Budget Schilderwerk",
+      "address": "Onbekend, 2131 ZZ Hoofddorp",
       "region": "Haarlemmermeer",
       "sector": "Painters",
+      "kvk_number": "00000000",
       "kvk_gate": "fail",
       "source_ids": [
-        "c3d4e5f6-a7b8-9012-cdef-123456789012"
+        "33333333-3333-4333-8333-333333333333"
       ],
       "list_membership": [
-        "Google Business scrape sample"
-      ],
-      "blacklist_flags": [
-        "no_kvk_match",
-        "complaint_cluster_rumor"
-      ],
-      "status": "staged"
-    },
-    {
-      "id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.208Z",
-      "v": 1,
-      "name": "QuickPaint Online",
-      "address": "",
-      "region": "Haarlemmermeer",
-      "sector": "Painters",
-      "kvk_gate": "unchecked",
-      "source_ids": [
-        "c3d4e5f6-a7b8-9012-cdef-123456789012"
-      ],
-      "list_membership": [
-        "Google Business scrape sample"
+        "TopSchildersGids.nl"
       ],
       "blacklist_flags": [],
       "status": "staged"
     },
     {
-      "id": "b8c9d0e1-f2a3-4567-1234-678901234efa",
+      "id": "20202020-2020-4202-8202-202020202020",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.207Z",
+      "createdAt": "2026-07-16T14:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.514Z",
       "v": 1,
-      "name": "Van der Laan Schilderwerken",
-      "address": "Stationsweg 9, Hoofddorp",
+      "name": "Vakschilder Jansen",
+      "address": "Lijsterbaan 12, 1171 XX Badhoevedorp",
       "region": "Haarlemmermeer",
       "sector": "Painters",
-      "kvk_number": "11223344",
-      "kvk_gate": "unchecked",
-      "source_ids": [
-        "d4e5f6a7-b8c9-0123-def0-234567890abc"
-      ],
-      "list_membership": [
-        "OVH ledenlijst 2024"
-      ],
-      "blacklist_flags": [],
-      "status": "candidate"
-    },
-    {
-      "id": "f6a7b8c9-d0e1-2345-f012-456789012cde",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.205Z",
-      "v": 1,
-      "name": "Schildersbedrijf T. de Wit",
-      "address": "Kerkstraat 4, Nieuw-Vennep",
-      "region": "Haarlemmermeer",
-      "sector": "Painters",
-      "kvk_number": "87654321",
+      "kvk_number": "23456789",
       "kvk_gate": "pass",
       "source_ids": [
-        "d4e5f6a7-b8c9-0123-def0-234567890abc",
-        "e5f6a7b8-c9d0-1234-ef01-345678901bcd"
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
       ],
       "list_membership": [
-        "OVH ledenlijst 2024",
-        "BouwBeurs 2024"
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "staged"
     },
     {
-      "id": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.204Z",
+      "createdAt": "2026-07-16T13:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.513Z",
       "v": 1,
-      "name": "Schilderbedrijf Voorbeeld BV",
-      "address": "Hoofdweg 12, Hoofddorp",
+      "name": "Renovatie Experts Haarlemmermeer",
+      "address": "Graan voor Visch 15, 2132 AA Hoofddorp",
       "region": "Haarlemmermeer",
       "sector": "Painters",
       "kvk_number": "12345678",
       "kvk_gate": "pass",
       "source_ids": [
         "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "e5f6a7b8-c9d0-1234-ef01-345678901bcd"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Ondernemersvereniging Haarlemmermeer",
+        "BouwBeurs 2024"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T12:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.511Z",
+      "v": 1,
+      "name": "Schilderbedrijf Zwanenburg",
+      "address": "Hoofdweg 200, 1161 AA Zwanenburg",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "01234567",
+      "kvk_gate": "pass",
+      "source_ids": [
         "d4e5f6a7-b8c9-0123-def0-234567890abc"
       ],
       "list_membership": [
-        "OVH ledenlijst 2024",
-        "Seed registry check"
+        "Ondernemersvereniging Haarlemmermeer"
       ],
       "blacklist_flags": [],
       "status": "candidate"
+    },
+    {
+      "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T12:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.510Z",
+      "v": 1,
+      "name": "De Lokale Schilder",
+      "address": "Dorpsstraat 88, 2152 XX Rijsenhout",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "90123456",
+      "kvk_gate": "unchecked",
+      "source_ids": [
+        "c3d4e5f6-a7b8-9012-cdef-123456789012",
+        "a6b7c8d9-e0f1-4234-bf23-567890123def"
+      ],
+      "list_membership": [
+        "Google Business Profile",
+        "BNI Haarlemmermeer chapter"
+      ],
+      "blacklist_flags": [],
+      "status": "candidate"
+    },
+    {
+      "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T11:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.509Z",
+      "v": 1,
+      "name": "Meesters in Verf BV",
+      "address": "Sloterweg 50, 2131 PD Hoofddorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "89012345",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "BouwBeurs 2024",
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T11:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.508Z",
+      "v": 1,
+      "name": "Schilderwerken Van Dijk",
+      "address": "Vennepstraat 22, 2151 BB Nieuw-Vennep",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "78901234",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "candidate"
+    },
+    {
+      "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T10:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.507Z",
+      "v": 1,
+      "name": "Onderhoudsbedrijf K&VK",
+      "address": "Kruisweg 100, 2131 NG Hoofddorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "67890123",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "e5f6a7b8-c9d0-1234-ef01-345678901bcd"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "BouwBeurs 2024"
+      ],
+      "blacklist_flags": [],
+      "status": "staged"
+    },
+    {
+      "id": "99999999-9999-4999-8999-999999999999",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T10:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.505Z",
+      "v": 1,
+      "name": "Atelier Kleurrijk",
+      "address": "Zwanenburgstraat 5, 1161 AJ Zwanenburg",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "56789012",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "Ondernemersvereniging Haarlemmermeer",
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888888",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T09:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.504Z",
+      "v": 1,
+      "name": "Verf & Co Haarlemmermeer",
+      "address": "Raadhuisplein 2, 1171 LX Badhoevedorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "45678901",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "Ondernemersvereniging Haarlemmermeer",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "staged"
+    },
+    {
+      "id": "77777777-7777-4777-8777-777777777777",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-16T09:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.503Z",
+      "v": 1,
+      "name": "Schildersbedrijf De Veen",
+      "address": "Veendijk 5, 2153 PW Rijsenhout",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "34567890",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "11111111-1111-4111-8111-111111111111"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Nederlandse Schilders Bond"
+      ],
+      "blacklist_flags": [],
+      "status": "staged"
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666666",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-15T14:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.502Z",
+      "v": 1,
+      "name": "Kevin Peter Schilderwerken",
+      "address": "Dorpsstraat 10, 2151 AA Nieuw-Vennep",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "27372999",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "55555555-5555-4555-8555-555555555555",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-15T14:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.501Z",
+      "v": 1,
+      "name": "Reekers Schilders",
+      "address": "Hannie Schaftstraat 88, 2135 KG Hoofddorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "52815587",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Ondernemersvereniging Haarlemmermeer",
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "b8c9d0e1-f2a3-4567-1234-678901234efa",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-15T13:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.500Z",
+      "v": 1,
+      "name": "Van der Laan Schilderwerken",
+      "address": "Rijsenhoutseweg 12, 2152 PW Rijsenhout",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "56781234",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "d4e5f6a7-b8c9-0123-def0-234567890abc"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Ondernemersvereniging Haarlemmermeer"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "a7b8c9d0-e1f2-3456-0123-567890123def",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-18T03:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.498Z",
+      "v": 1,
+      "name": "SnelSchilder Direct",
+      "address": "Postbus 999, 1111 AA Nowhere",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "00000000",
+      "kvk_gate": "fail",
+      "source_ids": [
+        "33333333-3333-4333-8333-333333333333"
+      ],
+      "list_membership": [
+        "TopSchildersGids.nl"
+      ],
+      "blacklist_flags": [
+        "fraud_report",
+        "fake_invoices"
+      ],
+      "status": "candidate"
+    },
+    {
+      "id": "f6a7b8c9-d0e1-2345-f012-456789012cde",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-15T11:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.497Z",
+      "v": 1,
+      "name": "Schildersbedrijf T. de Wit",
+      "address": "Getsewoud 45, 2151 CS Nieuw-Vennep",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "27372948",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "11111111-1111-4111-8111-111111111111"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Ondernemersvereniging Haarlemmermeer",
+        "Nederlandse Schilders Bond"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
+    },
+    {
+      "id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "ImportedDataset",
+      "createdAt": "2026-07-16T11:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.495Z",
+      "v": 1,
+      "name": "QuickPaint Online",
+      "address": "Digital Workspace, 2132 XX Hoofddorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "87654321",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "e5f6a7b8-c9d0-1234-ef01-345678901bcd"
+      ],
+      "list_membership": [
+        "BouwBeurs 2024"
+      ],
+      "blacklist_flags": [],
+      "status": "staged"
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-15T10:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.494Z",
+      "v": 1,
+      "name": "Schilderbedrijf Voorbeeld BV",
+      "address": "Hoofdweg 123, 2131 AB Hoofddorp",
+      "region": "Haarlemmermeer",
+      "sector": "Painters",
+      "kvk_number": "34125678",
+      "kvk_gate": "pass",
+      "source_ids": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "d4e5f6a7-b8c9-0123-def0-234567890abc",
+        "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
+        "11111111-1111-4111-8111-111111111111",
+        "22222222-2222-4222-8222-222222222222"
+      ],
+      "list_membership": [
+        "KvK Handelsregister",
+        "Ondernemersvereniging Haarlemmermeer",
+        "BouwBeurs 2024",
+        "Nederlandse Schilders Bond",
+        "De Betere Schilder"
+      ],
+      "blacklist_flags": [],
+      "status": "target"
     }
   ],
   "signals": [
@@ -608,8 +1363,8 @@
       "id": "55555555-5555-4555-8555-555555555504",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.201Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.488Z",
       "v": 1,
       "key": "infra",
       "label": "Thin digital footprint risk",
@@ -623,8 +1378,8 @@
       "id": "55555555-5555-4555-8555-555555555503",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.200Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.487Z",
       "v": 1,
       "key": "association",
       "label": "Local association membership",
@@ -642,8 +1397,8 @@
       "id": "55555555-5555-4555-8555-555555555502",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.199Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.486Z",
       "v": 1,
       "key": "longevity",
       "label": "Domain longevity",
@@ -661,8 +1416,8 @@
       "id": "55555555-5555-4555-8555-555555555501",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.198Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.485Z",
       "v": 1,
       "key": "registry",
       "label": "Official registry",
@@ -682,8 +1437,8 @@
       "id": "66666666-6666-4666-8666-666666666603",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.203Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.493Z",
       "v": 1,
       "targetType": "source",
       "targetId": "c3d4e5f6-a7b8-9012-cdef-123456789012",
@@ -694,26 +1449,11 @@
       ]
     },
     {
-      "id": "66666666-6666-4666-8666-666666666601",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.202Z",
-      "v": 1,
-      "targetType": "source",
-      "targetId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "suggested": 90,
-      "explanation": "Base 50 → registry +12 → locality context → suggested 90 (demo).",
-      "signalIds": [
-        "55555555-5555-4555-8555-555555555501"
-      ]
-    },
-    {
       "id": "66666666-6666-4666-8666-666666666602",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.202Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.492Z",
       "v": 1,
       "targetType": "source",
       "targetId": "d4e5f6a7-b8c9-0123-def0-234567890abc",
@@ -723,98 +1463,212 @@
         "55555555-5555-4555-8555-555555555503",
         "55555555-5555-4555-8555-555555555502"
       ]
+    },
+    {
+      "id": "66666666-6666-4666-8666-666666666601",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.490Z",
+      "v": 1,
+      "targetType": "source",
+      "targetId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "suggested": 90,
+      "explanation": "Base 50 → registry +12 → locality context → suggested 90 (demo).",
+      "signalIds": [
+        "55555555-5555-4555-8555-555555555501"
+      ]
     }
   ],
   "reviews": [
     {
-      "id": "77777777-7777-4777-8777-777777777701",
+      "id": "2b2b2b2b-2b2b-42b2-82b2-2b2b2b2b2b2b",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.210Z",
+      "createdAt": "2026-07-19T08:35:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.524Z",
+      "v": 1,
+      "targetType": "company",
+      "targetId": "a7b8c9d0-e1f2-3456-0123-567890123def",
+      "action": "disagree",
+      "originalScore": 40,
+      "humanScore": 0,
+      "reason": "Blacklist flag added after multiple reports of fraud via fake invoices.",
+      "valueTags": [
+        "fraud",
+        "blocklist"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "1a1a1a1a-1a1a-41a1-81a1-1a1a1a1a1a1a",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:30:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.522Z",
+      "v": 1,
+      "targetType": "company",
+      "targetId": "b8c9d0e1-f2a3-4567-1234-678901234efa",
+      "action": "adjust",
+      "originalScore": 70,
+      "humanScore": 55,
+      "reason": "Score adjusted down; recent ownership change not yet reflected in KvK.",
+      "valueTags": [
+        "change",
+        "monitoring"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:25:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.521Z",
+      "v": 1,
+      "targetType": "company",
+      "targetId": "d4e5f6a7-b8c9-0123-def0-234567890123",
+      "action": "agree",
+      "originalScore": 90,
+      "humanScore": 90,
+      "reason": "Matches all trusted sources; strong local reputation.",
+      "valueTags": [
+        "top_performer"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "e5e5e5e5-e5e5-4e5e-8e5e-e5e5e5e5e5e5",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:20:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.520Z",
+      "v": 1,
+      "targetType": "source",
+      "targetId": "e5f6a7b8-c9d0-1234-ef01-345678901bcd",
+      "action": "adjust",
+      "originalScore": 60,
+      "humanScore": 40,
+      "reason": "Low weight accepted; one-off fair participation without strict screening.",
+      "valueTags": [
+        "event",
+        "low_risk"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "d4d4d4d4-d4d4-4d4d-8d4d-d4d4d4d4d4d4",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:15:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.519Z",
+      "v": 1,
+      "targetType": "source",
+      "targetId": "22222222-2222-4222-8222-222222222222",
+      "action": "agree",
+      "originalScore": 75,
+      "humanScore": 75,
+      "reason": "Well-regarded quality mark with strict admission rules and periodic audits.",
+      "valueTags": [
+        "quality",
+        "quality_mark"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "c3c3c3c3-c3c3-4c3c-8c3c-c3c3c3c3c3c3",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:10:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.518Z",
+      "v": 1,
+      "targetType": "source",
+      "targetId": "33333333-3333-4333-8333-333333333333",
+      "action": "disagree",
+      "originalScore": 50,
+      "humanScore": 10,
+      "reason": "Domain <6 months old, no physical address, typical link-farm structure.",
+      "valueTags": [
+        "risk",
+        "seo_farm"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "b2b2b2b2-b2b2-4b2b-8b2b-b2b2b2b2b2b2",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:05:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.517Z",
+      "v": 1,
+      "targetType": "source",
+      "targetId": "d4e5f6a7-b8c9-0123-def0-234567890abc",
+      "action": "adjust",
+      "originalScore": 80,
+      "humanScore": 65,
+      "reason": "Weight adjusted to 65 because local coverage in Haarlemmermeer is thinner than national.",
+      "valueTags": [
+        "local_nuance"
+      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
+      "version": 1
+    },
+    {
+      "id": "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-19T19:01:07.516Z",
       "v": 1,
       "targetType": "source",
       "targetId": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
       "action": "agree",
-      "originalScore": 90,
-      "humanScore": 90,
-      "valueTags": [],
-      "observationIds": [
-        "22222222-2222-4222-8222-222222222202"
-      ],
-      "hypothesisIds": [],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444401"
-      ],
-      "version": 1
-    },
-    {
-      "id": "77777777-7777-4777-8777-777777777702",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.210Z",
-      "v": 1,
-      "targetType": "company",
-      "targetId": "d4e5f6a7-b8c9-0123-def0-234567890123",
-      "action": "adjust",
-      "originalScore": 84,
-      "humanScore": 88,
-      "reason": "Association longevity underestimated; OVH membership since 2011 strengthens confidence.",
+      "originalScore": 95,
+      "humanScore": 95,
+      "reason": "Base registry — reliable and legally required.",
       "valueTags": [
-        "locality",
-        "accountability"
+        "reliability",
+        "official"
       ],
-      "observationIds": [
-        "22222222-2222-4222-8222-222222222203"
-      ],
-      "hypothesisIds": [
-        "33333333-3333-4333-8333-333333333301"
-      ],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444402"
-      ],
+      "observationIds": [],
+      "hypothesisIds": [],
+      "evidenceIds": [],
       "version": 1
     }
   ],
   "findings": [
     {
-      "id": "88888888-8888-4888-8888-888888888801",
-      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.212Z",
-      "v": 1,
-      "summary": "Agreed source KvK Handelsregister at suggested 90 (DEMO).",
-      "status": "Validated",
-      "confidence": 90,
-      "reviewIds": [
-        "77777777-7777-4777-8777-777777777701"
-      ],
-      "observationIds": [
-        "22222222-2222-4222-8222-222222222202"
-      ],
-      "hypothesisIds": [],
-      "evidenceIds": [
-        "44444444-4444-4444-8444-444444444401"
-      ],
-      "sourceIds": [
-        "b2c3d4e5-f6a7-8901-bcde-f12345678901"
-      ],
-      "companyIds": []
-    },
-    {
       "id": "88888888-8888-4888-8888-888888888802",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.212Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.526Z",
       "v": 1,
-      "summary": "Adjusted company Schilderbedrijf Voorbeeld BV from 84 to 88: association longevity underestimated.",
+      "summary": "Agreed company Schilderbedrijf Voorbeeld BV — on all 5 trusted lists.",
       "status": "Validated",
-      "confidence": 88,
+      "confidence": 90,
       "reviewIds": [
-        "77777777-7777-4777-8777-777777777702"
+        "f6f6f6f6-f6f6-4f6f-8f6f-f6f6f6f6f6f6"
       ],
       "observationIds": [
         "22222222-2222-4222-8222-222222222203"
@@ -832,6 +1686,31 @@
       "companyIds": [
         "d4e5f6a7-b8c9-0123-def0-234567890123"
       ]
+    },
+    {
+      "id": "88888888-8888-4888-8888-888888888801",
+      "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "producer": "Human",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.525Z",
+      "v": 1,
+      "summary": "Agreed source KvK Handelsregister (DEMO worker portfolio).",
+      "status": "Validated",
+      "confidence": 90,
+      "reviewIds": [
+        "a1a1a1a1-a1a1-4a1a-8a1a-a1a1a1a1a1a1"
+      ],
+      "observationIds": [
+        "22222222-2222-4222-8222-222222222202"
+      ],
+      "hypothesisIds": [],
+      "evidenceIds": [
+        "44444444-4444-4444-8444-444444444401"
+      ],
+      "sourceIds": [
+        "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+      ],
+      "companyIds": []
     }
   ],
   "patterns": [
@@ -848,8 +1727,8 @@
       ],
       "confidence": 80,
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.218Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.534Z",
       "v": 1
     }
   ],
@@ -858,20 +1737,20 @@
       "id": "11111111-1111-4111-8111-111111111104",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.181Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.447Z",
       "v": 1,
       "kind": "task",
       "title": "CARA: finish pending sources + company candidates",
-      "body": "Agree/adjust GBP; review Schilderbedrijf De Wit as target.",
+      "body": "GBP still pending_review; drafts (BNI + Netwerk) ready for CARA. Import unlocked at 5 trusted lists.",
       "done": false
     },
     {
       "id": "11111111-1111-4111-8111-111111111103",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:58:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.180Z",
+      "createdAt": "2026-07-19T18:51:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.446Z",
       "v": 1,
       "kind": "note",
       "title": "Member list found",
@@ -881,8 +1760,8 @@
       "id": "11111111-1111-4111-8111-111111111102",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.179Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.444Z",
       "v": 1,
       "kind": "task",
       "title": "Verify KvK as registry source",
@@ -893,8 +1772,8 @@
       "id": "11111111-1111-4111-8111-111111111101",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
-      "createdAt": "2026-07-18T16:08:50.124Z",
-      "updatedAt": "2026-07-18T17:08:50.178Z",
+      "createdAt": "2026-07-19T18:01:07.313Z",
+      "updatedAt": "2026-07-19T19:01:07.443Z",
       "v": 1,
       "kind": "journal",
       "title": "Kickoff — DEMO",

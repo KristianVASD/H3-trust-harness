@@ -1,61 +1,61 @@
 {
   "version": "default.v1",
-  "label": "Standaard zoekplan — landelijk / regionaal / lokaal",
+  "label": "Standard search plan — national / regional / local",
   "entries": [
     {
       "layer": "national",
       "category": "registry",
-      "nuance_rule": "KVK/handelsregister is harde identiteit, geen soft trust-signaal. Aanwezigheid telt zwaar; ontbreken is een hard gat, geen nuance."
+      "nuance_rule": "Chamber of commerce / trade register is hard identity, not a soft trust signal. Presence weighs heavily; absence is a hard gap, not a nuance."
     },
     {
       "layer": "national",
       "category": "sector_qualification",
-      "nuance_rule": "Sector-kwalificaties (VCA, Erkend Leerbedrijf, branche-specifieke registraties). Check of de lijst actueel is en of lidmaatschap een drempel heeft — gratis inschrijving ≠ keurmerk."
+      "nuance_rule": "Sector qualifications (VCA, accredited training employer, sector-specific registers). Check that the list is current and that membership has a real barrier — free signup is not a quality mark."
     },
     {
       "layer": "national",
       "category": "quality_mark",
-      "nuance_rule": "Keurmerken alleen meewegen als de organisatie zelf traceerbaar en serieus is. Lidmaatschapsdrempel (laag/midden/hoog) bepaalt hoeveel gewicht de lijst mag krijgen."
+      "nuance_rule": "Only weigh quality marks if the organisation itself is traceable and serious. Membership threshold (low/medium/high) determines how much weight the list may carry."
     },
     {
       "layer": "national",
       "category": "branch_association",
-      "nuance_rule": "Landelijke branchevereniging: nuttig als discovery + soft trust. Controleer of het echte ledenlijsten publiceert, niet alleen marketing."
+      "nuance_rule": "National trade association: useful for discovery and soft trust. Check that it publishes real member lists, not marketing only."
     },
     {
       "layer": "national",
       "category": "labor_market_presence",
-      "nuance_rule": "Stages, traineeships en landelijke vacaturesites. Aanwezigheid toont dat het bedrijf als werkgever zichtbaar is — op zich zwak als trust, sterker als het consistent is met KVK-leeftijd en lokale aanwezigheid."
+      "nuance_rule": "Internships, traineeships and national job boards. Presence shows the firm is visible as an employer — weak as trust alone, stronger when consistent with registry age and local presence."
     },
     {
       "layer": "regional",
       "category": "labor_market_presence",
-      "nuance_rule": "Regionale vacaturebronnen: zelfde categorie als landelijk, andere scope. Een regio-vacature versterkt lokaliteit; alleen een Indeed-advertentie zonder regio-anker blijft zwak."
+      "nuance_rule": "Regional job sources: same category as national, different scope. A regional vacancy strengthens locality; an Indeed ad with no regional anchor stays weak."
     },
     {
       "layer": "regional",
       "category": "local_media",
-      "nuance_rule": "Advertentie in regionaal dagblad is op zich zwak. Als het bedrijf verdacht is (jong, dun bewijs), is media-aanwezigheid juist een hard nee-signaal (gekkocht zichtbaarheid). Als het bedrijf heel lokaal en al langer actief is, mag het een kleine boost geven — nooit als primaire bron."
+      "nuance_rule": "An ad in a regional paper is weak by itself. If the firm looks suspicious (young, thin evidence), media presence is a hard no (bought visibility). If the firm is very local and long-established, it may give a small boost — never as a primary source."
     },
     {
       "layer": "local",
       "category": "local_business_association",
-      "nuance_rule": "Lokale ondernemersvereniging: sterke lokaliteitsbron als de ledenlijst openbaar en meerjarig is. Eenmalige sponsorpagina zonder ledenlijst telt nauwelijks."
+      "nuance_rule": "Local business association: strong locality source when the member list is public and multi-year. A one-off sponsor page without a member list barely counts."
     },
     {
       "layer": "local",
       "category": "sponsorship",
-      "nuance_rule": "Sponsoring van sportclubs/evenementen: zachte lokaliteit. Alleen meewegen als het herhaaldelijk en traceerbaar is — een logo op een shirt zonder andere signalen is cosmetisch."
+      "nuance_rule": "Sponsoring sports clubs/events: soft locality. Only weigh when it is repeated and traceable — a logo on a shirt with no other signals is cosmetic."
     },
     {
       "layer": "local",
       "category": "networking_group",
-      "nuance_rule": "BNI en vergelijkbare netwerkgroepen: lidmaatschap toont sociale inbedding, niet vakbekwaamheid. Drempel en aanwezigheid van echte personen wegen zwaarder dan de groepsnaam."
+      "nuance_rule": "BNI and similar networking groups: membership shows social embedding, not craft skill. Barrier and presence of real people weigh more than the group name."
     },
     {
       "layer": "local",
       "category": "municipal_initiative",
-      "nuance_rule": "Gemeentelijke of lokale overheidsinitiatieven (ondernemersloket, lokale bedrijvenlijsten). Sterk als de overheid zelf curateert; zwak als het een open inschrijfformulier zonder toets is."
+      "nuance_rule": "Municipal or local government initiatives (business desk, local company lists). Strong when the government curates; weak when it is an open signup form with no checks."
     }
   ]
 }
