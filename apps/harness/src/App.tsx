@@ -2,6 +2,7 @@ import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { MissionLayout } from "./layouts/MissionLayout";
 import { WorkerLayout } from "./layouts/WorkerLayout";
 import { MissionControl } from "./pages/MissionControl";
+import { SingleSearchPage } from "./pages/SingleSearchPage";
 import { WorkspacePage } from "./pages/WorkspacePage";
 import { CandidateTriagePage } from "./pages/CandidateTriagePage";
 import { CaraReviewPage } from "./pages/CaraReviewPage";
@@ -22,18 +23,25 @@ export function App() {
             H3 Trust <span>Harness</span>
           </div>
           <p className="tagline">
-            Trust Investigation Platform — humans investigate today, OmegaClaw tomorrow.
+            Trust Investigation Platform — humans investigate today, OmegaClaw
+            tomorrow.
           </p>
         </div>
         <nav className="row">
           <NavLink className="btn secondary small" to="/">
             Mission Control
           </NavLink>
+          <NavLink className="btn secondary small" to="/search">
+            Search
+          </NavLink>
         </nav>
       </header>
 
       <Routes>
         <Route path="/" element={<MissionControl />} />
+
+        {/* Single Search — standalone, no mission context */}
+        <Route path="/search" element={<SingleSearchPage />} />
 
         {/* Data Worker — linear Sources → CARA → Import → Results */}
         <Route path="/work/:missionId" element={<WorkerLayout />}>

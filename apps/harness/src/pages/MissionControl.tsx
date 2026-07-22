@@ -140,6 +140,9 @@ export function MissionControl() {
         >
           Investigator
         </button>
+        <Link className="mode-toggle-btn" to="/search">
+          Search
+        </Link>
       </div>
 
       <p className="thesis">

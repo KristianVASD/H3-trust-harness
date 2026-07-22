@@ -638,6 +638,9 @@ a {
   font-weight: 600;
   color: var(--ink-soft);
   transition: background 0.18s ease, color 0.18s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .mode-toggle-btn:hover {

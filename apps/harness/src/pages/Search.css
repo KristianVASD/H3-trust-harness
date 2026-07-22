@@ -1,0 +1,210 @@
+/* ── Single Search ── */
+
+.single-search {
+    max-width: 56rem;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+  }
+  
+  .search-hero {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-hero h1 {
+    margin: 0 0 0.35rem;
+    font-size: 1.8rem;
+  }
+  
+  .search-hero .thesis {
+    max-width: 36rem;
+    margin: 0 auto;
+    font-size: 0.95rem;
+    color: var(--muted, #64748b);
+  }
+  
+  /* Search bar */
+  .search-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .search-bar input {
+    flex: 1;
+    padding: 0.6rem 0.85rem;
+    font-size: 1rem;
+    border: 2px solid var(--line, #e2e8f0);
+    border-radius: 0.4rem;
+    background: var(--card, #fff);
+    color: var(--text, #1e293b);
+  }
+  
+  .search-bar input:focus {
+    outline: none;
+    border-color: #0d9488;
+  }
+  
+  .search-bar .btn {
+    white-space: nowrap;
+  }
+  
+  /* No match */
+  .search-no-match {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    border: 2px dashed var(--line, #e2e8f0);
+    border-radius: 0.5rem;
+  }
+  
+  /* Mission context bar */
+  .search-mission-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--line, #e2e8f0);
+    background: var(--card, #fff);
+    margin-bottom: 1rem;
+  }
+  
+  .search-mission-bar h2 {
+    margin: 0 0 0.15rem;
+    font-size: 1.15rem;
+  }
+  
+  .search-mission-bar .muted {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+  
+  /* Result cards */
+  .search-result-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .search-result-card {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 0.5rem;
+    background: var(--card, #fff);
+  }
+  
+  .search-result-rank {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--muted, #64748b);
+    min-width: 2.5rem;
+    padding-top: 0.1rem;
+  }
+  
+  .search-result-body {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .search-result-body header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  
+  /* Score badge */
+  .search-score {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 0.1rem 0.55rem;
+    border-radius: 0.35rem;
+  }
+  
+  .search-score.high {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .search-score.mid {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .search-score.low {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  /* Why */
+  .search-why {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .search-why summary {
+    cursor: pointer;
+    color: var(--muted, #64748b);
+    font-weight: 600;
+  }
+  
+  .search-why-body ul {
+    margin: 0.35rem 0 0;
+    padding-left: 1.25rem;
+  }
+  
+  .search-why-body li {
+    margin-bottom: 0.15rem;
+  }
+  
+  .search-human-note {
+    margin-top: 0.35rem;
+    font-style: italic;
+    color: var(--muted, #64748b);
+  }
+  
+  /* Backwards CARA */
+  .search-cara {
+    margin-top: 0.65rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line, #e2e8f0);
+  }
+  
+  .search-cara-done {
+    font-size: 0.85rem;
+    color: #065f46;
+    font-weight: 600;
+  }
+  
+  .search-cara-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  
+  .search-cara-form label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  
+  .search-cara-form input,
+  .search-cara-form textarea {
+    width: 100%;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 0.3rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Footer */
+  .search-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+  }
