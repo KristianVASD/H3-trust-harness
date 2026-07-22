@@ -544,7 +544,7 @@
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-15T10:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.609Z",
       "v": 1,
       "name": "Schilderbedrijf Voorbeeld BV",
       "address": "Hoofdweg 123, 2131 AB Hoofddorp",
@@ -567,14 +567,34 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "spray painting",
+        "colour advice"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa",
+        "commercial"
+      ],
+      "differentiators": [
+        "colour advice",
+        "warranty"
+      ],
+      "profileSnippet": "Schilderbedrijf Voorbeeld BV offers broad painting with colour advice and warranty for private clients, HOAs and businesses.",
+      "profileSourceUrl": "https://example.nl/voorbeeld",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "e5f6a7b8-c9d0-1234-ef01-345678901234",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "ImportedDataset",
       "createdAt": "2026-07-16T11:00:00.000Z",
-      "updatedAt": "2026-07-18T14:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.610Z",
       "v": 1,
       "name": "QuickPaint Online",
       "address": "Digital Workspace, 2132 XX Hoofddorp",
@@ -589,14 +609,30 @@
         "BouwBeurs 2024"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "spray painting"
+      ],
+      "serviceContexts": [
+        "private",
+        "commercial"
+      ],
+      "differentiators": [
+        "online scheduling"
+      ],
+      "profileSnippet": "QuickPaint Online schedules painting jobs digitally; focus on fast interior and spray work.",
+      "profileSourceUrl": "https://example.nl/quickpaint",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "f6a7b8c9-d0e1-2345-f012-456789012cde",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-15T11:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.613Z",
       "v": 1,
       "name": "Schildersbedrijf T. de Wit",
       "address": "Getsewoud 45, 2151 CS Nieuw-Vennep",
@@ -615,14 +651,31 @@
         "Nederlandse Schilders Bond"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "exterior painting",
+        "wood-rot repair"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa"
+      ],
+      "differentiators": [
+        "heritage experience",
+        "historic finishes"
+      ],
+      "profileSnippet": "Schildersbedrijf T. de Wit specialises in exterior work and wood-rot repair, including heritage buildings.",
+      "profileSourceUrl": "https://example.nl/de-wit",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "a7b8c9d0-e1f2-3456-0123-567890123def",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-18T03:00:00.000Z",
-      "updatedAt": "2026-07-18T14:30:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.605Z",
       "v": 1,
       "name": "SnelSchilder Direct",
       "address": "Postbus 999, 1111 AA Nowhere",
@@ -640,14 +693,28 @@
         "fraud_report",
         "fake_invoices"
       ],
-      "status": "candidate"
+      "status": "candidate",
+      "category": "painting",
+      "capabilities": [
+        "interior painting"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "fast scheduling"
+      ],
+      "profileSnippet": "SnelSchilder Direct claims fast interior painting jobs for private clients; limited track record.",
+      "profileSourceUrl": "https://example.nl/snelschilder",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "b8c9d0e1-f2a3-4567-1234-678901234efa",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-15T13:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.607Z",
       "v": 1,
       "name": "Van der Laan Schilderwerken",
       "address": "Rijsenhoutseweg 12, 2152 PW Rijsenhout",
@@ -664,14 +731,34 @@
         "Ondernemersvereniging Haarlemmermeer"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "spray painting",
+        "wood-rot repair"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa",
+        "commercial"
+      ],
+      "differentiators": [
+        "full service",
+        "project coordination"
+      ],
+      "profileSnippet": "Van der Laan Schilderwerken delivers full-service painting including spray work and wood-rot repair for homes, HOAs and commercial sites.",
+      "profileSourceUrl": "https://example.nl/van-der-laan",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "55555555-5555-4555-8555-555555555555",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-15T14:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.601Z",
       "v": 1,
       "name": "Reekers Schilders",
       "address": "Hannie Schaftstraat 88, 2135 KG Hoofddorp",
@@ -692,14 +779,32 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "exterior painting",
+        "spray painting",
+        "wood-rot repair"
+      ],
+      "serviceContexts": [
+        "private",
+        "commercial"
+      ],
+      "differentiators": [
+        "spray painting",
+        "facade specialist"
+      ],
+      "profileSnippet": "Reekers Schilders specialises in exterior painting and airless spray work for homes and commercial buildings.",
+      "profileSourceUrl": "https://example.nl/reekers-schilders",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "66666666-6666-4666-8666-666666666666",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-15T14:30:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.602Z",
       "v": 1,
       "name": "Kevin Peter Schilderwerken",
       "address": "Dorpsstraat 10, 2151 AA Nieuw-Vennep",
@@ -718,14 +823,31 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "wallpapering"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "wallpapering",
+        "finishing"
+      ],
+      "profileSnippet": "Kevin Peter Schilderwerken offers painting and wallpapering for private homes in the Haarlemmermeer area.",
+      "profileSourceUrl": "https://example.nl/kevin-peter",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "Human"
     },
     {
       "id": "77777777-7777-4777-8777-777777777777",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T09:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.603Z",
       "v": 1,
       "name": "Schildersbedrijf De Veen",
       "address": "Veendijk 5, 2153 PW Rijsenhout",
@@ -742,14 +864,30 @@
         "Nederlandse Schilders Bond"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa"
+      ],
+      "differentiators": [
+        "local reputation"
+      ],
+      "profileSnippet": "Schildersbedrijf De Veen is a local painting firm for interior and exterior work for private clients and HOAs.",
+      "profileSourceUrl": "https://example.nl/de-veen",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "88888888-8888-4888-8888-888888888888",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T09:30:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.603Z",
       "v": 1,
       "name": "Verf & Co Haarlemmermeer",
       "address": "Raadhuisplein 2, 1171 LX Badhoevedorp",
@@ -766,14 +904,32 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "spray painting",
+        "colour advice"
+      ],
+      "serviceContexts": [
+        "private",
+        "commercial"
+      ],
+      "differentiators": [
+        "colour advice",
+        "showroom"
+      ],
+      "profileSnippet": "Verf & Co combines painting with colour advice from a local showroom in Haarlemmermeer.",
+      "profileSourceUrl": "https://example.nl/verf-co",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "99999999-9999-4999-8999-999999999999",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T10:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.604Z",
       "v": 1,
       "name": "Atelier Kleurrijk",
       "address": "Zwanenburgstraat 5, 1161 AJ Zwanenburg",
@@ -792,14 +948,31 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "colour advice",
+        "wallpapering"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "colour advice",
+        "design finish"
+      ],
+      "profileSnippet": "Atelier Kleurrijk focuses on interior painting, wallpapering and colour advice for private clients.",
+      "profileSourceUrl": "https://example.nl/atelier-kleurrijk",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T10:30:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.606Z",
       "v": 1,
       "name": "Onderhoudsbedrijf K&VK",
       "address": "Kruisweg 100, 2131 NG Hoofddorp",
@@ -816,14 +989,33 @@
         "BouwBeurs 2024"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "exterior painting",
+        "wood-rot repair",
+        "interior painting"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa",
+        "commercial"
+      ],
+      "differentiators": [
+        "maintenance contracts",
+        "heritage experience"
+      ],
+      "profileSnippet": "Onderhoudsbedrijf K&VK combines painting with wood-rot repair and maintenance contracts for HOAs and businesses.",
+      "profileSourceUrl": "https://example.nl/k-en-vk",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T11:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.608Z",
       "v": 1,
       "name": "Schilderwerken Van Dijk",
       "address": "Vennepstraat 22, 2151 BB Nieuw-Vennep",
@@ -838,14 +1030,29 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "candidate"
+      "status": "candidate",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "family business"
+      ],
+      "profileSnippet": "Schilderwerken Van Dijk is a family business for classic interior and exterior painting for private clients.",
+      "profileSourceUrl": "https://example.nl/van-dijk",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "Human"
     },
     {
       "id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T11:30:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.608Z",
       "v": 1,
       "name": "Meesters in Verf BV",
       "address": "Sloterweg 50, 2131 PD Hoofddorp",
@@ -866,14 +1073,33 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "exterior painting",
+        "spray painting",
+        "wood-rot repair"
+      ],
+      "serviceContexts": [
+        "commercial",
+        "hoa",
+        "municipal"
+      ],
+      "differentiators": [
+        "large projects",
+        "scaffolding"
+      ],
+      "profileSnippet": "Meesters in Verf BV focuses on larger painting projects for HOAs, businesses and municipalities, including spray work.",
+      "profileSourceUrl": "https://example.nl/meesters-in-verf",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T12:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.610Z",
       "v": 1,
       "name": "De Lokale Schilder",
       "address": "Dorpsstraat 88, 2152 XX Rijsenhout",
@@ -890,14 +1116,29 @@
         "BNI Haarlemmermeer chapter"
       ],
       "blacklist_flags": [],
-      "status": "candidate"
+      "status": "candidate",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "neighbourhood focus"
+      ],
+      "profileSnippet": "De Lokale Schilder works neighbourhood-focused for private clients in Haarlemmermeer.",
+      "profileSourceUrl": "https://example.nl/lokale-schilder",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T12:30:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.612Z",
       "v": 1,
       "name": "Schilderbedrijf Zwanenburg",
       "address": "Hoofdweg 200, 1161 AA Zwanenburg",
@@ -912,14 +1153,31 @@
         "Ondernemersvereniging Haarlemmermeer"
       ],
       "blacklist_flags": [],
-      "status": "candidate"
+      "status": "candidate",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "wallpapering"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa"
+      ],
+      "differentiators": [
+        "local network"
+      ],
+      "profileSnippet": "Schilderbedrijf Zwanenburg handles painting and wallpapering for private clients and HOAs in Zwanenburg and nearby.",
+      "profileSourceUrl": "https://example.nl/zwanenburg",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "Human"
     },
     {
       "id": "ffffffff-ffff-4fff-8fff-ffffffffffff",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T13:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.614Z",
       "v": 1,
       "name": "Renovatie Experts Haarlemmermeer",
       "address": "Graan voor Visch 15, 2132 AA Hoofddorp",
@@ -938,14 +1196,34 @@
         "BouwBeurs 2024"
       ],
       "blacklist_flags": [],
-      "status": "target"
+      "status": "target",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "wood-rot repair",
+        "spray painting"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa",
+        "commercial"
+      ],
+      "differentiators": [
+        "renovation programmes",
+        "project leadership"
+      ],
+      "profileSnippet": "Renovatie Experts Haarlemmermeer combines painting with renovation and project leadership for homes and commercial sites.",
+      "profileSourceUrl": "https://example.nl/renovatie-experts",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "10101010-1010-4101-8101-101010101010",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "ImportedDataset",
       "createdAt": "2026-07-18T02:30:00.000Z",
-      "updatedAt": "2026-07-18T14:30:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.598Z",
       "v": 1,
       "name": "Budget Schilderwerk",
       "address": "Onbekend, 2131 ZZ Hoofddorp",
@@ -960,14 +1238,29 @@
         "TopSchildersGids.nl"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting"
+      ],
+      "serviceContexts": [
+        "private"
+      ],
+      "differentiators": [
+        "low price"
+      ],
+      "profileSnippet": "Budget-oriented painting for private homes in Haarlemmermeer. Fast jobs, limited specialisations.",
+      "profileSourceUrl": "https://example.nl/budget-schilderwerk",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     },
     {
       "id": "20202020-2020-4202-8202-202020202020",
       "missionId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "producer": "Human",
       "createdAt": "2026-07-16T14:00:00.000Z",
-      "updatedAt": "2026-07-19T08:00:00.000Z",
+      "updatedAt": "2026-07-22T15:24:53.600Z",
       "v": 1,
       "name": "Vakschilder Jansen",
       "address": "Lijsterbaan 12, 1171 XX Badhoevedorp",
@@ -984,7 +1277,26 @@
         "De Betere Schilder"
       ],
       "blacklist_flags": [],
-      "status": "staged"
+      "status": "staged",
+      "category": "painting",
+      "capabilities": [
+        "interior painting",
+        "exterior painting",
+        "wood-rot repair",
+        "colour advice"
+      ],
+      "serviceContexts": [
+        "private",
+        "hoa"
+      ],
+      "differentiators": [
+        "trade association member",
+        "colour advice"
+      ],
+      "profileSnippet": "Vakschilder Jansen handles interior and exterior painting including wood-rot repair for private clients and HOAs in Badhoevedorp.",
+      "profileSourceUrl": "https://example.nl/vakschilder-jansen",
+      "profileHarvestedAt": "2026-07-18T10:00:00.000Z",
+      "profileProducer": "OmegaClaw"
     }
   ],
   "reviews": [

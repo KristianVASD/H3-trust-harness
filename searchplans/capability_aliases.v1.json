@@ -1,0 +1,55 @@
+{
+  "version": "capability_aliases.v1",
+  "aliases": {
+    "drain unblocking": [
+      "ontstopping",
+      "riool ontstoppen",
+      "afvoer vrijmaken",
+      "ontstoppen",
+      "unblock drain"
+    ],
+    "pipe installation": [
+      "aanleg",
+      "nieuwbouw riool",
+      "rioolaanleg",
+      "leidingaanleg"
+    ],
+    "camera inspection": [
+      "camera-inspectie",
+      "camerainspectie",
+      "rioolcamera",
+      "inspectie camera"
+    ],
+    "drain cleaning": ["reiniging", "rioolreiniging", "reinigen", "spoelen"],
+    "interior painting": [
+      "binnenwerk",
+      "binnenschilderwerk",
+      "binnen schilderen",
+      "interieurverf",
+      "interior paint"
+    ],
+    "exterior painting": [
+      "buitenwerk",
+      "buitenschilderwerk",
+      "buiten schilderen",
+      "gevelverf",
+      "exterior paint"
+    ],
+    "spray painting": [
+      "spuitwerk",
+      "spuiten",
+      "airless spuiten",
+      "spuitverf",
+      "airless spray"
+    ],
+    "wood-rot repair": [
+      "houtrotreparatie",
+      "houtrot",
+      "houtrot herstel",
+      "kozijnreparatie",
+      "timber repair"
+    ],
+    "wallpapering": ["behang", "behangen", "behangwerk"],
+    "colour advice": ["kleuradvies", "kleur advies", "kleurconsult", "color advice"]
+  }
+}

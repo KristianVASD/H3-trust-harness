@@ -4,6 +4,7 @@ import { v4 as uuid } from "uuid";
 import { computeListCoverage, type Company, type Review } from "@h3-trust/schema";
 import type { MissionData } from "../../hooks/useMissionData";
 import { StatusChip } from "../../components/Badges";
+import { CompanyProfileTags } from "../../components/CompanyProfileTags";
 import { api } from "../../api";
 import { countTrustedLists } from "../../lib/worker";
 
@@ -47,6 +48,7 @@ export function WorkerResultsPage() {
   function downloadCsv() {
     const header = [
       "name",
+      "category",
       "trust_score",
       "list_coverage",
       "human_action",
@@ -57,11 +59,16 @@ export function WorkerResultsPage() {
       "kvk_number",
       "region",
       "status",
+      "capabilities",
+      "serviceContexts",
+      "differentiators",
+      "profileSnippet",
     ];
     const lines = ranked.map(({ company: c, cov, human, displayScore }) => {
       const mentions = cov.lists.map((s) => s.name).join("; ");
       return [
         csvEscape(c.name),
+        csvEscape(c.category ?? ""),
         String(displayScore),
         String(cov.score),
         human?.action ?? "",
@@ -72,6 +79,10 @@ export function WorkerResultsPage() {
         c.kvk_number ?? "",
         csvEscape(c.region ?? ""),
         c.status,
+        csvEscape((c.capabilities ?? []).join("; ")),
+        csvEscape((c.serviceContexts ?? []).join("; ")),
+        csvEscape((c.differentiators ?? []).join("; ")),
+        csvEscape(c.profileSnippet ?? ""),
       ].join(",");
     });
     const blob = new Blob([[header.join(","), ...lines].join("\n")], {
@@ -241,11 +252,15 @@ export function WorkerResultsPage() {
                     <td className="mono muted">{idx + 1}</td>
                     <td>
                       <strong>{c.name}</strong>
+                      {c.category ? (
+                        <div className="company-category-label">{c.category}</div>
+                      ) : null}
                       {c.region ? (
                         <div className="muted" style={{ fontSize: "0.85rem" }}>
                           {c.region}
                         </div>
                       ) : null}
+                      <CompanyProfileTags company={c} />
                       <div style={{ marginTop: "0.25rem" }}>
                         <Link
                           className="muted"

@@ -278,12 +278,42 @@ export type KvkGate = z.infer<typeof KvkGateSchema>;
 export const CompanyStatusSchema = z.enum(["candidate", "target", "staged"]);
 export type CompanyStatus = z.infer<typeof CompanyStatusSchema>;
 
+/**
+ * Who the company serves — short universal enum, same set for every sector.
+ * Separate from company.category (navigation door) and capabilities (what they do).
+ * Legacy Dutch values are migrated on parse.
+ */
+export const ServiceContextSchema = z.preprocess((raw) => {
+  if (typeof raw !== "string") return raw;
+  const legacy: Record<string, string> = {
+    particulier: "private",
+    vve: "hoa",
+    gemeente: "municipal",
+    commercieel: "commercial",
+    industrieel: "industrial",
+  };
+  return legacy[raw] ?? raw;
+}, z.enum(["private", "hoa", "municipal", "commercial", "industrial"]));
+export type ServiceContext = z.infer<typeof ServiceContextSchema>;
+export const SERVICE_CONTEXTS: readonly ServiceContext[] = [
+  "private",
+  "hoa",
+  "municipal",
+  "commercial",
+  "industrial",
+];
+
 export const CompanySchema = z.object({
   ...baseMeta,
   name: z.string().min(1),
   address: z.string().default(""),
   region: z.string().default(""),
   sector: z.string().default(""),
+  /**
+   * Navigation door for the UI (e.g. "painting"). Not a trust signal.
+   * Distinct from mission/company `sector` and from Source.category.
+   */
+  category: z.string().default(""),
   kvk_number: z.string().optional(),
   /** Hard gate — not a weighted score. */
   kvk_gate: KvkGateSchema.default("unchecked"),
@@ -292,6 +322,23 @@ export const CompanySchema = z.object({
   /** Empty = no hard exclusion. */
   blacklist_flags: z.array(z.string()).default([]),
   status: CompanyStatusSchema.default("candidate"),
+  /**
+   * What the company can do — free strings, sector-specific.
+   * e.g. ["interior painting", "exterior painting", "spray painting"]
+   */
+  capabilities: z.array(z.string()).default([]),
+  /** Who they work for — universal enum. */
+  serviceContexts: z.array(ServiceContextSchema).default([]),
+  /**
+   * What stands out — free strings.
+   * e.g. ["heritage experience", "colour advice"]
+   */
+  differentiators: z.array(z.string()).default([]),
+  /** Short website summary (harvested or manual). Descriptive, not trust. */
+  profileSnippet: z.string().optional(),
+  profileSourceUrl: z.string().optional(),
+  profileHarvestedAt: IsoDateSchema.optional(),
+  profileProducer: ProducerSchema.optional(),
 });
 export type Company = z.infer<typeof CompanySchema>;
 
@@ -467,3 +514,4 @@ export * from "./agent-contracts";
 export * from "./list-coverage";
 export * from "./resolve-source-gaps";
 export * from "./search-plan";
+export * from "./capability-aliases";

@@ -15,6 +15,7 @@ import { api } from "../api";
 import { listSignals } from "../api-extra";
 import { parseCompanyImport } from "../lib/parseCompanyImport";
 import { ProducerBadge, StatusChip } from "./Badges";
+import { CompanyProfileTags } from "./CompanyProfileTags";
 
 type StatusFilter = "all" | CompanyStatus;
 
@@ -173,6 +174,11 @@ export function CompaniesPanel({
                 .filter(Boolean)
                 .join(" · ") || "No address / region / sector"}
             </p>
+            {selected.category ? (
+              <p className="company-category-label" style={{ marginTop: 0 }}>
+                category · {selected.category}
+              </p>
+            ) : null}
             <div className="mission-meta" style={{ margin: "0.5rem 0" }}>
               <StatusChip label={`status ${selected.status}`} />
               <StatusChip label={`kvk_gate ${selected.kvk_gate}`} />
@@ -180,6 +186,8 @@ export function CompaniesPanel({
                 <StatusChip label={`KvK ${selected.kvk_number}`} />
               ) : null}
             </div>
+
+            <CompanyProfileTags company={selected} />
 
             <h4 style={{ marginBottom: "0.35rem" }}>Weighted list coverage</h4>
             {coverage ? (

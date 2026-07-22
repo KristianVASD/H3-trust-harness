@@ -1,0 +1,89 @@
+/* Descriptive company tags — separate visual family from trust/CARA StatusChips. */
+
+.company-tags {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.65rem 0;
+  padding: 0.55rem 0.65rem;
+  border-left: 3px solid #0d9488;
+  background: color-mix(in srgb, #0d9488 6%, transparent);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.tag-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted, #64748b);
+  min-width: 4.5rem;
+}
+
+.tag-chip {
+  display: inline-block;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  padding: 0.12rem 0.45rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+}
+
+/* Kan — teal */
+.tag-chip.tag-cap {
+  background: #ccfbf1;
+  border-color: #5eead4;
+  color: #0f766e;
+}
+
+/* Voor — blue */
+.tag-chip.tag-ctx {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+/* Bijzonder — purple */
+.tag-chip.tag-diff {
+  background: #ede9fe;
+  border-color: #c4b5fd;
+  color: #6d28d9;
+}
+
+.profile-snippet {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--muted, #64748b) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--muted, #64748b) 18%, transparent);
+}
+
+.profile-snippet .snippet-text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text, #1e293b);
+}
+
+.profile-snippet .snippet-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--muted, #64748b);
+}
+
+.profile-snippet .snippet-meta a {
+  color: inherit;
+  word-break: break-all;
+}
+
+.company-category-label {
+  font-size: 0.85rem;
+  color: var(--muted, #64748b);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
