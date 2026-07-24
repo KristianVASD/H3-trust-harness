@@ -89,6 +89,13 @@ app.get("/api/missions/:id", async (c) => {
 app.post("/api/missions", async (c) => {
   const body = await c.req.json();
   const mission = await store.upsertMission(body as Mission);
+  // Reuse CARA-confirmed national + same-location lists so Data Worker
+  // is not empty on a new sector / location mission.
+  try {
+    await store.warmStartMissionSources(mission.id, mission.location);
+  } catch {
+    /* mission still created; worker can link sources manually */
+  }
   return c.json(mission, 201);
 });
 
@@ -105,6 +112,25 @@ app.delete("/api/missions/:id", async (c) => {
   const ok = await store.deleteMission(c.req.param("id"));
   if (!ok) return c.json({ error: "Not found" }, 404);
   return c.json({ ok: true });
+});
+
+/** Link reusable catalogue sources into an existing mission (idempotent). */
+app.post("/api/missions/:missionId/sources/warm-start", async (c) => {
+  const missionId = c.req.param("missionId");
+  const mission = await store.getMission(missionId);
+  if (!mission) return c.json({ error: "Not found" }, 404);
+  try {
+    const linked = await store.warmStartMissionSources(
+      missionId,
+      mission.location,
+    );
+    return c.json({ linked: linked.length, sources: linked });
+  } catch (err) {
+    return c.json(
+      { error: err instanceof Error ? err.message : "Warm-start failed" },
+      400,
+    );
+  }
 });
 
 /** Create a new catalogue Source and link it to this mission. */

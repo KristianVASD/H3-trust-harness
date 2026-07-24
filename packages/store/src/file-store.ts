@@ -267,6 +267,65 @@ export class FileStore implements Store {
     return { source: next, link };
   }
 
+  /**
+   * Scenario B/C warm-start: reuse CARA-confirmed lists that apply across
+   * sectors (national registry etc.) or across the same location (local
+   * associations). Sector-specific lists (branch_association, quality_mark,
+   * sector_qualification) stay out — those remain gaps for the new sector.
+   */
+  async warmStartMissionSources(
+    missionId: string,
+    location: string,
+  ): Promise<Source[]> {
+    const CROSS_SECTOR_NATIONAL = new Set([
+      "registry",
+      "labor_market_presence",
+      "internship_market",
+      "digital_presence",
+      "trade_fair",
+    ]);
+    const LOCATION_REUSABLE = new Set([
+      "local_business_association",
+      "networking_group",
+      "sponsorship",
+      "municipal_initiative",
+      "local_media",
+      "labor_market_presence",
+    ]);
+
+    const loc = location.trim().toLowerCase();
+    const all = await this.listAllSources();
+    const linked: Source[] = [];
+
+    for (const source of all) {
+      if (source.status !== "accepted" && source.status !== "adjusted") {
+        continue;
+      }
+
+      let reuse = false;
+      if (source.scope === "national") {
+        reuse = CROSS_SECTOR_NATIONAL.has(source.category);
+      } else if (source.scope === "regional" || source.scope === "local") {
+        const region = (source.region ?? "").trim().toLowerCase();
+        reuse =
+          Boolean(loc) &&
+          region === loc &&
+          LOCATION_REUSABLE.has(source.category);
+      }
+
+      if (!reuse) continue;
+
+      const { source: next } = await this.linkSourceToMission(
+        missionId,
+        source.id,
+        "ImportedDataset",
+      );
+      linked.push(next);
+    }
+
+    return linked;
+  }
+
   private async ensureLink(
     missionId: string,
     sourceId: string,

@@ -31,6 +31,11 @@ export const api = {
   getMission: (id: string) => request<Mission>(`/missions/${id}`),
   createMission: (mission: Mission) =>
     request<Mission>("/missions", { method: "POST", body: JSON.stringify(mission) }),
+  warmStartSources: (missionId: string) =>
+    request<{ linked: number; sources: Source[] }>(
+      `/missions/${missionId}/sources/warm-start`,
+      { method: "POST", body: "{}" },
+    ),
   updateMission: (mission: Mission) =>
     request<Mission>(`/missions/${mission.id}`, {
       method: "PUT",

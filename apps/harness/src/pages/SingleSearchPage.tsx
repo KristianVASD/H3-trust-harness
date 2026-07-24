@@ -1,12 +1,14 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import {
   computeListCoverage,
+  DEFAULT_SEARCH_PLAN_VERSION,
   type Company,
   type Mission,
   type Review,
   type ServiceContext,
+  type Source,
 } from "@h3-trust/schema";
 import { api } from "../api";
 import { listReviews } from "../api-extra";
@@ -15,7 +17,7 @@ import { CompanyProfileTags } from "../components/CompanyProfileTags";
 import { StatusChip } from "../components/Badges";
 import "./Search.css";
 
-/* ── Query parser — geen NLP, gewoon keyword-match ── */
+/* ── Query parser — keyword match against real missions + aliases ── */
 
 interface ParsedQuery {
   sector?: string;
@@ -45,28 +47,69 @@ const CONTEXT_ALIASES: Record<string, string> = {
   industrial: "industrial",
 };
 
-function parseQuery(raw: string, missions: Mission[]): ParsedQuery {
-  const lower = raw.toLowerCase();
+/** Strip labels like "(DEMO)" so "Painters (DEMO)" matches "painters". */
+function normalizeLabel(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
+function missionSectorText(m: Mission): string {
+  return normalizeLabel(`${m.subsector} ${m.sector}`);
+}
+
+function aliasHit(hay: string, needle: string): boolean {
+  const n = normalizeLabel(needle);
+  if (!n) return false;
+  if (hay.includes(n) || n.includes(hay)) return true;
+  const fromKey = SECTOR_ALIASES[n];
+  if (fromKey?.some((a) => hay.includes(a))) return true;
+  for (const [key, list] of Object.entries(SECTOR_ALIASES)) {
+    const inFamily =
+      key === n ||
+      list.some((a) => a === n || n.includes(a) || a.includes(n));
+    if (!inFamily) continue;
+    if (hay.includes(key) || list.some((a) => hay.includes(a))) return true;
+  }
+  return false;
+}
+
+function parseQuery(raw: string, missions: Mission[]): ParsedQuery {
+  const lower = normalizeLabel(raw);
+
+  // Longest location first so "Nieuw-Vennep" wins over shorter overlaps.
   let location: string | undefined;
-  for (const m of missions) {
-    if (lower.includes(m.location.toLowerCase())) {
-      location = m.location;
+  const locations = [...new Set(missions.map((m) => m.location))].sort(
+    (a, b) => b.length - a.length,
+  );
+  for (const loc of locations) {
+    if (lower.includes(normalizeLabel(loc))) {
+      location = loc;
       break;
     }
   }
 
   let sector: string | undefined;
   for (const [key, aliases] of Object.entries(SECTOR_ALIASES)) {
-    if (aliases.some((a) => lower.includes(a))) {
+    if (aliases.some((a) => lower.includes(a)) || lower.includes(key)) {
       sector = key;
       break;
     }
   }
   if (!sector) {
-    for (const m of missions) {
-      if (lower.includes(m.subsector.toLowerCase())) {
-        sector = m.subsector;
+    // Match against actual mission sector / subsector labels (any language).
+    const labels = [
+      ...new Set(
+        missions.flatMap((m) => [m.subsector, m.sector].filter(Boolean)),
+      ),
+    ].sort((a, b) => b.length - a.length);
+    for (const label of labels) {
+      const norm = normalizeLabel(label);
+      if (norm.length >= 3 && lower.includes(norm)) {
+        sector = label;
         break;
       }
     }
@@ -84,21 +127,95 @@ function parseQuery(raw: string, missions: Mission[]): ParsedQuery {
 }
 
 function missionMatchesSector(m: Mission, sector: string): boolean {
-  const needle = sector.toLowerCase();
-  const hay = `${m.subsector} ${m.sector}`.toLowerCase();
-  if (hay.includes(needle)) return true;
-  const aliases = SECTOR_ALIASES[needle];
-  if (aliases?.some((a) => hay.includes(a))) return true;
-  for (const [key, list] of Object.entries(SECTOR_ALIASES)) {
-    if (list.some((a) => a === needle || needle.includes(a)) && hay.includes(key)) {
-      return true;
-    }
-    if (list.some((a) => hay.includes(a)) && (key === needle || list.includes(needle))) {
-      return true;
-    }
-  }
-  return false;
+  return aliasHit(missionSectorText(m), sector);
 }
+
+function missionMatchesQuery(m: Mission, parsed: ParsedQuery): boolean {
+  const locOk = parsed.location
+    ? normalizeLabel(m.location) === normalizeLabel(parsed.location)
+    : true;
+  const secOk = parsed.sector
+    ? missionMatchesSector(m, parsed.sector)
+    : true;
+  return locOk && secOk;
+}
+
+function companyMatchesSector(company: Company, sector: string): boolean {
+  const hay = normalizeLabel(
+    `${company.sector} ${company.category} ${company.name}`,
+  );
+  // Name-only match is weak; require sector or category signal when present.
+  const sectorHay = normalizeLabel(`${company.sector} ${company.category}`);
+  if (sectorHay.trim()) return aliasHit(sectorHay, sector);
+  return aliasHit(hay, sector);
+}
+
+type MissionBundle = {
+  mission: Mission;
+  sources: Source[];
+  companies: Company[];
+  reviews: Review[];
+};
+
+function rankMissionsForQuery(
+  bundles: MissionBundle[],
+  parsed: ParsedQuery,
+): MissionBundle[] {
+  return [...bundles].sort((a, b) => {
+    const aComps = a.companies.filter((c) => c.kvk_gate !== "fail").length;
+    const bComps = b.companies.filter((c) => c.kvk_gate !== "fail").length;
+    if (bComps !== aComps) return bComps - aComps;
+
+    const aTrusted = countTrustedLists(a.sources);
+    const bTrusted = countTrustedLists(b.sources);
+    if (bTrusted !== aTrusted) return bTrusted - aTrusted;
+
+    if (parsed.sector) {
+      const aExact = normalizeLabel(a.mission.subsector).includes(
+        normalizeLabel(parsed.sector),
+      )
+        ? 1
+        : 0;
+      const bExact = normalizeLabel(b.mission.subsector).includes(
+        normalizeLabel(parsed.sector),
+      )
+        ? 1
+        : 0;
+      if (bExact !== aExact) return bExact - aExact;
+    }
+
+    return b.mission.updatedAt.localeCompare(a.mission.updatedAt);
+  });
+}
+
+const SECTOR_DISPLAY: Record<string, string> = {
+  painter: "Painters",
+  plumber: "Plumbers",
+  electrician: "Electricians",
+  roofing: "Roofing",
+  carpentry: "Carpentry",
+  drainage: "Drainage",
+};
+
+function displaySubsector(sector: string): string {
+  const key = normalizeLabel(sector);
+  if (SECTOR_DISPLAY[key]) return SECTOR_DISPLAY[key];
+  // Title-case free-form labels from missions
+  return sector
+    .replace(/\([^)]*\)/g, "")
+    .trim()
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+const defaultPhases: Mission["phases"] = [
+  { key: "observation", status: "active" },
+  { key: "hypothesis", status: "waiting" },
+  { key: "evidence", status: "waiting" },
+  { key: "cara", status: "waiting" },
+  { key: "patterns", status: "waiting" },
+  { key: "companies", status: "waiting" },
+  { key: "deep_check", status: "waiting" },
+];
 
 /* ── Ranked result ── */
 
@@ -115,11 +232,15 @@ interface RankedCompany {
 /* ── Page ── */
 
 export function SingleSearchPage() {
+  const navigate = useNavigate();
   const [missions, setMissions] = useState<Mission[]>([]);
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [parsedHint, setParsedHint] = useState<ParsedQuery | null>(null);
+  const [noMatchReason, setNoMatchReason] = useState<string | null>(null);
 
   const [matchedMission, setMatchedMission] = useState<Mission | null>(null);
   const [ranked, setRanked] = useState<RankedCompany[]>([]);
@@ -137,6 +258,23 @@ export function SingleSearchPage() {
       .catch(() => {});
   }, []);
 
+  const exampleQueries = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const m of missions) {
+      const sub = normalizeLabel(m.subsector).replace(/\s+/g, " ");
+      const loc = m.location;
+      if (!sub || !loc) continue;
+      const q = `${m.subsector.replace(/\s*\([^)]*\)\s*/g, "").trim()} in ${loc}`;
+      const key = normalizeLabel(q);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(q);
+      if (out.length >= 6) break;
+    }
+    return out;
+  }, [missions]);
+
   async function onSearch(e: FormEvent) {
     e.preventDefault();
     if (!query.trim()) return;
@@ -146,46 +284,89 @@ export function SingleSearchPage() {
     setSearched(true);
     setMatchedMission(null);
     setRanked([]);
+    setTrustedCount(0);
+    setParsedHint(null);
+    setNoMatchReason(null);
 
     try {
       const parsed = parseQuery(query, missions);
+      setParsedHint(parsed);
 
-      const match = missions.find((m) => {
-        const locOk = parsed.location
-          ? m.location.toLowerCase() === parsed.location.toLowerCase()
-          : true;
-        const secOk = parsed.sector
-          ? missionMatchesSector(m, parsed.sector)
-          : true;
-        return locOk && secOk;
-      });
-
-      if (!match) {
-        setLoading(false);
+      // Never silently fall through to the first mission (usually DEMO).
+      if (!parsed.location && !parsed.sector) {
+        setNoMatchReason(
+          "Could not detect a location or sector in your query. Try e.g. “painters in Haarlemmermeer”, or pick an investigation below.",
+        );
         return;
       }
 
-      setMatchedMission(match);
+      let candidates = missions.filter((m) => missionMatchesQuery(m, parsed));
 
-      const [src, comps, revs] = await Promise.all([
-        api.listSources(match.id),
-        api.listCompanies(match.id),
-        listReviews(match.id),
-      ]);
+      // Location-only query across different subsectors → ask for sector.
+      if (parsed.location && !parsed.sector) {
+        const subsectors = [
+          ...new Set(candidates.map((m) => normalizeLabel(m.subsector))),
+        ];
+        if (subsectors.length > 1) {
+          setNoMatchReason(
+            `Several investigations exist in ${parsed.location}. Add a sector (e.g. painters, plumbers) so we pick the right one.`,
+          );
+          return;
+        }
+      }
 
-      setTrustedCount(countTrustedLists(src));
+      // Sector-only: keep candidates. Location+sector: already filtered.
+      if (!candidates.length) {
+        const available = missions
+          .map(
+            (m) =>
+              `${m.location} · ${m.subsector.replace(/\s*\([^)]*\)\s*/g, "").trim()}`,
+          )
+          .filter((v, i, arr) => arr.indexOf(v) === i);
+        setNoMatchReason(
+          available.length
+            ? `No investigation matches this query. Available: ${available.join("; ")}.`
+            : "No investigations yet. Create one in Mission Control first.",
+        );
+        return;
+      }
+
+      const bundles: MissionBundle[] = await Promise.all(
+        candidates.map(async (mission) => {
+          const [sources, companies, reviews] = await Promise.all([
+            api.listSources(mission.id),
+            api.listCompanies(mission.id),
+            listReviews(mission.id),
+          ]);
+          return { mission, sources, companies, reviews };
+        }),
+      );
+
+      const rankedMissions = rankMissionsForQuery(bundles, parsed);
+      const best = rankedMissions[0];
+      if (!best) {
+        setNoMatchReason("No investigation matched after loading data.");
+        return;
+      }
+
+      // Prefer a mission that actually has seed/imported companies when twins exist.
+      setMatchedMission(best.mission);
+      setTrustedCount(countTrustedLists(best.sources));
 
       const reviewMap = new Map<string, Review>();
-      for (const r of revs) {
+      for (const r of best.reviews) {
         if (r.targetType !== "company") continue;
         const prev = reviewMap.get(r.targetId);
         if (!prev || r.createdAt > prev.createdAt) reviewMap.set(r.targetId, r);
       }
 
-      let results: RankedCompany[] = comps
+      let results: RankedCompany[] = best.companies
         .filter((c) => c.kvk_gate !== "fail")
+        .filter((c) =>
+          parsed.sector ? companyMatchesSector(c, parsed.sector) : true,
+        )
         .map((c) => {
-          const cov = computeListCoverage(c, src);
+          const cov = computeListCoverage(c, best.sources);
           const human = reviewMap.get(c.id);
           const displayScore =
             human?.humanScore != null ? human.humanScore : cov.score;
@@ -209,10 +390,56 @@ export function SingleSearchPage() {
       }
 
       setRanked(results.slice(0, 5));
+
+      if (!results.length) {
+        setNoMatchReason(
+          `Matched “${best.mission.location} · ${best.mission.subsector}” but it has no companies yet. Import or discover companies in the Data Worker for that mission — seed data only lives on investigations that were seeded or filled.`,
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Search failed");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function startInvestigationFromQuery() {
+    if (!parsedHint?.location || !parsedHint?.sector) return;
+    setCreating(true);
+    setError(null);
+    try {
+      const now = new Date().toISOString();
+      const subsector = displaySubsector(parsedHint.sector);
+      const mission: Mission = {
+        id: uuid(),
+        location: parsedHint.location,
+        country: "Netherlands",
+        sector: "Home Maintenance",
+        subsector,
+        goal: `Find trustworthy ${subsector.toLowerCase()} in ${parsedHint.location} and validate source reliability.`,
+        search_plan_version: DEFAULT_SEARCH_PLAN_VERSION,
+        discoveryBrief: {
+          approach: "Warm-start reusable lists from catalogue; fill sector-specific gaps.",
+          candidateListTypes: ["registry", "local_business_association", "branch_association"],
+          successCriteria:
+            "≥5 CARA-accepted/adjusted lists before company deep-check",
+          producer: "Human",
+          updatedAt: now,
+        },
+        phases: defaultPhases,
+        producer: "Human",
+        createdAt: now,
+        updatedAt: now,
+        v: 1,
+      };
+      await api.createMission(mission);
+      navigate(`/work/${mission.id}/sources`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to start investigation",
+      );
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -297,7 +524,7 @@ export function SingleSearchPage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder='e.g. "painters in Haarlemmermeer" or "schilder voor VvE"'
+          placeholder='e.g. "painters in Haarlemmermeer" or "loodgieters in Amstelveen"'
           autoFocus
         />
         <button type="submit" className="btn" disabled={loading}>
@@ -305,28 +532,91 @@ export function SingleSearchPage() {
         </button>
       </form>
 
+      {exampleQueries.length ? (
+        <div className="search-examples">
+          <span className="muted">Try:</span>
+          {exampleQueries.map((q) => (
+            <button
+              key={q}
+              type="button"
+              className="search-example-chip"
+              onClick={() => setQuery(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {error ? <div className="error">{error}</div> : null}
 
-      {/* No match */}
-      {searched && !loading && !matchedMission ? (
+      {/* No match / empty investigation */}
+      {searched && !loading && (!matchedMission || !ranked.length) ? (
         <div className="search-no-match">
           <p>
-            <strong>No investigation found for this query.</strong>
+            <strong>
+              {!matchedMission
+                ? "No investigation found for this query."
+                : "Investigation matched, but no companies to rank."}
+            </strong>
           </p>
-          <p className="muted">
-            Single Search reads existing investigations. Start one in Mission
-            Control first, then come back here.
-          </p>
-          <div className="row" style={{ justifyContent: "center", marginTop: "0.75rem" }}>
-            <Link className="btn" to="/">
+          {noMatchReason ? <p className="muted">{noMatchReason}</p> : null}
+          {parsedHint && (parsedHint.location || parsedHint.sector) ? (
+            <p className="muted mono" style={{ fontSize: "0.85rem" }}>
+              Parsed:{" "}
+              {[
+                parsedHint.location && `location=${parsedHint.location}`,
+                parsedHint.sector && `sector=${parsedHint.sector}`,
+                parsedHint.context && `context=${parsedHint.context}`,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
+          <div
+            className="row"
+            style={{ justifyContent: "center", marginTop: "0.75rem", gap: "0.5rem" }}
+          >
+            {!matchedMission &&
+            parsedHint?.location &&
+            parsedHint?.sector ? (
+              <button
+                type="button"
+                className="btn"
+                disabled={creating}
+                onClick={() => void startInvestigationFromQuery()}
+              >
+                {creating
+                  ? "Starting…"
+                  : `Start ${displaySubsector(parsedHint.sector)} · ${parsedHint.location}`}
+              </button>
+            ) : null}
+            {matchedMission ? (
+              <Link
+                className="btn"
+                to={`/work/${matchedMission.id}/import`}
+              >
+                Open Data Worker → Import
+              </Link>
+            ) : null}
+            <Link className="btn secondary" to="/">
               ← Mission Control
             </Link>
           </div>
+          {!matchedMission &&
+          parsedHint?.location &&
+          parsedHint?.sector ? (
+            <p className="muted" style={{ marginTop: "0.85rem", fontSize: "0.85rem" }}>
+              Starts a Data Worker mission and warm-starts reusable seed lists
+              (e.g. KvK, local associations). Sector-specific lists stay as gaps
+              to fill — companies are not copied from Painters.
+            </p>
+          ) : null}
         </div>
       ) : null}
 
       {/* Results */}
-      {matchedMission ? (
+      {matchedMission && ranked.length ? (
         <div className="search-results">
           {/* Mission context bar */}
           <div className="search-mission-bar">
@@ -361,214 +651,209 @@ export function SingleSearchPage() {
           </div>
 
           {/* Ranked cards */}
-          {!ranked.length ? (
-            <div className="empty">
-              No companies found. Import companies in the Data Worker first.
-            </div>
-          ) : (
-            <div className="search-result-list">
-              {ranked.map((r, idx) => (
-                <article key={r.company.id} className="search-result-card">
-                  <div className="search-result-rank">#{idx + 1}</div>
+          <div className="search-result-list">
+            {ranked.map((r, idx) => (
+              <article key={r.company.id} className="search-result-card">
+                <div className="search-result-rank">#{idx + 1}</div>
 
-                  <div className="search-result-body">
-                    <header>
-                      <div>
-                        <strong>{r.company.name}</strong>
-                        {r.company.category ? (
-                          <span
-                            className="muted mono"
-                            style={{ marginLeft: "0.5rem" }}
-                          >
-                            {r.company.category}
-                          </span>
-                        ) : null}
-                        {r.company.region ? (
-                          <span
-                            className="muted"
-                            style={{ marginLeft: "0.5rem" }}
-                          >
-                            {r.company.region}
-                          </span>
-                        ) : null}
-                      </div>
-                      <div className="row" style={{ gap: "0.35rem" }}>
+                <div className="search-result-body">
+                  <header>
+                    <div>
+                      <strong>{r.company.name}</strong>
+                      {r.company.category ? (
                         <span
-                          className={`search-score ${
-                            r.displayScore >= 70
-                              ? "high"
-                              : r.displayScore >= 40
-                                ? "mid"
-                                : "low"
-                          }`}
+                          className="muted mono"
+                          style={{ marginLeft: "0.5rem" }}
                         >
-                          {r.displayScore}
+                          {r.company.category}
                         </span>
-                        <StatusChip
-                          label={`KvK: ${r.company.kvk_gate}`}
-                          tone={
-                            r.company.kvk_gate === "pass"
-                              ? "done"
-                              : r.company.kvk_gate === "fail"
-                                ? "waiting"
-                                : "active"
-                          }
-                        />
-                      </div>
-                    </header>
+                      ) : null}
+                      {r.company.region ? (
+                        <span
+                          className="muted"
+                          style={{ marginLeft: "0.5rem" }}
+                        >
+                          {r.company.region}
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="row" style={{ gap: "0.35rem" }}>
+                      <span
+                        className={`search-score ${
+                          r.displayScore >= 70
+                            ? "high"
+                            : r.displayScore >= 40
+                              ? "mid"
+                              : "low"
+                        }`}
+                      >
+                        {r.displayScore}
+                      </span>
+                      <StatusChip
+                        label={`KvK: ${r.company.kvk_gate}`}
+                        tone={
+                          r.company.kvk_gate === "pass"
+                            ? "done"
+                            : r.company.kvk_gate === "fail"
+                              ? "waiting"
+                              : "active"
+                        }
+                      />
+                    </div>
+                  </header>
 
-                    {/* Can / For / Notable + profile snippet */}
-                    <CompanyProfileTags company={r.company} />
+                  {/* Can / For / Notable + profile snippet */}
+                  <CompanyProfileTags company={r.company} />
 
-                    {/* Why */}
-                    <details className="search-why">
-                      <summary>
-                        Why {r.displayScore}/100? · {r.onCount}/
-                        {r.totalCount} trusted lists
-                      </summary>
-                      <div className="search-why-body">
-                        {r.lists.length ? (
-                          <ul>
-                            {r.lists.map((s) => (
-                              <li key={s.id}>{s.name}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="muted">No trusted list mentions yet.</p>
-                        )}
-                        {r.humanReview ? (
-                          <p className="search-human-note">
-                            Human: {r.humanReview.action}
-                            {r.humanReview.humanScore != null
-                              ? ` → ${r.humanReview.humanScore}`
-                              : ""}
-                            {r.humanReview.reason
-                              ? ` · "${r.humanReview.reason}"`
-                              : ""}
-                          </p>
-                        ) : null}
-                      </div>
-                    </details>
-
-                    {/* Backwards CARA — one click */}
-                    <div className="search-cara">
+                  {/* Why */}
+                  <details className="search-why">
+                    <summary>
+                      Why {r.displayScore}/100? · {r.onCount}/
+                      {r.totalCount} trusted lists
+                    </summary>
+                    <div className="search-why-body">
+                      {r.lists.length ? (
+                        <ul>
+                          {r.lists.map((s) => (
+                            <li key={s.id}>{s.name}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="muted">No trusted list mentions yet.</p>
+                      )}
                       {r.humanReview ? (
-                        <span className="search-cara-done">
-                          ✓ {r.humanReview.action}
+                        <p className="search-human-note">
+                          Human: {r.humanReview.action}
+                          {r.humanReview.humanScore != null
+                            ? ` → ${r.humanReview.humanScore}`
+                            : ""}
                           {r.humanReview.reason
                             ? ` · "${r.humanReview.reason}"`
                             : ""}
-                        </span>
-                      ) : adjustingId === r.company.id ? (
-                        <div className="search-cara-form">
-                          <label>
-                            Score
-                            <input
-                              type="number"
-                              min={0}
-                              max={100}
-                              value={adjustScore}
-                              onChange={(e) => setAdjustScore(e.target.value)}
-                            />
-                          </label>
-                          <label>
-                            Reason
-                            <textarea
-                              rows={2}
-                              value={reason}
-                              onChange={(e) => setReason(e.target.value)}
-                              placeholder="Why adjust / disagree? (min 8 chars)"
-                            />
-                          </label>
-                          <div className="row" style={{ gap: "0.25rem" }}>
-                            <button
-                              type="button"
-                              className="btn small"
-                              disabled={busy}
-                              onClick={() =>
-                                void submitReview(r.company, r.score, "adjust")
-                              }
-                            >
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              className="btn danger small"
-                              disabled={busy}
-                              onClick={() =>
-                                void submitReview(
-                                  r.company,
-                                  r.score,
-                                  "disagree",
-                                )
-                              }
-                            >
-                              Disagree
-                            </button>
-                            <button
-                              type="button"
-                              className="btn secondary small"
-                              onClick={() => {
-                                setAdjustingId(null);
-                                setReason("");
-                              }}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
+                        </p>
+                      ) : null}
+                    </div>
+                  </details>
+
+                  {/* Backwards CARA — one click */}
+                  <div className="search-cara">
+                    {r.humanReview ? (
+                      <span className="search-cara-done">
+                        ✓ {r.humanReview.action}
+                        {r.humanReview.reason
+                          ? ` · "${r.humanReview.reason}"`
+                          : ""}
+                      </span>
+                    ) : adjustingId === r.company.id ? (
+                      <div className="search-cara-form">
+                        <label>
+                          Score
+                          <input
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={adjustScore}
+                            onChange={(e) => setAdjustScore(e.target.value)}
+                          />
+                        </label>
+                        <label>
+                          Reason
+                          <textarea
+                            rows={2}
+                            value={reason}
+                            onChange={(e) => setReason(e.target.value)}
+                            placeholder="Why adjust / disagree? (min 8 chars)"
+                          />
+                        </label>
                         <div className="row" style={{ gap: "0.25rem" }}>
                           <button
                             type="button"
                             className="btn small"
                             disabled={busy}
                             onClick={() =>
-                              void submitReview(r.company, r.score, "agree")
+                              void submitReview(r.company, r.score, "adjust")
                             }
                           >
-                            ✓ Correct
-                          </button>
-                          <button
-                            type="button"
-                            className="btn secondary small"
-                            disabled={busy}
-                            onClick={() => {
-                              setAdjustingId(r.company.id);
-                              setAdjustScore(String(r.score));
-                              setReason("");
-                            }}
-                          >
-                            ~ Adjust
+                            Save
                           </button>
                           <button
                             type="button"
                             className="btn danger small"
                             disabled={busy}
+                            onClick={() =>
+                              void submitReview(
+                                r.company,
+                                r.score,
+                                "disagree",
+                              )
+                            }
+                          >
+                            Disagree
+                          </button>
+                          <button
+                            type="button"
+                            className="btn secondary small"
                             onClick={() => {
-                              setAdjustingId(r.company.id);
-                              setAdjustScore("0");
+                              setAdjustingId(null);
                               setReason("");
                             }}
                           >
-                            ✗ Wrong
+                            Cancel
                           </button>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <div className="row" style={{ gap: "0.25rem" }}>
+                        <button
+                          type="button"
+                          className="btn small"
+                          disabled={busy}
+                          onClick={() =>
+                            void submitReview(r.company, r.score, "agree")
+                          }
+                        >
+                          ✓ Correct
+                        </button>
+                        <button
+                          type="button"
+                          className="btn secondary small"
+                          disabled={busy}
+                          onClick={() => {
+                            setAdjustingId(r.company.id);
+                            setAdjustScore(String(r.score));
+                            setReason("");
+                          }}
+                        >
+                          ~ Adjust
+                        </button>
+                        <button
+                          type="button"
+                          className="btn danger small"
+                          disabled={busy}
+                          onClick={() => {
+                            setAdjustingId(r.company.id);
+                            setAdjustScore("0");
+                            setReason("");
+                          }}
+                        >
+                          ✗ Wrong
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </article>
-              ))}
-            </div>
-          )}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       ) : null}
 
       {/* Footer */}
       <footer className="search-footer">
         <p className="muted">
-          Single Search reads existing investigations. It does not create new
-          data. Every result links back to the full investigation trail.
+          Single Search reads existing investigations (including seed). It does
+          not invent a new sector — create or fill that mission first, then
+          search it. Every result links back to the full investigation trail.
         </p>
       </footer>
     </div>

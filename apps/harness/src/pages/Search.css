@@ -48,6 +48,29 @@
   .search-bar .btn {
     white-space: nowrap;
   }
+
+  .search-examples {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin: -0.5rem 0 1.25rem;
+  }
+
+  .search-example-chip {
+    border: 1px solid var(--line, #e2e8f0);
+    background: var(--card, #fff);
+    color: var(--text, #1e293b);
+    border-radius: 999px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .search-example-chip:hover {
+    border-color: #0d9488;
+    color: #0f766e;
+  }
   
   /* No match */
   .search-no-match {

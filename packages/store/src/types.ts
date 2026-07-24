@@ -80,6 +80,15 @@ export interface Store {
     producer?: Producer,
   ): Promise<{ source: Source; link: MissionSource }>;
 
+  /**
+   * Link reusable CARA-confirmed catalogue sources into a new mission
+   * (national cross-sector + regional/local for the same location).
+   */
+  warmStartMissionSources(
+    missionId: string,
+    location: string,
+  ): Promise<Source[]>;
+
   listLinkableSources(
     excludeMissionId: string,
     q?: string,
