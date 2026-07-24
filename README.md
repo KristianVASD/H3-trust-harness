@@ -52,7 +52,7 @@ This is Trust Discovery: evidence-based, human-validated, AI-ready.
 
 | Entrance | Path | Job |
 |----------|------|-----|
-| **Data Worker** | `/work/:id/…` | Linear production: sources → CARA → import → results |
+| **Data Worker** | `/work/:id/…` | Linear production: sources → import → results (CARA anytime) |
 | **Investigation** | `/missions/:id` | Deep desk: notebook, Situation Room, graph |
 | **Single Search** | `/search` | One question → ranked answer from existing investigations |
 
@@ -65,6 +65,9 @@ Switch anytime via Mission Control or the top bar.
 Human investigators work today. OmegaClaw becomes another investigator tomorrow. Every object carries a **Producer**. OmegaClaw never performs final CARA validation.
 
 You investigate which **sources** and **signals** should count when judging trustworthiness of home-service companies — starting with residential maintenance (painters), later more sectors and geographies.
+
+**OmegaClaw jobs (prompt + I/O contract):** see [`OmegaClaw.md`](OmegaClaw.md).  
+Pipeline first, CARA later — CARA scores sources, confirms choices, and feeds reasons back so OmegaClaw improves; it does not block discovery.
 
 ---
 
@@ -206,7 +209,7 @@ For **companies**, CARA writes Review + Finding only — it does **not** change 
 
 Reuse of a source always inherits a prior human CARA judgement — it never bypasses one.
 
-You can keep working in Workspace while reviews wait — CARA is not a blocker.
+You can keep working in Workspace while reviews wait — **CARA is not a blocker.** OmegaClaw may continue Jobs 1–4; CARA later locks scores and stores Adjust/Disagree reasons as feedback (see [`OmegaClaw.md`](OmegaClaw.md)).
 
 ### 6. Situation Room — `/missions/:id/situation`
 
@@ -293,7 +296,7 @@ If that loop feels natural, the product thesis is working: you ran a trust **inv
 
 **Solid now:** Mission Control, **Single Search**, Data Worker + Investigator desks, Workspace (journal / observations / hypotheses / sources / **companies** + bulk import), Source **category**, company **profile dimensions** (Can / For / Notable + snippet), Signals + explainability, CARA (sources **and** companies), Situation Room, Knowledge Graph, Export (includes companies), Producer on records, seed mission, local FileStore.
 
-**Thin / next:** OmegaClaw **profile harvest** from company websites (fill capabilities / contexts / differentiators), capability-filter / CSI query UX, Pattern Library promote UI (schema has `PATTERN_MIN_INVESTIGATIONS = 5`), full Investigation Memory screen, richer Evidence tab, Track B fraud / company deep-check phases, live OmegaClaw jobs (API contracts only for now).
+**Thin / next:** live OmegaClaw jobs per [`OmegaClaw.md`](OmegaClaw.md) (Gap Fill stub → Job 1/2; profile harvest Job 4), capability-filter / CSI query UX, Pattern Library promote UI (schema has `PATTERN_MIN_INVESTIGATIONS = 5`), full Investigation Memory screen, richer Evidence tab, Track B fraud / company deep-check phases.
 
 ---
 
